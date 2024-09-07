@@ -38,5 +38,23 @@ The data is sourced from the [NYC Taxi & Limousine Commission Trip Record Data](
 
 ## 📝 Setup
 
+You must have the latest version of Docker and docker-compose installed. 
+
+```shell
+# Open a terminal (Command Prompt or PowerShell for Windows, Terminal for macOS or Linux)
+
+# Ensure Git is installed
+# Visit https://git-scm.com to download and install console Git if not already installed
+
+# Clone the repository
+git clone https://github.com/Abblix/Oidc.Server.git](https://github.com/nimbly-dev/nyctripdata_project.git
+
+# Navigate to the project directory
+cd nyctripdata_project
+
+# Execute this command, wait until installation is complete and after finishing it will start the server.
+docker-compose up -d
+```
+
 ## 📚 Documentation
 Provide a detailed description of the project structure, how to set it up locally, and any necessary configurations.
