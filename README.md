@@ -11,6 +11,7 @@
 - [About](#-about)
 - [Project Infrastructure](#-project-infrastructure)
 - [Dataset](#-dataset)
+- [Setup](#-setup)
 - [Documentation](#documentation)
 
 ## 🚀 About
@@ -34,6 +35,8 @@ This pipeline architecture demonstrates the system’s ability to handle **large
 
 ## 📊 Dataset
 The data is sourced from the [NYC Taxi & Limousine Commission Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). Many data engineering principles used in this project are inspired by the [DataTalksClub Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp).
+
+## 📝 Setup
 
 ## 📚 Documentation
 Provide a detailed description of the project structure, how to set it up locally, and any necessary configurations.
