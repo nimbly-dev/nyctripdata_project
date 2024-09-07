@@ -17,8 +17,6 @@
 ## 🚀 About
 This project simulates a **production-grade Data Infrastructure** designed to process NYC trip data through multiple stages: **dev**, **stage**, and **production**. The pipeline handles **millions of trip data records**, ensuring reliability and scalability through techniques like **batch writing** and **disk spill management**.
 
-Here’s your **modified Project Architecture** section with a more detailed explanation based on the adjustments you provided:
-
 ## 🗂️ Project Infrastructure
 ![Environment Diagram](images/environment_diagram.png)
 
