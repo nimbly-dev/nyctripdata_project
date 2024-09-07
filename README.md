@@ -16,14 +16,21 @@
 ## 🚀 About
 This project simulates a **production-grade Data Infrastructure** designed to process NYC trip data through multiple stages: **dev**, **stage**, and **production**. The pipeline handles **millions of trip data records**, ensuring reliability and scalability through techniques like **batch writing** and **disk spill management**.
 
+Here’s your **modified Project Architecture** section with a more detailed explanation based on the adjustments you provided:
+
 ## 🗂️ Project Infrastructure
 ![Environment Diagram](images/environment_diagram.png)
 
-The project leverages both **Data Lakehouse** and **Data Warehouse** concepts to ensure efficient data management:
-- **Data Lakehouse**: Local storage is organized under the `spark-lakehouse` directory, where temporary files, downloads, and processed trip data are stored.
-- **Data Warehouse**: The data workflow transitions data across **dev**, **stage**, and **production** PostgreSQL databases, ensuring a smooth lifecycle management process.
+The data processing in this project follows a **vertical pipeline** architecture with three stages:
+1. **Development**: Focuses on data cleaning, column transformations, and preparing raw data for subsequent stages.
+2. **Staging**: Responsible for **data governance**—applying rules to the datasets, modifying columns, and ensuring that data quality is maintained throughout the process.
+3. **Production**: In this final stage, data is ready for **feature extraction**, **reporting**, and **analysis**.
 
-This pipeline demonstrates the capability to handle large datasets with high reliability and efficiency in a production-like environment.
+The project leverages both **Data Lakehouse** and **Data Warehouse** architectures for effective data management:
+- **Data Lakehouse**: This is where raw and intermediate data is stored. The local storage is organized under the `spark-lakehouse` directory, where temporary files, downloads, and processed trip data are housed.
+- **Data Warehouse**: The processed data moves through a series of PostgreSQL databases: **dev**, **stage**, and **production**, ensuring a smooth transition across the lifecycle and enhancing governance and data management.
+
+This pipeline architecture demonstrates the system’s ability to handle **large datasets** with high **reliability** and **efficiency**, mimicking a production-like environment.
 
 ## 📊 Dataset
 The data is sourced from the [NYC Taxi & Limousine Commission Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). Many data engineering principles used in this project are inspired by the [DataTalksClub Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp).
