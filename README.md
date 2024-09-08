@@ -148,3 +148,18 @@ The following are the default hostname and ports of our Postgres databases.
 | **nyc_taxi_staging_postgres**| `postgres-staging`  | 5433  |
 | **nyc_taxi_production_postgres** | `postgres-production` | 5434  |
 
+### Usage
+
+Note: I will not delve deep on how to use Mage. For mage documentation refer to this: https://docs.mage.ai/introduction/overview
+
+After running up the Project Application, navigate to http://localhost:6789/. It will then show you the Mage Dashboard
+
+![NYC Tripdata Overview Page](images/documentation/nyc_tripdata_homepage.JPG)
+
+For populating the databases with Tripdata. We can use the **spark_populate_tripdata_local_infastructure** Pipeline. This Pipeline contains the Orchestration of different pipelines that proccesses tripdata from its raw form to its production-ready data
+to be transfered to our Data Warehouse and Data Lakehouse. 
+
+To get started. From the Mage Dashboard Page, Navigate to Pipelines from the Left-Side Panel, and then click the **spark_populate_tripdata_local_infastructure** Pipeline 
+
+
+
