@@ -38,13 +38,13 @@ The data is sourced from the [NYC Taxi & Limousine Commission Trip Record Data](
 
 ### Prerequisites
 
-Before running the `docker-compose up -d` command, please review the [Running on Docker](#Running-on-docker) section to modify the image resources if running on a low-end environment. Take note of the System Requirements below.
+Before running the `docker-compose up -d` command, please review the [Running on Docker](###Running-on-docker) section to modify the image resources if running on a low-end environment. Take note of the System Requirements below.
 
 You must have the latest version of Docker and docker-compose installed. 
 
 ### System Requirements
 
-| Specification       | Suggested Requirements                          | Minimum Requirements (for alternative `docker-compose`) |
+| Specification       | Suggested Requirements                          | Minimum Requirements (for alternative `docker-compose`) TODO |
 |---------------------|-------------------------------------------------|----------------------------------------------------------|
 | **CPU**             | 6 cores, 3.5 GHz or higher                      | 3 cores                                                   |
 | **RAM**             | 32 GB (16 GB allocated to Docker)               | 16 GB (8 GB allocated to Docker)                          |
@@ -71,4 +71,70 @@ docker-compose up -d
 ```
 
 ## 📚 Documentation
-Provide a detailed description of the project structure, how to set it up locally, and any necessary configurations.
+
+### Running on Docker
+
+This project is containerized using **Docker** to simplify deployment across multiple environments. Docker allows for easy distribution and configuration management by simply editing the service declarations in the `docker-compose.yml` file.
+
+The Docker Compose configuration sets up the following services, all connected through a shared network named **`mage-network`**:
+
+```
+├── mage_orchestrator     # Manages workflows and pipelines (Mage AI)
+├── spark_master          # Master node managing the Spark cluster
+│   ├── spark-worker-1    # Spark worker node 1
+│   ├── spark-worker-2    # Spark worker node 2
+│   └── spark-worker-3    # Spark worker node 3
+├── pg_admin              # PgAdmin web UI for PostgreSQL management
+├── postgres-dev          # PostgreSQL for the development environment
+├── postgres-staging      # PostgreSQL for the staging environment
+└── postgres-production   # PostgreSQL for the production environment
+```
+
+### Spark Configuration
+
+The default Spark service configuration includes the following ports:
+
+- **Master Node**: 7077
+- **Worker UI**: 7000
+- **Web UI**: 9090
+- **Worker Web UI**: 9091, 9092, 909* (for workers)
+
+#### Adding a New Spark Worker
+
+If you need to add additional Spark workers to the cluster, you can easily append a new worker configuration to the `docker-compose.yml`. Below is an example configuration to add a new Spark worker:
+
+```yaml
+  spark-new-worker:
+    image: cluster-apache-spark:python3.10.14-spark3.5.1
+    container_name: spark-new-worker
+    entrypoint: ['/bin/bash', '/start-spark.sh', 'worker']
+    networks:
+      - mage-network
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=2  
+      - SPARK_WORKER_MEMORY=4G 
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-new-worker
+      - PYSPARK_PYTHON=${PYSPARK_PYTHON}
+      - PYSPARK_DRIVER_PYTHON=${PYSPARK_DRIVER_PYTHON}
+      - SPARK_EVENTLOG_DIR=${SPARK_EVENTLOG_DIR}
+      - SPARK_HISTORY_DIR=${SPARK_HISTORY_DIR}
+      - SPARK_WAREHOUSE_DIR=${SPARK_WAREHOUSE_DIR}
+      - SPARK_LAKEHOUSE_DIR=${SPARK_LAKEHOUSE_DIR}
+      - SPARK_CHECKPOINT_DIR=${SPARK_CHECKPOINT_DIR}
+      - SPARK_LOCAL_DIR=${SPARK_LOCAL_DIR}
+    volumes:
+      - spark-home:/opt/spark
+      - ./spark-data:/opt/spark/work
+    ports:
+      - "{CHANGE_PORT_HERE}:8081"  # Change this port to avoid conflicts
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "4G"
+```
+
