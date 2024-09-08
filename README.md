@@ -138,3 +138,13 @@ If you need to add additional Spark workers to the cluster, you can easily appen
           memory: "4G"
 ```
 
+#### Database Configurations
+
+This table provides a clear overview of the database names, their corresponding hostnames, and the ports they are running on, making it easier for users to reference and configure connections.
+
+| Database Name               | Hostname            | Port  |
+|-----------------------------|---------------------|-------|
+| **nyc_taxi_dev_postgres**    | `postgres-dev`      | 5432  |
+| **nyc_taxi_staging_postgres**| `postgres-staging`  | 5433  |
+| **nyc_taxi_production_postgres** | `postgres-production` | 5434  |
+
