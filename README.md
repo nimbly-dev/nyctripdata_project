@@ -173,7 +173,7 @@ To populate the databases with NYC trip data, you can use the **spark_populate_t
    ![Pipeline Trigger](images/documentation/trigger_spark_populate_tripdata_local_infastructure.JPG)
 
 3. **Execute the Pipeline via API**:  
-   Copy the API URL provided and use a tool like Postman to execute the pipeline. Below is an example of how to structure your API request.
+   Copy the API URL provided and use a tool like Postman to execute the pipeline.
 
    ![Trigger Endpoint URL](images/documentation/endpoint_spark_populate_tripdata_local_infastructure.JPG)
 
