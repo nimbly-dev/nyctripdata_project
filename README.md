@@ -237,3 +237,21 @@ Once you send the request, the pipeline will begin processing the data as per th
 ![Trigger Endpoint URL](images/documentation/pipeline_diagram.png)
 
 This diagram is the overview of the Pipeline Orchestration. This follows the Data Proccessing stages that we mentioned on the Project description.
+
+The following is the Pipelines being run by this pipeline Orchestration
+
+```
+├── conditional_run_spark_taxi_etl_to_dev_partition # Run Pipeline based on tripdata
+├───spark_yellow_taxi_etl_to_dev_partition
+├───spark_green_taxi_etl_to_dev_partition
+├───spark_fhv_taxi_etl_to_dev_partition
+├── check_if_spark_taxi_etil_to_dev_partition_is_done # Run Pipeline based on tripdata
+├───spark_load_to_psql_stage
+├───spark_psql_stage_to_local_lakehouse_dir
+├───spark_psql_stage_to_production
+├───data_tmp_cleanup
+```
+
+This is the Pipelines Image:
+
+![Populate Infra Tripdata Pipelines](images/documentation/spark_populate_tripdata_local_infastructure_pipeline_chart.JPG)
