@@ -38,6 +38,20 @@ The data is sourced from the [NYC Taxi & Limousine Commission Trip Record Data](
 
 You must have the latest version of Docker and docker-compose installed. 
 
+Before running docker-compose up -d command. Please consult first the [Running on Docker](#Running-on-docker) documentation to modify the image resources if running on a low-end Environment. 
+
+### Prerequisites
+
+Before running the `docker-compose up -d` command, please review the [Running on Docker](#Running-on-docker) section to modify the image resources if running on a low-end environment. Take note of the System Requirements below.
+
+### System Requirements
+
+| Specification       | Suggested Requirements                          | Minimum Requirements (for alternative `docker-compose`) |
+|---------------------|-------------------------------------------------|----------------------------------------------------------|
+| **CPU**             | 6 cores, 3.5 GHz or higher                      | 3 cores                                                   |
+| **RAM**             | 32 GB (16 GB allocated to Docker)               | 16 GB (8 GB allocated to Docker)                          |
+| **Spark Cluster**    | 3 workers, each with 2 cores and 4 GB of RAM    | 2 workers, each with 2 cores and 2.5 GB of RAM            |
+
 ```shell
 # Open a terminal (Command Prompt or PowerShell for Windows, Terminal for macOS or Linux)
 
