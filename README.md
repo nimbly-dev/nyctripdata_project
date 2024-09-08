@@ -140,7 +140,7 @@ If you need to add additional Spark workers to the cluster, you can easily appen
 
 #### Database Configurations
 
-This table provides a clear overview of the database names, their corresponding hostnames, and the ports they are running on, making it easier for users to reference and configure connections.
+The following are the default hostname and ports of our Postgres databases.
 
 | Database Name               | Hostname            | Port  |
 |-----------------------------|---------------------|-------|
