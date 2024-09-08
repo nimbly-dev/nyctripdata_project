@@ -148,7 +148,7 @@ The following are the default hostname and ports of our Postgres databases.
 | **nyc_taxi_staging_postgres**| `postgres-staging`  | 5433  |
 | **nyc_taxi_production_postgres** | `postgres-production` | 5434  |
 
-### Usage
+### Documentation
 
 > **Note**: This guide focuses on the usage of the project and its pipelines. For detailed information on using Mage, please refer to the [Mage documentation](https://docs.mage.ai/introduction/overview).
 
@@ -231,3 +231,9 @@ Once you send the request, the pipeline will begin processing the data as per th
   - `"very_strict"`: Maximum data loss of **1%**.
   - `"strict"`: Maximum data loss of **5%**.
   - `"moderate"`: Maximum data loss of **10%**.
+ 
+#### Structure of the Populate Tripdata Pipeline 
+
+![Trigger Endpoint URL](images/documentation/pipeline_diagram.png)
+
+This diagram is the overview of the Pipeline Orchestration. This follows the Data Proccessing stages that we mentioned on the Project description.
