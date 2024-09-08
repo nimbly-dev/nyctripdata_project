@@ -49,6 +49,8 @@ You must have the latest version of Docker and docker-compose installed.
 | **CPU**             | 6 cores, 3.5 GHz or higher                      | 3 cores                                                   |
 | **RAM**             | 32 GB (16 GB allocated to Docker)               | 16 GB (8 GB allocated to Docker)                          |
 | **Spark Cluster**    | 3 workers, each with 2 cores and 4 GB of RAM    | 2 workers, each with 2 cores and 2.5 GB of RAM            |
+| **Storage**         | 30-50 GB                                        | 30-50 GB                                                  |
+
 
 ### Running Project using Docker Compose
 
