@@ -150,28 +150,36 @@ The following are the default hostname and ports of our Postgres databases.
 
 ### Usage
 
-Note: I will not delve deep on how to use Mage. For mage documentation refer to this: https://docs.mage.ai/introduction/overview
+> **Note**: This guide focuses on the usage of the project and its pipelines. For detailed information on using Mage, please refer to the [Mage documentation](https://docs.mage.ai/introduction/overview).
 
-After running up the Project Application, navigate to http://localhost:6789/. It will then show you the Mage Dashboard
+After starting the project, navigate to [http://localhost:6789/](http://localhost:6789/). This will take you to the Mage Dashboard, where you can manage the pipelines and view data processing workflows.
 
 ![NYC Tripdata Overview Page](images/documentation/nyc_tripdata_homepage.JPG)
 
-For populating the databases with Tripdata. We can use the **spark_populate_tripdata_local_infastructure** Pipeline. This Pipeline contains the Orchestration of different pipelines that proccesses tripdata from its raw form to its production-ready data
-to be transfered to our Data Warehouse and Data Lakehouse. 
+#### Populating the Databases with Tripdata
 
-To get started. From the Mage Dashboard Page, Navigate to Pipelines from the Left-Side Panel, and then click the **spark_populate_tripdata_local_infastructure** Pipeline 
+To populate the databases with NYC trip data, you can use the **spark_populate_tripdata_local_infrastructure** pipeline. This pipeline orchestrates various stages, transforming raw trip data into production-ready formats to be stored in both the Data Warehouse and Data Lakehouse.
 
-![NYC Tripdata Overview Page](images/documentation/pipeline_list_spark_populate_tripdata_local_infastructure.JPG)
+#### Getting Started with the Pipeline
 
-After going to the pipeline page, navigate to Trigger from the Left-Side Panel, and then click **Run Pipeline orchestration via API** hyperlink. 
+1. **Navigate to the Pipelines**:  
+   From the Mage Dashboard, click on **Pipelines** in the left-side panel. Then, select the **spark_populate_tripdata_local_infrastructure** pipeline to proceed.
 
-![NYC Tripdata Overview Page](images/documentation/trigger_spark_populate_tripdata_local_infastructure.JPG)
+   ![NYC Tripdata Pipeline List](images/documentation/pipeline_list_spark_populate_tripdata_local_infastructure.JPG)
 
-Copy the URL and paste it to your Postman Application
+2. **Trigger the Pipeline**:  
+   On the pipeline page, navigate to **Trigger** in the left-side panel. Click on the **Run Pipeline orchestration via API** hyperlink to open the pipeline's trigger endpoint.
 
-![NYC Tripdata Overview Page](images/documentation/endpoint_spark_populate_tripdata_local_infastructure.JPG)
+   ![Pipeline Trigger](images/documentation/trigger_spark_populate_tripdata_local_infastructure.JPG)
 
-This is an sample request body:
+3. **Execute the Pipeline via API**:  
+   Copy the API URL provided and use a tool like Postman to execute the pipeline. Below is an example of how to structure your API request.
+
+   ![Trigger Endpoint URL](images/documentation/endpoint_spark_populate_tripdata_local_infastructure.JPG)
+
+##### Example API Request Body
+
+Here’s an example request body that you can use in Postman to run the pipeline:
 
 ```json
 {
@@ -191,4 +199,35 @@ This is an sample request body:
 }
 ```
 
+- **dev_limit_rows**: Set to `-1` to process all rows, or limit the number of rows for testing.
+- **start_year / start_month**: Specify the start period for the trip data.
+- **end_year / end_month**: Specify the end period for the trip data.
+- **pipeline_run_name**: A custom name for the pipeline run.
+- **spark_mode**: Choose the Spark execution mode, e.g., `local` or `cluster`.
+- **tripdata_type**: The type of trip data to process (e.g., `fhv_cab_tripdata`).
+- **data_loss_threshold**: Set to `"very_strict"` for strict error handling during data processing.
 
+Once you send the request, the pipeline will begin processing the data as per the parameters you provided.
+
+
+##### API Request Body Parameters
+
+| Parameter             | Description                                                                                                                                                            | Example Value                       |
+|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------|
+| **dev_limit_rows**     | Limit the number of rows for testing. Set to `-1` to process all rows.                                                                                                  | `-1` (process all rows)             |
+| **start_year**         | The start year of the trip data to be processed.                                                                                                                        | `2021`                              |
+| **start_month**        | The start month of the trip data to be processed.                                                                                                                       | `1` (for January)                   |
+| **end_year**           | The end year of the trip data to be processed.                                                                                                                          | `2021`                              |
+| **end_month**          | The end month of the trip data to be processed.                                                                                                                         | `12` (for December)                 |
+| **pipeline_run_name**  | A custom name for the pipeline run, useful for tracking multiple runs.                                                                                                  | `"populate_fhvtripdata_2022"`       |
+| **spark_mode**         | The execution mode for Spark. Set to `"local"` for local execution or `"cluster"` for distributed execution.                                                            | `"cluster"`                         |
+| **tripdata_type**      | Specifies the type of trip data to be processed. Possible values: `"yellow_cab_tripdata"`, `"green_cab_tripdata"`, `"fhv_cab_tripdata"`.                                 | `"fhv_cab_tripdata"`                |
+| **data_loss_threshold**| Specifies the acceptable level of data loss during processing. Possible values: `"very_strict"` (1% loss), `"strict"` (5% loss), `"moderate"` (10% loss).                | `"very_strict"`                     |
+
+
+**Explanation of Key Parameters:**
+- **tripdata_type**: Choose between `yellow_cab_tripdata`, `green_cab_tripdata`, or `fhv_cab_tripdata` based on the dataset you want to process.
+- **data_loss_threshold**: Defines how much data loss is acceptable during the data processing pipeline. Here’s how the thresholds break down:
+  - `"very_strict"`: Maximum data loss of **1%**.
+  - `"strict"`: Maximum data loss of **5%**.
+  - `"moderate"`: Maximum data loss of **10%**.
