@@ -40,7 +40,7 @@ The data is sourced from the [NYC Taxi & Limousine Commission Trip Record Data](
 
 Before running the `docker-compose up -d` command, please review the [Running on Docker](###Running-on-docker) section to modify the image resources if running on a low-end environment. Take note of the System Requirements below.
 
-You must have the latest version of Docker and docker-compose installed. 
+You must have the latest version of Docker and docker-compose installed. Furthermore, you also must have Postman to trigger the pipeline.
 
 ### System Requirements
 
@@ -161,5 +161,34 @@ to be transfered to our Data Warehouse and Data Lakehouse.
 
 To get started. From the Mage Dashboard Page, Navigate to Pipelines from the Left-Side Panel, and then click the **spark_populate_tripdata_local_infastructure** Pipeline 
 
+![NYC Tripdata Overview Page](images/documentation/pipeline_list_spark_populate_tripdata_local_infastructure.JPG)
+
+After going to the pipeline page, navigate to Trigger from the Left-Side Panel, and then click **Run Pipeline orchestration via API** hyperlink. 
+
+![NYC Tripdata Overview Page](images/documentation/trigger_spark_populate_tripdata_local_infastructure.JPG)
+
+Copy the URL and paste it to your Postman Application
+
+![NYC Tripdata Overview Page](images/documentation/endpoint_spark_populate_tripdata_local_infastructure.JPG)
+
+This is an sample request body:
+
+```json
+{
+  "pipeline_run": {
+    "variables": {
+      "dev_limit_rows" : -1,
+      "end_month": 12,
+      "end_year": 2021,
+      "start_month": 1,
+      "start_year": 2021,
+      "pipeline_run_name": "populate_fhvtripdata_2022",
+      "spark_mode" : "cluster",
+      "tripdata_type": "fhv_cab_tripdata",
+      "data_loss_threshold": "very_strict"
+    }
+  }
+}
+```
 
 
