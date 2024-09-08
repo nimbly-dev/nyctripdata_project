@@ -90,7 +90,7 @@ The Docker Compose configuration sets up the following services, all connected t
 └── postgres-production   # PostgreSQL for the production environment
 ```
 
-### Spark Configuration
+#### Spark Configuration
 
 The default Spark service configuration includes the following ports:
 
