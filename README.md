@@ -236,4 +236,4 @@ Once you send the request, the pipeline will begin processing the data as per th
 
 ![Trigger Endpoint URL](images/documentation/pipeline_diagram.png)
 
-This diagram is the overview of the Pipeline Orchestration.
+This diagram is the overview of the Pipeline Orchestration. This follows the Data Proccessing stages that we mentioned on the Project description.
