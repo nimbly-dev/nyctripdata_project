@@ -72,6 +72,8 @@ docker-compose up -d
 
 ## 📚 Documentation
 
+> **Note**: This guide focuses on the usage of the project and its pipelines. For detailed information on using Mage, please refer to the [Mage documentation](https://docs.mage.ai/introduction/overview).
+
 ### Running on Docker
 
 This project is containerized using **Docker** to simplify deployment across multiple environments. Docker allows for easy distribution and configuration management by simply editing the service declarations in the `docker-compose.yml` file.
@@ -147,10 +149,6 @@ The following are the default hostname and ports of our Postgres databases.
 | **nyc_taxi_dev_postgres**    | `postgres-dev`      | 5432  |
 | **nyc_taxi_staging_postgres**| `postgres-staging`  | 5433  |
 | **nyc_taxi_production_postgres** | `postgres-production` | 5434  |
-
-### Documentation
-
-> **Note**: This guide focuses on the usage of the project and its pipelines. For detailed information on using Mage, please refer to the [Mage documentation](https://docs.mage.ai/introduction/overview).
 
 After starting the project, navigate to [http://localhost:6789/](http://localhost:6789/). This will take you to the Mage Dashboard, where you can manage the pipelines and view data processing workflows.
 
