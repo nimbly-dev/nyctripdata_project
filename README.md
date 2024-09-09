@@ -232,7 +232,7 @@ Once you send the request, the pipeline will begin processing the data as per th
   - `"strict"`: Maximum data loss of **5%**.
   - `"moderate"`: Maximum data loss of **10%**.
  
-#### Structure of the Populate Tripdata Pipeline 
+##### Structure of the Populate Tripdata Pipeline 
 
 ![Trigger Endpoint URL](images/documentation/pipeline_diagram.png)
 
@@ -258,7 +258,7 @@ The following is the Pipelines being run by this pipeline Orchestration
 
 The `Populate Infra Tripdata Pipelines` workflow is a series of pipelines that automate the processing of NYC trip data from downloading to production. Each pipeline performs specific tasks to ensure data is correctly processed, cleaned, and loaded into PostgreSQL and the Lakehouse storage.
 
-##### 1. **`spark_taxi_etil_to_dev_partition` Pipeline**
+###### 1. **`spark_taxi_etil_to_dev_partition` Pipeline**
 
 This pipeline is responsible for preparing the trip data for further processing:
 
@@ -267,7 +267,7 @@ This pipeline is responsible for preparing the trip data for further processing:
 - Cleans the data for quality assurance.
 - Writes the cleaned data to a temporary Parquet directory in the **dev** environment.
 
-##### 2. **`spark_load_to_psql_stage` Pipeline**
+###### 2. **`spark_load_to_psql_stage` Pipeline**
 
 This pipeline loads the cleaned trip data into the **staging** PostgreSQL table using an upsert strategy:
 
@@ -280,7 +280,7 @@ This pipeline loads the cleaned trip data into the **staging** PostgreSQL table 
    - **Conflict Handling**: If a conflict occurs on the primary key, `pickup_datetime`, or `dropoff_datetime`, the existing record is updated with the new data.
    - **Clean-up**: The temporary table used for batch inserts is dropped after the upsert is completed.
 
-##### 3. **`spark_psql_stage_to_local_lakehouse_dir` Pipeline**
+###### 3. **`spark_psql_stage_to_local_lakehouse_dir` Pipeline**
 
 This pipeline moves the trip data from the **staging** PostgreSQL table to the local Lakehouse directory:
 
@@ -288,7 +288,7 @@ This pipeline moves the trip data from the **staging** PostgreSQL table to the l
 - Writes the data to a **pre-lakehouse** temporary Parquet directory.
 - Writes the final data to the **Lakehouse** directory at `/opt/spark/spark-lakehouse/partitioned/{tripdata_type}/data` in Parquet format.
 
-##### 4. **`spark_psql_stage_to_production` Pipeline**
+###### 4. **`spark_psql_stage_to_production` Pipeline**
 
 This pipeline transfers data from the **Lakehouse** and **staging** environments to the **production** PostgreSQL table:
 
