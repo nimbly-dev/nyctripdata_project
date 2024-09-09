@@ -294,3 +294,5 @@ This pipeline transfers data from the **Lakehouse** and **staging** environments
 - Join the two datasets, treating the **Lakehouse** as the source of truth.
 - Applies a basic cleaning process to the combined dataset.
 - Loads the cleaned and combined data into the **production** trip data table using an **upsert strategy** similar to the one used in the `spark_load_to_psql_stage` pipeline.
+
+### 
