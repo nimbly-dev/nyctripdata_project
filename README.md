@@ -252,6 +252,47 @@ The following is the Pipelines being run by this pipeline Orchestration
 ├───data_tmp_cleanup
 ```
 
-This is the Pipelines Image:
+#### Populate Infra Tripdata Pipelines
 
 ![Populate Infra Tripdata Pipelines](images/documentation/spark_populate_tripdata_local_infastructure_pipeline_chart.JPG)
+
+The `Populate Infra Tripdata Pipelines` workflow is a series of pipelines that automate the processing of NYC trip data from downloading to production. Each pipeline performs specific tasks to ensure data is correctly processed, cleaned, and loaded into PostgreSQL and the Lakehouse storage.
+
+##### 1. **`spark_taxi_etil_to_dev_partition` Pipeline**
+
+This pipeline is responsible for preparing the trip data for further processing:
+
+- Downloads raw trip data from the NYC Tripdata website.
+- Transforms columns by converting data types and renaming columns as necessary.
+- Cleans the data for quality assurance.
+- Writes the cleaned data to a temporary Parquet directory in the **dev** environment.
+
+##### 2. **`spark_load_to_psql_stage` Pipeline**
+
+This pipeline loads the cleaned trip data into the **staging** PostgreSQL table using an upsert strategy:
+
+- Ingests the cleaned data from the **dev** Parquet directory.
+- Runs an additional cleaning process on the data.
+- Adds a **dwid** (primary key) to each record in the trip data.
+- Appends the data to the **staging** trip data table using an **upsert strategy**:
+   - **Partitioning**: Creates a partition in PostgreSQL based on the trip data's year and month.
+   - **Batch Insert**: Data is written in batches, with a default `BATCH_SIZE` of 1,000,000.
+   - **Conflict Handling**: If a conflict occurs on the primary key, `pickup_datetime`, or `dropoff_datetime`, the existing record is updated with the new data.
+   - **Clean-up**: The temporary table used for batch inserts is dropped after the upsert is completed.
+
+##### 3. **`spark_psql_stage_to_local_lakehouse_dir` Pipeline**
+
+This pipeline moves the trip data from the **staging** PostgreSQL table to the local Lakehouse directory:
+
+- Extracts the data from the **staging** trip data table.
+- Writes the data to a **pre-lakehouse** temporary Parquet directory.
+- Writes the final data to the **Lakehouse** directory at `/opt/spark/spark-lakehouse/partitioned/{tripdata_type}/data` in Parquet format.
+
+##### 4. **`spark_psql_stage_to_production` Pipeline**
+
+This pipeline transfers data from the **Lakehouse** and **staging** environments to the **production** PostgreSQL table:
+
+- Reads data from both the **Lakehouse** and the **staging** table, writing them into temporary directories.
+- Join the two datasets, treating the **Lakehouse** as the source of truth.
+- Applies a basic cleaning process to the combined dataset.
+- Loads the cleaned and combined data into the **production** trip data table using an **upsert strategy** similar to the one used in the `spark_load_to_psql_stage` pipeline.
