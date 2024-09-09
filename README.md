@@ -232,7 +232,7 @@ Once you send the request, the pipeline will begin processing the data as per th
   - `"strict"`: Maximum data loss of **5%**.
   - `"moderate"`: Maximum data loss of **10%**.
  
-##### Structure of the Populate Tripdata Pipeline 
+#### Structure of the Populate Tripdata Pipeline 
 
 ![Trigger Endpoint URL](images/documentation/pipeline_diagram.png)
 
