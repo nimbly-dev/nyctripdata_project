@@ -295,4 +295,8 @@ This pipeline transfers data from the **Lakehouse** and **staging** environments
 - Applies a basic cleaning process to the combined dataset.
 - Loads the cleaned and combined data into the **production** trip data table using an **upsert strategy** similar to the one used in the `spark_load_to_psql_stage` pipeline.
 
-### 
+### Tripdata Tables
+
+When running using docker-compose, a partitioned tripdata tables with no data will be created. A series of sql queries will be run that can be checked on the deployment folder. 
+
+
