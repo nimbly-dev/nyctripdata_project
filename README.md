@@ -15,7 +15,7 @@
 - [Documentation](#documentation)
 
 ## 🚀 About
-This project simulates a **production-grade Data Infrastructure** designed to process NYC trip data through multiple stages: **dev**, **stage**, and **production**. The pipeline handles **millions of trip data records**, ensuring reliability and scalability through techniques like **batch writing** and **disk spill management**.
+This project simulates a **production-grade Data Infrastructure** designed to process NYC trip data through multiple stages: **dev**, **stage**, and **production**. The pipeline handles **millions of trip data records**, ensuring reliability and scalability through techniques like **batch writing** and **disk spill management**. The project heavily used Apache Spark's Distributed Computing capabilities to process large datasets effectively.  
 
 ## 🗂️ Project Infrastructure
 ![Environment Diagram](images/environment_diagram.png)
