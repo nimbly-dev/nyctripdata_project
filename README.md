@@ -300,5 +300,13 @@ This pipeline transfers data from the **Lakehouse** and **staging** environments
 
 ### Tripdata Tables
 
-When running using docker-compose, a partitioned tripdata tables with no data will be created. A series of sql queries will be run that can be checked on the deployment folder. 
+When using Docker Compose, partitioned **Tripdata** tables will be created without data. A series of SQL queries will be executed, and you can review these queries in the deployment folder. The project includes three types of datasets:
+
+| Dataset         | Description                               | Data Dictionary                                                   |
+|-----------------|-------------------------------------------|-------------------------------------------------------------------|
+| **Yellow Tripdata**  | Data containing trip records for Yellow Cab taxis. | [Yellow Tripdata Dictionary](https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf) |
+| **Green Tripdata**   | Data containing trip records for Green Cab taxis.  | [Green Tripdata Dictionary](https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_green.pdf)  |
+| **FHV Tripdata**     | Data containing trip records for For-Hire Vehicles. | [FHV Tripdata Dictionary](https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_fhv.pdf)    |
+
+
 
