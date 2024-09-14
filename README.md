@@ -279,7 +279,7 @@ This pipeline loads the cleaned trip data into the **staging** PostgreSQL table 
   - If overwrite is disabled. It will create a temporary table first, and then the temporary table will be populated by parallel PSQL copy command. Finally, we will insert the data using Upsert strategy.
 
 Overwrite Workflow: 
-![Spark Load Workflow](images/documentation/spsql_load_workflow.gif)
+![Spark Load Workflow](images/documentation/psql_load_workflow.gif)
 
 ###### 3. **`spark_psql_stage_to_local_lakehouse_dir` Pipeline**
 
