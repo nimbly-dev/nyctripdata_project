@@ -318,5 +318,7 @@ The `dwid` column is added at the stage level and is used as a primary key in va
 
 By generating a `dwid` based on these key columns, we ensure consistent and unique identification across datasets, facilitating efficient data management and integration.
 
+#### Partitioning in the Tripdata tables
 
+Whenever data is being appended to one of the Tripdata tables. The pipeline ensures that before appending, a partition will be created depending on the month value of the `pickup_datetime`. This makes the table be partitioned in each month. AFter creating the partition, data will be inserted to that partition.
 
