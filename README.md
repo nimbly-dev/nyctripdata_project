@@ -274,7 +274,12 @@ This pipeline loads the cleaned trip data into the **staging** PostgreSQL table 
 - Runs an additional cleaning process on the data.
 - Adds a **dwid** (primary key) to each record in the trip data.
 - Appends the data to the **staging** trip data table using an **overwrite** or **upsert** strategy:
-   - 
+  - Writes temporary .csv files that will be copied to the staging table.
+  - If overwrite is enabled. It will truncate the selected partitoned table first, and then parallelly copy the csv to the stage table
+  - If overwrite is disabled. It will create a temporary table first, and then the temporary table will be populated by parallel PSQL copy command. Finally, we will insert the data using Upsert strategy.
+
+Overwrite Workflow: 
+![Spark Load Workflow](images/documentation/spsql_load_workflow.gif)
 
 ###### 3. **`spark_psql_stage_to_local_lakehouse_dir` Pipeline**
 
