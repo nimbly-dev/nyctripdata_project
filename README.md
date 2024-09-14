@@ -15,7 +15,7 @@
 - [Documentation](#documentation)
 
 ## 🚀 About
-This project simulates a **production-grade Data Infrastructure** designed to process NYC trip data through multiple stages: **dev**, **stage**, and **production**. The pipeline handles **millions of trip data records**, ensuring reliability and scalability through techniques like **batch writing** and **disk spill management**. The project heavily used Apache Spark's Distributed Computing capabilities to process large datasets effectively.  
+This project simulates a **production-grade Data Infrastructure** designed to process NYC trip data through multiple stages: **dev**, **stage**, and **production**. The pipeline handles **millions of trip data records**, ensuring reliability and scalability through techniques like **batch writing**, **disk spill management** and **Parallelization**. The project heavily used Apache Spark's Distributed Computing capabilities to process large datasets effectively.  
 
 ## 🗂️ Project Infrastructure
 ![Environment Diagram](images/environment_diagram.png)
@@ -191,7 +191,8 @@ Here’s an example request body that you can use in Postman to run the pipeline
       "pipeline_run_name": "populate_fhvtripdata_2022",
       "spark_mode" : "cluster",
       "tripdata_type": "fhv_cab_tripdata",
-      "data_loss_threshold": "very_strict"
+      "data_loss_threshold": "very_strict",
+      "is_overwrite_enabled": true
     }
   }
 }
@@ -221,7 +222,7 @@ Once you send the request, the pipeline will begin processing the data as per th
 | **spark_mode**         | The execution mode for Spark. Set to `"local"` for local execution or `"cluster"` for distributed execution.                                                            | `"cluster"`                         |
 | **tripdata_type**      | Specifies the type of trip data to be processed. Possible values: `"yellow_cab_tripdata"`, `"green_cab_tripdata"`, `"fhv_cab_tripdata"`.                                 | `"fhv_cab_tripdata"`                |
 | **data_loss_threshold**| Specifies the acceptable level of data loss during processing. Possible values: `"very_strict"` (1% loss), `"strict"` (5% loss), `"moderate"` (10% loss).                | `"very_strict"`                     |
-
+| **is_overwrite_enabled**| Specifies if either to overwrite or update existing data on the PSQL data-warehouse.                                                                                   | `"true"`                     |
 
 **Explanation of Key Parameters:**
 - **tripdata_type**: Choose between `yellow_cab_tripdata`, `green_cab_tripdata`, or `fhv_cab_tripdata` based on the dataset you want to process.
@@ -272,11 +273,8 @@ This pipeline loads the cleaned trip data into the **staging** PostgreSQL table 
 - Ingests the cleaned data from the **dev** Parquet directory.
 - Runs an additional cleaning process on the data.
 - Adds a **dwid** (primary key) to each record in the trip data.
-- Appends the data to the **staging** trip data table using an **upsert strategy**:
-   - **Partitioning**: Creates a partition in PostgreSQL based on the trip data's year and month.
-   - **Batch Insert**: Data is written in batches, with a default `BATCH_SIZE` of 1,000,000.
-   - **Conflict Handling**: If a conflict occurs on the primary key, `pickup_datetime`, or `dropoff_datetime`, the existing record is updated with the new data.
-   - **Clean-up**: The temporary table used for batch inserts is dropped after the upsert is completed.
+- Appends the data to the **staging** trip data table using an **overwrite** or **upsert** strategy:
+   - 
 
 ###### 3. **`spark_psql_stage_to_local_lakehouse_dir` Pipeline**
 
@@ -298,5 +296,4 @@ This pipeline transfers data from the **Lakehouse** and **staging** environments
 ### Tripdata Tables
 
 When running using docker-compose, a partitioned tripdata tables with no data will be created. A series of sql queries will be run that can be checked on the deployment folder. 
-
 
