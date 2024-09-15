@@ -327,8 +327,10 @@ A SQL function available in all public schemas automates this process. It takes 
 
 ### Modifying the Pipeline
 
-If you want to modify the pipeline. Please keep-in mind some of this information. For changes in a specific Tripdata Type, such as column transformations, new cleaning, adding new data, and etc. It is recommended to have this changes on the dev pipeline. e.g spark_yellow_taxi_etl_to_dev_partition. As Dev stage is for specific changes ona Tripdata Type.
+When modifying the pipeline, consider the following guidelines:
 
-For things such as ensuring data integrity, adding new columns that are present on each data sets, and cleaning/tranformation data before Production. Stage level is more appropriate for this.
+- **Development Stage**: Apply specific changes such as column transformations, new cleaning rules, or additional data to the development pipeline (e.g., `spark_yellow_taxi_etl_to_dev_partition`). This stage is intended for testing changes specific to a Tripdata type.
 
-For Production level, not much changes on here. The combination of lakehouse data and stage data is a must as it is another layer of data integrity, A simple clean operation that is dynamic is also in here. Note that column transformations must not be written in here, It must be written on either Stage for global changes between Tripdata sets or Dev level for a specific tripdata changes. 
+- **Stage Level**: Use this stage for ensuring data integrity, adding columns present across datasets, and pre-production data cleaning and transformation. It is suitable for global changes that affect all Tripdata types.
+
+- **Production Level**: Make minimal changes here. This stage combines lakehouse data and stage data to maintain data integrity. Include only dynamic cleaning operations. Avoid column transformations at this level; these should be handled in the Stage level for global changes or the Development stage for specific changes.
