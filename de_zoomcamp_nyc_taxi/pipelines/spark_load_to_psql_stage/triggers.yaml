@@ -1,0 +1,21 @@
+triggers:
+- description: null
+  envs: []
+  last_enabled_at: 2024-08-31 08:04:24.163035
+  name: DEV_TST
+  pipeline_uuid: spark_load_to_psql_stage
+  schedule_interval: null
+  schedule_type: api
+  settings: null
+  sla: null
+  start_time: 2024-08-31 08:00:00
+  status: active
+  token: 34ad4d1e9e1d4d1ab8e5ad6f0ff3c0a2
+  variables:
+    end_month: 8
+    end_year: 2022
+    pipeline_run_name: development_pipeline
+    spark_mode: cluster
+    start_month: 6
+    start_year: 2022
+    tripdata_type: green_cab_tripdata

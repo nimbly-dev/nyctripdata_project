@@ -1,0 +1,136 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - spark_combine_lakehouse_and_psql_data
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_get_tripdata_from_lakehouse
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: spark_get_tripdata_from_lakehouse
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    config_profile: stage_db
+    file_source:
+      path: data_loaders/spark_get_tripdata_from_psql.py
+    psql_environment: staging
+    target_dir: pre_stage_to_prod_psql
+  downstream_blocks:
+  - spark_combine_lakehouse_and_psql_data
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_get_tripdata_from_psql
+  retry_config: {}
+  status: updated
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: spark_get_tripdata_from_psql
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - spark_do_basic_clean_operations
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_combine_lakehouse_and_psql_data
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - spark_get_tripdata_from_psql
+  - spark_get_tripdata_from_lakehouse
+  uuid: spark_combine_lakehouse_and_psql_data
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    columns_to_exclude_from_null_check: '[]'
+    primary_key: dwid
+    source_pq_dir: pre_combined_data_production
+    target_pq_dir: pre_combined_clean_data_production
+  downstream_blocks:
+  - spark_load_parquet_to_psql
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_do_basic_clean_operations
+  retry_config: {}
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - spark_combine_lakehouse_and_psql_data
+  uuid: spark_do_basic_clean_operations
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    config_profile: production_db
+    file_path: data_exporters/spark_load_parquet_to_psql.py
+    file_source:
+      path: data_exporters/spark_load_parquet_to_psql.py
+    pq_dir: pre_combined_data_production
+    psql_environment: production
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_load_parquet_to_psql
+  retry_config: {}
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - spark_do_basic_clean_operations
+  uuid: spark_load_parquet_to_psql
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals: []
+created_at: '2024-09-01 12:00:06.544846+00:00'
+data_integration: null
+description: Load PSQL Stage to Production table
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: spark_psql_stage_to_production
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags:
+- local
+- warehouse
+- spark
+type: python
+uuid: spark_psql_stage_to_production
+variables:
+  data_loss_threshold: very_strict
+  end_month: 12
+  end_year: 2022
+  overwrite_enabled: true
+  pipeline_run_name: populate_fhvtripdata_2022
+  spark_mode: cluster
+  start_month: 1
+  start_year: 2022
+  tripdata_type: fhv_cab_tripdata
+variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
+widgets: []

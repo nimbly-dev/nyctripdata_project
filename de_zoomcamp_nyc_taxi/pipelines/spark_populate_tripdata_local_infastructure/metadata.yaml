@@ -1,0 +1,253 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_path: data_exporters/trigger_spark_yellow_taxi_etl_to_dev_partition.py
+    file_source:
+      path: data_exporters/trigger_spark_yellow_taxi_etl_to_dev_partition.py
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: trigger_spark_yellow_taxi_etl_to_dev_partition
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - conditional_run_spark_taxi_etl_to_dev_partition
+  uuid: trigger_spark_yellow_taxi_etl_to_dev_partition
+- all_upstream_blocks_executed: true
+  color: teal
+  configuration: {}
+  downstream_blocks:
+  - trigger_spark_yellow_taxi_etl_to_dev_partition
+  - trigger_spark_green_taxi_etl_to_dev_partition
+  - trigger_spark_fhv_taxi_etl_to_dev_partition
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: conditional_run_spark_taxi_etl_to_dev_partition
+  retry_config: null
+  status: executed
+  timeout: null
+  type: custom
+  upstream_blocks: []
+  uuid: conditional_run_spark_taxi_etl_to_dev_partition
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_path: data_exporters/trigger_spark_green_taxi_etl_to_dev_partition.py
+    file_source:
+      path: data_exporters/trigger_spark_green_taxi_etl_to_dev_partition.py
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: trigger_spark_green_taxi_etl_to_dev_partition
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - conditional_run_spark_taxi_etl_to_dev_partition
+  uuid: trigger_spark_green_taxi_etl_to_dev_partition
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_path: data_exporters/trigger_spark_fhv_taxi_etl_to_dev_partition.py
+    file_source:
+      path: data_exporters/trigger_spark_fhv_taxi_etl_to_dev_partition.py
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: trigger_spark_fhv_taxi_etl_to_dev_partition
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - conditional_run_spark_taxi_etl_to_dev_partition
+  uuid: trigger_spark_fhv_taxi_etl_to_dev_partition
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    file_path: data_exporters/trigger_spark_load_to_psql_stage.py
+    file_source:
+      path: data_exporters/trigger_spark_load_to_psql_stage.py
+  downstream_blocks:
+  - trigger_spark_psql_stage_to_local_lakehouse_dir
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: trigger_spark_load_to_psql_stage
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - check_if_spark_taxi_etil_to_dev_partition_is_done
+  uuid: trigger_spark_load_to_psql_stage
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    file_path: data_exporters/trigger_spark_psql_stage_to_local_lakehouse_dir.py
+    file_source:
+      path: data_exporters/trigger_spark_psql_stage_to_local_lakehouse_dir.py
+  downstream_blocks:
+  - trigger_spark_psql_stage_to_production
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: trigger_spark_psql_stage_to_local_lakehouse_dir
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - trigger_spark_load_to_psql_stage
+  uuid: trigger_spark_psql_stage_to_local_lakehouse_dir
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    file_path: data_exporters/trigger_spark_psql_stage_to_production.py
+    file_source:
+      path: data_exporters/trigger_spark_psql_stage_to_production.py
+  downstream_blocks:
+  - data_tmp_cleanup
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: trigger_spark_psql_stage_to_production
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - trigger_spark_psql_stage_to_local_lakehouse_dir
+  uuid: trigger_spark_psql_stage_to_production
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - trigger_spark_load_to_psql_stage
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: check_if_spark_taxi_etil_to_dev_partition_is_done
+  retry_config: null
+  status: updated
+  timeout: null
+  type: sensor
+  upstream_blocks: []
+  uuid: check_if_spark_taxi_etil_to_dev_partition_is_done
+- all_upstream_blocks_executed: false
+  color: grey
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: data_tmp_cleanup
+  retry_config: null
+  status: updated
+  timeout: null
+  type: custom
+  upstream_blocks:
+  - trigger_spark_psql_stage_to_production
+  uuid: data_tmp_cleanup
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals:
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_spark_fhv_taxi_etl_to_dev_partition
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - trigger_spark_fhv_taxi_etl_to_dev_partition
+  uuid: run_spark_fhv_taxi_etl_to_dev_partition
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_spark_green_taxi_etl_to_dev_partition
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - trigger_spark_green_taxi_etl_to_dev_partition
+  uuid: run_spark_green_taxi_etl_to_dev_partition
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_spark_yellow_taxi_etl_to_dev_partition
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - trigger_spark_yellow_taxi_etl_to_dev_partition
+  uuid: run_spark_yellow_taxi_etl_to_dev_partition
+created_at: '2024-08-17 02:14:51.677403+00:00'
+data_integration: null
+description: Run this pipeline orchestration to locally populate tripdata to both
+  simulated data warehouse and data lakehouse
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: spark_populate_tripdata_local_infastructure
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags:
+- production
+type: python
+uuid: spark_populate_tripdata_local_infastructure
+variables:
+  data_loss_threshold: very_strict
+  dev_limit_rows: -1
+  end_month: 12
+  end_year: 2022
+  overwrite_enabled: true
+  pipeline_run_name: development_pipeline
+  spark_mode: cluster
+  start_month: 1
+  start_year: 2022
+  tripdata_type: yellow_cab_tripdata
+variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
+widgets: []

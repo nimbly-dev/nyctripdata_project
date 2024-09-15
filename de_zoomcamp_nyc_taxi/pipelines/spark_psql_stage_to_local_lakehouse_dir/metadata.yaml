@@ -1,0 +1,93 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    config_profile: stage_db
+    psql_environment: staging
+    target_dir: pre_lakehouse
+  downstream_blocks:
+  - spark_load_data_to_lakehouse
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_get_tripdata_from_psql
+  retry_config: {}
+  status: updated
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: spark_get_tripdata_from_psql
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    psql_environment: staging
+    target_dir: pre_stage_to_prod_psql
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_load_data_to_lakehouse
+  retry_config: {}
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - spark_get_tripdata_from_psql
+  uuid: spark_load_data_to_lakehouse
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals: []
+created_at: '2024-08-31 11:47:34.284703+00:00'
+data_integration: null
+description: Load PSQL stage to a simulated lakehouse directory
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: spark_psql_stage_to_local_lakehouse_dir
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags:
+- local
+- spark
+- lakehouse
+type: python
+uuid: spark_psql_stage_to_local_lakehouse_dir
+variables:
+  end_month: 12
+  end_year: 2022
+  pipeline_run_name: development_pipeline
+  spark_mode: cluster
+  start_month: 1
+  start_year: 2022
+  tripdata_type: yellow_cab_tripdata
+variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
+widgets:
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    chart_type: bar chart
+    limit: 10
+    x: x
+    y: y
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_get_tripdata_from_psql_table_l0
+  retry_config: null
+  status: executed
+  timeout: null
+  type: chart
+  upstream_blocks:
+  - spark_get_tripdata_from_psql
+  uuid: spark_get_tripdata_from_psql_table_l0

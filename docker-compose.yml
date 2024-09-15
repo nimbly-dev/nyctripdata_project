@@ -1,0 +1,318 @@
+version: '3.8'
+services:
+  magic:
+    image: mageai/mageai:latest
+    command: mage start de_zoomcamp_nyc_taxi
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      # MAGE CONFIGURATION
+      ULIMIT_NO_FILE: 16384
+      PROJECT_NAME: de_zoomcamp_nyc_taxi
+      USER_CODE_PATH: /home/src/de_zoomcamp_nyc_taxi
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      # SPARK CONFIGURATION
+      SPARK_MASTER_HOST: spark://spark-master:7077
+      PYSPARK_PYTHON: /usr/bin/python
+      PYSPARK_DRIVER_PYTHON: /usr/bin/python
+      SPARK_HOME: /opt/spark
+      SPARK_CONF_DIR: /opt/spark/conf
+      SPARK_WAREHOUSE_DIR: /opt/spark/data/warehouse
+      SPARK_PARTITION_FILES_DIR: /opt/spark/spark-lakehouse/partitioned
+      SPARK_LAKEHOUSE_DIR: /opt/spark/spark-lakehouse
+      # DEV CONFIGURATION
+      DEV_POSTGRES_DBNAME: nyc_taxi_dev_postgres
+      DEV_POSTGRES_SCHEMA: public
+      DEV_POSTGRES_USER: postgres
+      DEV_POSTGRES_PASSWORD: postgres
+      DEV_POSTGRES_PORT: 5432
+      DEV_POSTGRES_HOST: postgres-dev
+      DEV_SERVICE_ACCOUNT_USER: dev-service-account@de-nyctripdata-project.iam.com
+      DEV_SERVICE_ACCOUNT_PASSWORD: password123!
+      # STAGE CONFIGURATION
+      STAGE_POSTGRES_DBNAME: nyc_taxi_staging_postgres
+      STAGE_POSTGRES_SCHEMA: public
+      STAGE_POSTGRES_USER: postgres
+      STAGE_POSTGRES_PASSWORD: postgres
+      STAGE_POSTGRES_PORT: 5433
+      STAGE_POSTGRES_HOST: postgres-staging
+      STAGE_SERVICE_ACCOUNT_USER: staging-service-account@de-nyctripdata-project.iam.com
+      STAGE_SERVICE_ACCOUNT_PASSWORD: password123!
+      # PRODUCTION CONFIGURATION
+      PRODUCTION_POSTGRES_DBNAME: nyc_taxi_production_postgres
+      PRODUCTION_POSTGRES_SCHEMA: public
+      PRODUCTION_POSTGRES_USER: postgres
+      PRODUCTION_POSTGRES_PASSWORD: postgres
+      PRODUCTION_POSTGRES_PORT: 5434
+      PRODUCTION_POSTGRES_HOST: postgres-production
+      PRODUCTION_SERVICE_ACCOUNT_USER: production-service-account@de-nyctripdata-project.iam.com
+      PRODUCTION_SERVICE_ACCOUNT_PASSWORD: password123!
+    ports:
+      - 6789:6789
+    volumes:
+      - .:/home/src/
+      - ./.data:/home/src/mage_data
+      - spark-home:/opt/spark
+    networks:
+      - mage-network
+
+  spark-master:
+    image: cluster-apache-spark:python3.10.14-spark3.5.1
+    container_name: spark-master
+    build:
+      context: ./deployment/spark  
+      dockerfile: Dockerfile  
+    networks:
+      - mage-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    environment:
+      SPARK_LOCAL_IP: spark-master
+      SPARK_WORKLOAD: master
+      PYSPARK_PYTHON: /usr/bin/python
+      PYSPARK_DRIVER_PYTHON: /usr/bin/python
+      SPARK_EVENTLOG_DIR: /opt/spark/logs/eventLog
+      SPARK_HISTORY_DIR:  /opt/spark/logs/history
+      SPARK_WAREHOUSE_DIR: /opt/spark/data/warehouse
+      SPARK_LAKEHOUSR_DIR: /opt/spark/spark-lakehouse
+      SPARK_CHECKPOINT_DIR: /opt/spark/data/checkpoints
+      SPARK_LOCAL_DIR: /opt/spark/data/tmp
+    volumes:
+      - spark-home:/opt/spark
+      - ./.data/spark-data:/opt/spark/work
+      # - ./.data/spark-lakehosue:/opt/spark/spark-lakehouse
+    ports:
+      - "9090:8080"
+      - "7077:7077"
+      - "7337:7337"
+
+  spark-worker-1:
+    image: cluster-apache-spark:python3.10.14-spark3.5.1
+    container_name: spark-worker-1
+    entrypoint: ['/bin/bash', '/start-spark.sh', 'worker']
+    build:
+      context: ./deployment/spark  
+      dockerfile: Dockerfile  
+    networks:
+      - mage-network
+    depends_on:
+      - spark-master
+    environment:
+      SPARK_MASTER: spark://spark-master:7077
+      SPARK_WORKER_CORES: 2  
+      SPARK_WORKER_MEMORY: 4G 
+      SPARK_WORKLOAD: worker
+      SPARK_LOCAL_IP: spark-worker-1
+      PYSPARK_PYTHON: /usr/bin/python
+      PYSPARK_DRIVER_PYTHON: /usr/bin/python
+      SPARK_EVENTLOG_DIR: /opt/spark/logs/eventLog
+      SPARK_HISTORY_DIR:  /opt/spark/logs/history
+      SPARK_WAREHOUSE_DIR: /opt/spark/data/warehouse
+      SPARK_LAKEHOUSR_DIR: /opt/spark/spark-lakehouse
+      SPARK_CHECKPOINT_DIR: /opt/spark/data/checkpoints
+      SPARK_LOCAL_DIR: /opt/spark/data/tmp
+    volumes:
+      - spark-home:/opt/spark
+      - ./.data/spark-data:/opt/spark/work
+      # - ./.data/spark-lakehosue:/opt/spark/spark-lakehouse
+    ports:
+      - "9091:8081"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "4G"
+          
+  spark-worker-2:
+    image: cluster-apache-spark:python3.10.14-spark3.5.1
+    container_name: spark-worker-2
+    entrypoint: ['/bin/bash', '/start-spark.sh', 'worker']
+    build:
+      context: ./deployment/spark  
+      dockerfile: Dockerfile  
+    networks:
+      - mage-network
+    depends_on:
+      - spark-master
+    environment:
+      SPARK_MASTER: spark://spark-master:7077
+      SPARK_WORKER_CORES: 2  
+      SPARK_WORKER_MEMORY: 4G 
+      SPARK_WORKLOAD: worker
+      SPARK_LOCAL_IP: spark-worker-2
+      PYSPARK_PYTHON: /usr/bin/python
+      PYSPARK_DRIVER_PYTHON: /usr/bin/python
+      SPARK_EVENTLOG_DIR: /opt/spark/logs/eventLog
+      SPARK_HISTORY_DIR:  /opt/spark/logs/history
+      SPARK_WAREHOUSE_DIR: /opt/spark/data/warehouse
+      SPARK_LAKEHOUSR_DIR: /opt/spark/spark-lakehouse
+      SPARK_CHECKPOINT_DIR: /opt/spark/data/checkpoints
+      SPARK_LOCAL_DIR: /opt/spark/data/tmp
+    volumes:
+      - spark-home:/opt/spark
+      - ./.data/spark-data:/opt/spark/work
+      # - ./.data/spark-lakehosue:/opt/spark/spark-lakehouse
+    ports:
+      - "9092:8081"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "4G"
+
+  spark-worker-3:
+    image: cluster-apache-spark:python3.10.14-spark3.5.1
+    container_name: spark-worker-3
+    entrypoint: ['/bin/bash', '/start-spark.sh', 'worker']
+    build:
+      context: ./deployment/spark  
+      dockerfile: Dockerfile  
+    networks:
+      - mage-network
+    depends_on:
+      - spark-master
+    environment:
+      SPARK_MASTER: spark://spark-master:7077
+      SPARK_WORKER_CORES: 2  
+      SPARK_WORKER_MEMORY: 4G 
+      SPARK_WORKLOAD: worker
+      SPARK_LOCAL_IP: spark-worker-3
+      PYSPARK_PYTHON: /usr/bin/python
+      PYSPARK_DRIVER_PYTHON: /usr/bin/python
+      SPARK_EVENTLOG_DIR: /opt/spark/logs/eventLog
+      SPARK_HISTORY_DIR:  /opt/spark/logs/history
+      SPARK_WAREHOUSE_DIR: /opt/spark/data/warehouse
+      SPARK_LAKEHOUSR_DIR: /opt/spark/spark-lakehouse
+      SPARK_CHECKPOINT_DIR: /opt/spark/data/checkpoints
+      SPARK_LOCAL_DIR: /opt/spark/data/tmp
+    volumes:
+      - spark-home:/opt/spark
+      - ./.data/spark-data:/opt/spark/work
+      # - ./.data/spark-lakehosue:/opt/spark/spark-lakehouse
+    ports:
+      - "9093:8081"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "4G"
+
+  spark-history:
+    image: cluster-apache-spark:python3.10.14-spark3.5.1
+    container_name: spark-history
+    build:
+      context: ./deployment/spark  
+      dockerfile: Dockerfile  
+    networks:
+      - mage-network
+    environment:
+      SPARK_WORKLOAD: history
+      PYSPARK_PYTHON: /usr/bin/python
+      PYSPARK_DRIVER_PYTHON: /usr/bin/python
+      SPARK_HISTORY_OPTS: >
+        -Dspark.history.fs.logDirectory=/opt/spark/logs/eventLog
+        -Dspark.history.ui.port=18080
+      SPARK_LOG_DIR: /opt/spark/logs
+      SPARK_HISTORY_LOG: /opt/spark/logs/spark-history.out
+    volumes:
+      - spark-home:/opt/spark
+      - ./.data/spark-data:/opt/spark/work
+    ports:
+      - "18080:18080"  # History Server UI
+      
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    volumes:
+      - ./deployment/servers.json:/pgadmin4/servers.json
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - "5050:80"
+    networks:
+      - mage-network
+
+  postgres-dev:
+    image: postgres:14
+    container_name: nyc-taxi-dev-postgres
+    restart: always
+    env_file:
+      - ./deployment/users/dev_user.env
+    depends_on:
+      - pgadmin
+    environment:
+      POSTGRES_DB: nyc_taxi_dev_postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5432
+      PGPORT: 5432
+      ENVIRONMENT: dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./.data/db_data/nyc_taxi_dev_data:/var/lib/postgresql/data:rw"
+      - "./deployment/db-entrypoint/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh"
+      - "./deployment/deployment-sql:/deployment-sql"  # Mount the SQL directory
+    networks:
+      - mage-network
+
+  postgres-staging:
+    image: postgres:14
+    container_name: nyc-taxi-staging-postgres
+    restart: always
+    env_file:
+      - ./deployment/users/stage_user.env
+    depends_on:
+      - pgadmin
+    environment:
+      POSTGRES_DB: nyc_taxi_staging_postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5433
+      PGPORT: 5433
+      ENVIRONMENT: stage
+    ports:
+      - "5433:5433"
+    volumes:
+      - "./.data/db_data/nyc_taxi_stage_data:/var/lib/postgresql/data:rw"
+      - "./deployment/db-entrypoint/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh"
+      - "./deployment/deployment-sql:/deployment-sql"  # Mount the SQL directory
+    networks:
+      - mage-network
+
+  postgres-production:
+    image: postgres:14
+    container_name: nyc-taxi-production-postgres
+    restart: always    
+    env_file:
+      - ./deployment/users/prod_user.env
+    depends_on:
+      - pgadmin
+    environment:
+      POSTGRES_DB: nyc_taxi_production_postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5434
+      PGPORT: 5434
+      ENVIRONMENT: production
+    ports:
+      - "5434:5434"
+    volumes:
+      - "./.data/db_data/nyc_taxi_production_data:/var/lib/postgresql/data:rw"
+      - "./deployment/db-entrypoint/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh"
+      - "./deployment/deployment-sql:/deployment-sql"  # Mount the SQL directory
+    networks:
+      - mage-network
+
+networks:
+  mage-network:
+    driver: bridge
+
+volumes:
+  spark-home:

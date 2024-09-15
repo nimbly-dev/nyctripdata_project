@@ -1,0 +1,291 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_path: data_loaders/spark_get_tripdata_from_pq_partition.py
+    file_source:
+      path: data_loaders/spark_get_tripdata_from_pq_partition.py
+    source_pq_path: dev
+    target_pq_path: stage
+  downstream_blocks:
+  - conditional_run_clean_taxi_data
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_get_tripdata_from_pq_partition
+  retry_config:
+    delay: 45
+    max_delay: 80
+    retries: 5
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: spark_get_tripdata_from_pq_partition
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    file_source:
+      path: transformers/spark_add_unique_identifier.py
+    tripdata_type: yellow_cab_tripdata
+  downstream_blocks:
+  - spark_load_parquet_to_psql
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_add_unique_identifier
+  retry_config: {}
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - check_if_taxi_clean_codeblock_is_done
+  uuid: spark_add_unique_identifier
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_source:
+      path: transformers/spark_clean_yellow_taxi_data.py
+    pq_dir: stage
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_clean_yellow_taxi_data
+  retry_config: {}
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - conditional_run_clean_taxi_data
+  uuid: spark_clean_yellow_taxi_data
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_source:
+      path: transformers/spark_clean_green_taxi_data.py
+    pq_dir: stage
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_clean_green_taxi_data
+  retry_config: {}
+  status: updated
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - conditional_run_clean_taxi_data
+  uuid: spark_clean_green_taxi_data
+- all_upstream_blocks_executed: true
+  color: teal
+  configuration:
+    file_source:
+      path: custom/conditional_run_clean_taxi_data.py
+  downstream_blocks:
+  - spark_clean_yellow_taxi_data
+  - spark_clean_green_taxi_data
+  - spark_clean_fhv_taxi_data
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: conditional_run_clean_taxi_data
+  retry_config: null
+  status: executed
+  timeout: null
+  type: custom
+  upstream_blocks:
+  - spark_get_tripdata_from_pq_partition
+  uuid: conditional_run_clean_taxi_data
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - spark_add_unique_identifier
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: check_if_taxi_clean_codeblock_is_done
+  retry_config: null
+  status: updated
+  timeout: null
+  type: sensor
+  upstream_blocks: []
+  uuid: check_if_taxi_clean_codeblock_is_done
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_source:
+      path: transformers/spark_clean_fhv_taxi_data.py
+    pq_dir: stage
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_clean_fhv_taxi_data
+  retry_config: {}
+  status: updated
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - conditional_run_clean_taxi_data
+  uuid: spark_clean_fhv_taxi_data
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    config_profile: stage_db
+    file_source:
+      path: data_exporters/spark_load_parquet_to_psql.py
+    pq_dir: stage
+    psql_environment: staging
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_load_parquet_to_psql
+  retry_config: {}
+  status: failed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - spark_add_unique_identifier
+  uuid: spark_load_parquet_to_psql
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config:
+  pipeline_run_limit_all_triggers: 1
+conditionals:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_export_dev_pq_fhv_taxi_data_to_stage_psql
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks: []
+  uuid: run_export_dev_pq_fhv_taxi_data_to_stage_psql
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_clean_fhv_taxi_data
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - spark_clean_fhv_taxi_data
+  uuid: run_clean_fhv_taxi_data
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_load_dev_green_taxi_data_to_stage_psql
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks: []
+  uuid: run_load_dev_green_taxi_data_to_stage_psql
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_load_dev_yellow_taxi_data_to_stage_psql
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks: []
+  uuid: run_load_dev_yellow_taxi_data_to_stage_psql
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_clean_green_taxi_data
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - spark_clean_green_taxi_data
+  uuid: run_clean_green_taxi_data
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_clean_yellow_taxi_data
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - spark_clean_yellow_taxi_data
+  uuid: run_clean_yellow_taxi_data
+created_at: '2024-08-03 08:18:50.843912+00:00'
+data_integration: null
+description: Load data from stage temp table to stage table
+executor_config: {}
+executor_count: 1
+executor_type: local_python
+extensions: {}
+name: spark_load_to_psql_stage
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers:
+    save_in_code_automatically: true
+spark_config: {}
+tags:
+- staging
+- spark
+- psql
+type: python
+uuid: spark_load_to_psql_stage
+variables:
+  end_month: 12
+  end_year: 2022
+  overwrite_enabled: true
+  pipeline_run_name: populate_greentripdata_2021_2022
+  spark_mode: cluster
+  start_month: 1
+  start_year: 2021
+  tripdata_type: green_cab_tripdata
+variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
+widgets: []

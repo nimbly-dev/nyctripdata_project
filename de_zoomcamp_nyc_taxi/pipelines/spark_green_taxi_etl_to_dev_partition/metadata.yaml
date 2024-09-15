@@ -1,0 +1,94 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    base_url: https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_
+    file_source:
+      path: data_loaders/spark_download_and_partition_nyc_taxi_data.py
+    partition_column: lpep_pickup_datetime
+    tripdata_type: green_cab_tripdata
+  downstream_blocks:
+  - spark_transform_green_taxi_data_column
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_download_and_partition_nyc_taxi_data
+  retry_config: {}
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: spark_download_and_partition_nyc_taxi_data
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    pq_dir: dev
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_clean_green_taxi_data
+  retry_config: {}
+  status: updated
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - spark_transform_green_taxi_data_column
+  uuid: spark_clean_green_taxi_data
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_source:
+      path: transformers/spark_transform_green_taxi_data_column.py
+  downstream_blocks:
+  - spark_clean_green_taxi_data
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: spark_transform_green_taxi_data_column
+  retry_config: null
+  status: updated
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - spark_download_and_partition_nyc_taxi_data
+  uuid: spark_transform_green_taxi_data_column
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals: []
+created_at: '2024-08-18 11:04:47.960277+00:00'
+data_integration: null
+description: 'Load from NYC tripdata website to PSQL temp stage table '
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: spark_green_taxi_etl_to_dev_partition
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags:
+- spark
+- green_cab_tripdata
+- development
+type: python
+uuid: spark_green_taxi_etl_to_dev_partition
+variables:
+  dev_limit_rows: -1
+  end_month: 2
+  end_year: 2024
+  pipeline_run_name: development_pipeline
+  spark_mode: cluster
+  start_month: 1
+  start_year: 2023
+  tripdata_type: green_cab_tripdata
+variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
+widgets: []

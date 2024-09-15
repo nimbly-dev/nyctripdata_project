@@ -1,0 +1,34 @@
+<configuration>
+  <property>
+    <name>fs.AbstractFileSystem.gs.impl</name>
+    <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS</value>
+    <description>The AbstractFileSystem for 'gs:' URIs.</description>
+  </property>
+  <!-- <property>
+    <name>fs.gs.impl</name>
+    <value>com.google.cloud.hadoop.fs.gcs.GoogleHadoopFileSystem</value>
+  </property> -->
+  <property>
+    <name>fs.gs.project.id</name>
+    <value></value>
+    <description>
+      Optional. Google Cloud Project ID with access to GCS buckets.
+      Required only for list buckets and create bucket operations.
+    </description>
+  </property>
+  <property>
+    <name>google.cloud.auth.type</name>
+    <value>SERVICE_ACCOUNT_JSON_KEYFILE</value>
+    <description>
+      Authentication type to use for GCS access.
+    </description>
+  </property>
+  <property>
+    <name>google.cloud.auth.service.account.json.keyfile</name>
+    <value>opt/spark/gcs-keys/keys/my-creds.json</value>
+    <description>
+      The JSON keyfile of the service account used for GCS
+      access when google.cloud.auth.type is SERVICE_ACCOUNT_JSON_KEYFILE.
+    </description>
+  </property>
+</configuration>

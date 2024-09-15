@@ -1,0 +1,35 @@
+project_type: standalone
+
+variables_dir: ~/home/src/.data/mage_data
+# remote_variables_dir: s3://bucket/path_prefix
+
+variables_retention_period: 1h
+cache_block_output_in_memory: false
+emr_config:
+spark_config:
+  # Application name
+  app_name: mage_spark
+  spark_master: spark://spark-master:7077
+  executor_env: {}
+  spark_jars:
+  - /opt/spark/third-party-jars/postgresql-42.2.24.jar
+  spark_home: /opt/spark
+  others: {}
+  use_custom_session: true
+  custom_session_var_name: spark
+help_improve_mage: true
+notification_config:
+  alert_on:
+  - trigger_failure
+  - trigger_passed_sla
+  slack_config:
+    webhook_url: "{{ env_var('MAGE_SLACK_WEBHOOK_URL') }}"
+  teams_config:
+    webhook_url: "{{ env_var('MAGE_TEAMS_WEBHOOK_URL') }}"
+project_uuid: 9f230f3714924afdb36aa3147ab6aa9a
+features:
+  add_new_block_v2: true
+  automatic_kernel_cleanup: true
+  compute_management: true
+pipelines:
+remote_variables_dir:
