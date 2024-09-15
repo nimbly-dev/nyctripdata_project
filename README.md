@@ -260,7 +260,7 @@ The following is the Pipelines being run by this pipeline Orchestration
 ├───data_tmp_cleanup
 ```
 
-### Populate Infra Tripdata Pipelines
+#### Populate Infra Tripdata Pipelines
 
 ![Populate Infra Tripdata Pipelines](images/documentation/spark_populate_tripdata_local_infastructure_pipeline_chart.JPG)
 
