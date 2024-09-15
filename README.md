@@ -348,7 +348,7 @@ Key Points:
 - **Uniqueness**: The `dwid` is designed to be unique and deterministic. It is not random but derived from consistent values in the common columns.
 - **Deterministic Nature**: This ensures that the `dwid` remains consistent even if the data pipeline is run multiple times. This deterministic approach supports reliable upserts (updates and inserts) without duplication.
 
-By generating a `dwid` based on these key columns, we ensure consistent and unique identification across datasets, facilitating efficient data management and integration.
+By generating a `dwid` based on these key columns, we ensure consistent and unique identification across datasets, this also allows us to do an **upsert** operation whenever needed using this column.
 
 #### Partitioning in the Tripdata Tables
 
