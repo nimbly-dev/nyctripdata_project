@@ -74,9 +74,11 @@ After starting the project, navigate to [http://localhost:6789/](http://localhos
 
 ![NYC Tripdata Overview Page](images/documentation/nyc_tripdata_homepage.JPG)
 
+
 ## 📚 Documentation
 
 > **Note**: This guide focuses on the usage of the project and its pipelines. For detailed information on using Mage, please refer to the [Mage documentation](https://docs.mage.ai/introduction/overview).
+
 
 ### Running on Docker
 
@@ -96,6 +98,7 @@ The Docker Compose configuration sets up the following services, all connected t
 └── postgres-production   # PostgreSQL for the production environment
 ```
 
+
 #### Spark Configuration
 
 The default Spark service configuration includes the following ports:
@@ -104,6 +107,7 @@ The default Spark service configuration includes the following ports:
 - **Worker UI**: 7000
 - **Web UI**: 9090
 - **Worker Web UI**: 9091, 9092, 909* (for workers)
+
 
 #### Adding a New Spark Worker
 
@@ -144,6 +148,7 @@ If you need to add additional Spark workers to the cluster, you can easily appen
           memory: "4G"
 ```
 
+
 #### Database Configurations
 
 The following are the default hostname and ports of our Postgres databases.
@@ -163,9 +168,11 @@ Furthermore, these are the service account users that are used by the pipeline i
 | Production | `production-service-account@de-nyctripdata-project.iam.com` | `nyc_taxi_production_postgres` | - **SELECT**, **INSERT**, **UPDATE**, **DELETE** on all tables in `public` and `temp` schemas<br>- **CREATE** on `public` and `temp` schemas<br>- **USAGE**, **SELECT** on all sequences in `public` and `temp` schemas |
 
 
+
 #### Populating the Databases with Tripdata
 
 To populate the databases with NYC trip data, you can use the **spark_populate_tripdata_local_infrastructure** pipeline. This pipeline orchestrates various stages, transforming raw trip data into production-ready formats to be stored in both the Data Warehouse and Data Lakehouse.
+
 
 ### Getting Started with the Pipeline
 
@@ -183,6 +190,8 @@ To populate the databases with NYC trip data, you can use the **spark_populate_t
    Copy the API URL provided and use a tool like Postman to execute the pipeline.
 
    ![Trigger Endpoint URL](images/documentation/endpoint_spark_populate_tripdata_local_infastructure.JPG)
+
+
 
 #### Example API Request Body
 
@@ -239,6 +248,7 @@ Once you send the request, the pipeline will begin processing the data as per th
   - `"very_strict"`: Maximum data loss of **1%**.
   - `"strict"`: Maximum data loss of **5%**.
   - `"moderate"`: Maximum data loss of **10%**.
+
  
 ### Structure of the Populate Tripdata Pipeline 
 
@@ -266,6 +276,7 @@ The following is the Pipelines being run by this pipeline Orchestration
 
 The `Populate Infra Tripdata Pipelines` workflow is a series of pipelines that automate the processing of NYC trip data from downloading to production. Each pipeline performs specific tasks to ensure data is correctly processed, cleaned, and loaded into PostgreSQL and the Lakehouse storage.
 
+
 ##### 1. **`spark_taxi_etil_to_dev_partition` Pipeline**
 
 This pipeline is responsible for preparing the trip data for further processing:
@@ -274,6 +285,7 @@ This pipeline is responsible for preparing the trip data for further processing:
 - Transforms columns by converting data types and renaming columns as necessary.
 - Cleans the data for quality assurance.
 - Writes the cleaned data to a temporary Parquet directory in the **dev** environment.
+
 
 ##### 2. **`spark_load_to_psql_stage` Pipeline**
 
@@ -290,6 +302,7 @@ This pipeline loads the cleaned trip data into the **staging** PostgreSQL table 
 Overwrite Workflow: 
 ![Spark Load Workflow](images/documentation/psql_load_workflow.gif)
 
+
 ##### 3. **`spark_psql_stage_to_local_lakehouse_dir` Pipeline**
 
 This pipeline moves the trip data from the **staging** PostgreSQL table to the local Lakehouse directory:
@@ -297,6 +310,7 @@ This pipeline moves the trip data from the **staging** PostgreSQL table to the l
 - Extracts the data from the **staging** trip data table.
 - Writes the data to a **pre-lakehouse** temporary Parquet directory.
 - Writes the final data to the **Lakehouse** directory at `/opt/spark/spark-lakehouse/partitioned/{tripdata_type}/data` in Parquet format.
+
 
 ##### 4. **`spark_psql_stage_to_production` Pipeline**
 
@@ -306,6 +320,7 @@ This pipeline transfers data from the **Lakehouse** and **staging** environments
 - Join the two datasets, treating the **Lakehouse** as the source of truth.
 - Applies a basic cleaning process to the combined dataset.
 - Loads the cleaned and combined data into the **production** trip data table using an **upsert strategy** similar to the one used in the `spark_load_to_psql_stage` pipeline.
+
 
 ### Tripdata Tables
 
