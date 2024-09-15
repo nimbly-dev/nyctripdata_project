@@ -37,7 +37,7 @@ The project leverages both **Data Lakehouse** and **Data Warehouse** architectur
 - **Data Lakehouse**: This is where raw and intermediate data is stored. The local storage is organized under the `spark-lakehouse` directory, where temporary files, downloads, and processed trip data are housed.
 - **Data Warehouse**: The processed data moves through a series of PostgreSQL databases: **dev**, **stage**, and **production**, ensuring a smooth transition across the lifecycle and enhancing governance and data management.
 
-This pipeline architecture demonstrates the system’s ability to handle **large datasets** with high **reliability** and **efficiency**, mimicking a production-like environment.
+This architecture demonstrates the system’s ability to handle **large datasets** with high **reliability** and **efficiency**, mimicking a production-like environment.
 
 ## 📊 Dataset
 The data is sourced from the [NYC Taxi & Limousine Commission Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). Many data engineering principles used in this project are inspired by the [DataTalksClub Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp).
