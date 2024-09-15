@@ -366,3 +366,21 @@ When modifying the pipeline, consider the following guidelines:
 - **Stage Level**: Use this stage for ensuring data integrity, adding columns present across datasets, and pre-production data cleaning and transformation. It is suitable for global changes that affect all Tripdata types.
 
 - **Production Level**: Make minimal changes here. This stage combines lakehouse data and stage data to maintain data integrity. Include only dynamic cleaning operations. Avoid column transformations at this level; these should be handled in the Stage level for global changes or the Development stage for specific changes.
+
+### Monitoring Pipelines
+
+You can monitor the progress of your pipeline directly in the Mage app. Navigate to [http://localhost:6789/pipelines](http://localhost:6789/pipelines) to view the pipeline status.
+
+If the pipeline fails, you can investigate the issue by selecting the pipeline detail and reviewing the logs. You can also re-run the pipeline if necessary.
+
+![Pipeline Run List](images/documentation/pipeline_run_list.JPG)
+
+Clicking on a specific pipeline will display the individual code blocks that are executed as part of the pipeline:
+
+![Pipeline Run Detail](images/documentation/pipeline_run_detail.JPG)
+
+To view real-time logs or troubleshoot errors, click the logs icon, which provides a live tail of the pipeline’s execution:
+
+![Pipeline Run Log Tail](images/documentation/pipeline_log_tail.JPG)
+
+
