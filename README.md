@@ -21,9 +21,17 @@ This project simulates a **production-grade Data Infrastructure** designed to pr
 ![Environment Diagram](images/environment_diagram.png)
 
 The data processing in this project follows a **vertical pipeline** architecture with three stages:
-1. **Development**: Focuses on data cleaning, column transformations, and preparing raw data for subsequent stages.
-2. **Staging**: Responsible for **data governance**—applying rules to the datasets, modifying columns, and ensuring that data quality is maintained throughout the process.
-3. **Production**: In this final stage, data is ready for **feature extraction**, **reporting**, and **analysis**.
+1. **Development**: 
+   - Focuses on data cleaning, transformations, and preparation of raw data.
+   - Handles **specific Tripdata type modifications** and processes, ensuring that each dataset (e.g., yellow cab, green cab) is adjusted individually before moving forward.
+
+2. **Staging**: 
+   - Responsible for **data governance** and ensuring data quality.
+   - Applies **global transformations** across all Tripdata types, such as adding unique identifiers (e.g., `dwid`), making data consistent and up to standard before it moves to production.
+
+3. **Production**: 
+   - The final stage where data is fully prepared for **feature extraction**, **reporting**, and **analysis**.
+   - The data at this point is ready for consumption in analytical and reporting workflows.
 
 The project leverages both **Data Lakehouse** and **Data Warehouse** architectures for effective data management:
 - **Data Lakehouse**: This is where raw and intermediate data is stored. The local storage is organized under the `spark-lakehouse` directory, where temporary files, downloads, and processed trip data are housed.
