@@ -70,6 +70,10 @@ cd nyctripdata_project
 docker-compose up -d
 ```
 
+After starting the project, navigate to [http://localhost:6789/](http://localhost:6789/). This will take you to the Mage Dashboard, where you can manage the pipelines and view data processing workflows.
+
+![NYC Tripdata Overview Page](images/documentation/nyc_tripdata_homepage.JPG)
+
 ## 📚 Documentation
 
 > **Note**: This guide focuses on the usage of the project and its pipelines. For detailed information on using Mage, please refer to the [Mage documentation](https://docs.mage.ai/introduction/overview).
@@ -150,9 +154,14 @@ The following are the default hostname and ports of our Postgres databases.
 | **nyc_taxi_staging_postgres**| `postgres-staging`  | 5433  |
 | **nyc_taxi_production_postgres** | `postgres-production` | 5434  |
 
-After starting the project, navigate to [http://localhost:6789/](http://localhost:6789/). This will take you to the Mage Dashboard, where you can manage the pipelines and view data processing workflows.
+Furthermore, these are the service account users that are used by the pipeline in order to query with the databases
 
-![NYC Tripdata Overview Page](images/documentation/nyc_tripdata_homepage.JPG)
+| Environment | Service Account Email | Database Name | Role (Privileges) |
+|-------------|-----------------------|---------------|-------------------|
+| Development | `dev-service-account@de-nyctripdata-project.iam.com` | `nyc_taxi_dev_postgres` | - **SELECT**, **INSERT**, **UPDATE**, **DELETE** on all tables in `public` and `temp` schemas<br>- **CREATE** on `public` and `temp` schemas<br>- **USAGE**, **SELECT** on all sequences in `public` and `temp` schemas |
+| Staging | `staging-service-account@de-nyctripdata-project.iam.com` | `nyc_taxi_staging_postgres` | - **SELECT**, **INSERT**, **UPDATE**, **DELETE** on all tables in `public` and `temp` schemas<br>- **CREATE** on `public` and `temp` schemas<br>- **USAGE**, **SELECT** on all sequences in `public` and `temp` schemas |
+| Production | `production-service-account@de-nyctripdata-project.iam.com` | `nyc_taxi_production_postgres` | - **SELECT**, **INSERT**, **UPDATE**, **DELETE** on all tables in `public` and `temp` schemas<br>- **CREATE** on `public` and `temp` schemas<br>- **USAGE**, **SELECT** on all sequences in `public` and `temp` schemas |
+
 
 #### Populating the Databases with Tripdata
 
