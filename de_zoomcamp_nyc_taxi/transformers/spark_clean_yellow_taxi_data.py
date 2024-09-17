@@ -18,6 +18,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 from datetime import datetime
 from calendar import monthrange
+import calendar
 
 SPARK_LAKEHOUSE_FILES_DIR = os.getenv('SPARK_LAKEHOUSE_DIR_FILES', '/opt/spark/spark-lakehouse/partitioned')
 SPARK_LAKEHOUSE_DIR = os.getenv('SPARK_LAKEHOUSE_DIR', '/opt/spark/spark-lakehouse')
@@ -47,17 +48,14 @@ def transform(data, *args, **kwargs):
 
     # Loop over the date range
     start_date = datetime(start_year, start_month, 1)
-    end_date = datetime(end_year, end_month, monthrange(end_year, end_month)[1]) 
-    
+    last_day = calendar.monthrange(end_year, end_month)[1]
+    end_date = datetime(end_year, end_month, last_day)
+        
     current_date = start_date
     while current_date <= end_date:
         year = current_date.year
         month = current_date.month
         
-        # Get the last day of the current month
-        last_day = monthrange(year, month)[1]
-        LOG.info(f"Processing data for {year}-{month} (Last day: {last_day})")
-
         partition_path = os.path.join(base_path, f'year={year}', f'month={month}')
         LOG.info(f'Partition path: {partition_path}')
 
@@ -80,8 +78,13 @@ def transform(data, *args, **kwargs):
         df.write.mode("overwrite").parquet(partition_path)
         LOG.info(f"Writing cleaned data for {year}-{month} to Parquet files at: {partition_path}")
         
-        # Update to next month
-        current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
+        # Move to the next month
+        if month == 12:
+            year += 1
+            month = 1
+        else:
+            month += 1
+        current_date = datetime(year, month, 1)
 
     LOG.info("Transformation complete")
 
@@ -105,11 +108,13 @@ def read_parquet(args, kwargs) -> DataFrame:
     spark = get_spark_session(mode=spark_mode, appname='test_all_conditions_spark_clean_yellow_taxi_data')
     
     dfs = []
+
     # Loop over the date range
     start_date = datetime(start_year, start_month, 1)
-    end_date = datetime(end_year, end_month, 1)
+    last_day = calendar.monthrange(end_year, end_month)[1]
+    end_date = datetime(end_year, end_month, last_day)
+        
     current_date = start_date
-    
     while current_date <= end_date:
         year = current_date.year
         month = current_date.month
@@ -119,7 +124,15 @@ def read_parquet(args, kwargs) -> DataFrame:
             df = spark.read.schema(get_dataframe_schema(spark,partition_path)).parquet(partition_path)
             dfs.append(df)
         
-        current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
+        if month == 12:
+            year += 1
+            month = 1
+        else:
+            month += 1
+
+        # Update current_date based on updated year and month
+        current_date = datetime(year, month, 1)
+
     
     if not dfs:
         raise ValueError("No parquet files found in the specified date range.")
