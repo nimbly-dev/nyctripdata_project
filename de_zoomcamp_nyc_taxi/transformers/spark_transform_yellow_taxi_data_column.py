@@ -12,7 +12,7 @@ from de_zoomcamp_nyc_taxi.model.schema.yellow_tripdata import YellowTripDataSche
 from de_zoomcamp_nyc_taxi.utils.common.common_util import validate_parquet_files
 from de_zoomcamp_nyc_taxi.utils.spark.spark_util import get_spark_session
 from datetime import datetime
-from calendar import monthrange
+import calendar
 
 logger = logging.getLogger(__name__)
 
@@ -53,10 +53,6 @@ def transform(*args, **kwargs):
     while current_date <= end_date:
         year = current_date.year
         month = current_date.month
-        
-        # Get the last day of the current month
-        last_day = monthrange(year, month)[1]
-        LOG.info(f"Processing data for {year}-{month} (Last day: {last_day})")
 
         partition_path = os.path.join(partitioned_path, f'year={year}', f'month={month}')
         LOG.info(f'Partition path: {partition_path}')
@@ -64,11 +60,7 @@ def transform(*args, **kwargs):
         if not validate_parquet_files(partition_path):
             raise FileNotFoundError(f"No valid Parquet files found in directory: {partition_path}")
 
-        df = spark.read.parquet(partitioned_path)
-
-        # Add year and month columns based on pickup_datetime
-        df = df.withColumn("year", pyspark_year(df["tpep_pickup_datetime"])) \
-            .withColumn("month", pyspark_month(df["tpep_dropoff_datetime"]))
+        df = spark.read.parquet(partition_path)
 
         # Cast columns to desired types
         df = schema_manager.cast_columns(df)
@@ -85,9 +77,16 @@ def transform(*args, **kwargs):
         write_path = os.path.join(dev_path, f'year={year}', f'month={month}')
         df.write.mode("overwrite").parquet(write_path)
         
-        # Update to next month
-        current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
+        if month == 12:
+            year += 1
+            month = 1
+        else:
+            month += 1
 
+        # Update current_date based on updated year and month
+        current_date = datetime(year, month, 1)
+
+            
     LOG.info("Transformation complete")
     spark.stop()
 
@@ -137,11 +136,10 @@ def test_columns_name_and_type(*args, **kwargs):
         StructField("airport_fee", FloatType(), True)
     ])
 
-    # Loop over the date range
     start_date = datetime(start_year, start_month, 1)
     last_day = calendar.monthrange(end_year, end_month)[1]
     end_date = datetime(end_year, end_month, last_day)
-
+        
     current_date = start_date
     while current_date <= end_date:
         year = current_date.year
@@ -182,12 +180,15 @@ def test_columns_name_and_type(*args, **kwargs):
             assert actual_dtype == expected_dtype, \
                 f"Column '{column}' in {year}-{month} has wrong type: expected {expected_dtype}, got {actual_dtype}"
 
-        # Update the counter to the next month
-        current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
+        if month == 12:
+            year += 1
+            month = 1
+        else:
+            month += 1
+
+        # Update current_date based on updated year and month
+        current_date = datetime(year, month, 1)
+
 
     LOG.info("Schema validation complete")
     spark.stop()
-
-
-
-
