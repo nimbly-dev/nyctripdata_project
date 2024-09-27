@@ -31,12 +31,12 @@ blocks:
   language: python
   name: spark_get_tripdata_from_psql
   retry_config: {}
-  status: updated
+  status: executed
   timeout: null
   type: data_loader
   upstream_blocks: []
   uuid: spark_get_tripdata_from_psql
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration: {}
   downstream_blocks:
@@ -54,7 +54,7 @@ blocks:
   - spark_get_tripdata_from_psql
   - spark_get_tripdata_from_lakehouse
   uuid: spark_combine_lakehouse_and_psql_data
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration:
     columns_to_exclude_from_null_check: '[]'
@@ -75,7 +75,7 @@ blocks:
   upstream_blocks:
   - spark_combine_lakehouse_and_psql_data
   uuid: spark_do_basic_clean_operations
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration:
     config_profile: production_db
@@ -91,7 +91,7 @@ blocks:
   language: python
   name: spark_load_parquet_to_psql
   retry_config: {}
-  status: updated
+  status: executed
   timeout: null
   type: data_exporter
   upstream_blocks:
@@ -127,10 +127,10 @@ variables:
   end_month: 12
   end_year: 2022
   overwrite_enabled: true
-  pipeline_run_name: populate_fhvtripdata_2022
+  pipeline_run_name: populate_yellowtripdata_2021_2022
   spark_mode: cluster
   start_month: 1
-  start_year: 2022
-  tripdata_type: fhv_cab_tripdata
+  start_year: 2021
+  tripdata_type: yellow_cab_tripdata
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

@@ -13,12 +13,12 @@ blocks:
   language: python
   name: spark_get_tripdata_from_psql
   retry_config: {}
-  status: updated
+  status: executed
   timeout: null
   type: data_loader
   upstream_blocks: []
   uuid: spark_get_tripdata_from_psql
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration:
     psql_environment: staging
@@ -64,14 +64,14 @@ uuid: spark_psql_stage_to_local_lakehouse_dir
 variables:
   end_month: 12
   end_year: 2022
-  pipeline_run_name: development_pipeline
+  pipeline_run_name: populate_yellowtripdata_2021_2022
   spark_mode: cluster
   start_month: 1
-  start_year: 2022
+  start_year: 2021
   tripdata_type: yellow_cab_tripdata
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets:
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration:
     chart_type: bar chart
