@@ -17,13 +17,9 @@ $$;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO "{{SERVICE_ACCOUNT_USER}}";
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA temp TO "{{SERVICE_ACCOUNT_USER}}";
 
--- Grant CREATE privilege on the public and temp schemas
-GRANT CREATE ON SCHEMA public TO "{{SERVICE_ACCOUNT_USER}}";
-GRANT CREATE ON SCHEMA temp TO "{{SERVICE_ACCOUNT_USER}}";
-
--- Grant USAGE privilege on the public and temp schemas to allow access to them
-GRANT USAGE ON SCHEMA public TO "{{SERVICE_ACCOUNT_USER}}";
-GRANT USAGE ON SCHEMA temp TO "{{SERVICE_ACCOUNT_USER}}";
+-- Grant CREATE and USAGE privilege on the public and temp schemas
+GRANT CREATE, USAGE ON SCHEMA public TO "{{SERVICE_ACCOUNT_USER}}";
+GRANT CREATE, USAGE ON SCHEMA temp TO "{{SERVICE_ACCOUNT_USER}}";
 
 -- Grant privileges on existing sequences in the public and temp schemas
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO "{{SERVICE_ACCOUNT_USER}}";
@@ -37,8 +33,45 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA temp
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO "{{SERVICE_ACCOUNT_USER}}";
 
 -- Ensure future sequences in the public and temp schemas grant USAGE and SELECT privileges
-ALTER DEFAULT PRIVILEGES IN SCHEMA public
-GRANT USAGE, SELECT ON SEQUENCES TO "{{SERVICE_ACCOUNT_USER}}";
+-- ALTER DEFAULT PRIVILEGES IN SCHEMA public
+-- GRANT USAGE, SELECT ON SEQUENCES TO "{{SERVICE_ACCOUNT_USER}}";
 
-ALTER DEFAULT PRIVILEGES IN SCHEMA temp
-GRANT USAGE, SELECT ON SEQUENCES TO "{{SERVICE_ACCOUNT_USER}}";
+-- ALTER DEFAULT PRIVILEGES IN SCHEMA temp
+-- GRANT USAGE, SELECT ON SEQUENCES TO "{{SERVICE_ACCOUNT_USER}}";
+
+
+-- Grant privileges on all existing schemas to the service account user
+DO $$
+DECLARE
+    schema_name TEXT;
+BEGIN
+    FOR schema_name IN
+        SELECT nspname
+        FROM pg_namespace
+        WHERE nspname NOT IN ('information_schema', 'pg_catalog', 'pg_toast')  -- Exclude system schemas
+    LOOP
+        EXECUTE format('GRANT USAGE, CREATE ON SCHEMA %I TO "{{SERVICE_ACCOUNT_USER}}";', schema_name);
+        EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO "{{SERVICE_ACCOUNT_USER}}";', schema_name);
+        EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT USAGE, SELECT ON SEQUENCES TO "{{SERVICE_ACCOUNT_USER}}";', schema_name);
+    END LOOP;
+END $$;
+
+-- Future-proofing for new schemas: Grant the necessary privileges automatically
+CREATE OR REPLACE FUNCTION grant_new_schema_privileges()
+RETURNS event_trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Grant the necessary privileges to the service account user when a new schema is created
+    EXECUTE format('GRANT USAGE, CREATE ON SCHEMA %I TO "{{SERVICE_ACCOUNT_USER}}";', tg_argv[0]);
+    EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO "{{SERVICE_ACCOUNT_USER}}";', tg_argv[0]);
+    EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT USAGE, SELECT ON SEQUENCES TO "{{SERVICE_ACCOUNT_USER}}";', tg_argv[0]);
+END;
+$$;
+
+-- Create an event trigger that fires when a new schema is created
+DROP EVENT TRIGGER IF EXISTS grant_new_schema_privileges_trigger;
+CREATE EVENT TRIGGER grant_new_schema_privileges_trigger
+    ON ddl_command_end
+    WHEN TAG IN ('CREATE SCHEMA')
+    EXECUTE PROCEDURE grant_new_schema_privileges();

@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  jupyter:
+    image: sample-nyc-tripdata-poc
+    build: .
+    ports:
+      - "8888:8888"
+    environment:
+      - JDBC_DRIVER_PATH=/usr/local/share/postgresql/postgresql-42.7.3.jar
+    volumes:
+      - .:/home/nimbly-dev/work
+    command: ["start-notebook.sh", "--NotebookApp.token=''"]
+    networks:
+      - nyctripdata_project_mage-network  # Reference the network by name
+
+networks:
+  nyctripdata_project_mage-network:
+    external: true  # Declare it as an external network

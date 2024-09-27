@@ -19,10 +19,31 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EO
 EOSQL
 echo "'temp' schema created successfully in $POSTGRES_DB."
 
+# Create 'dim' schema for all environments
+echo "Creating 'dim' schema in $POSTGRES_DB..."
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EOSQL
+    CREATE SCHEMA IF NOT EXISTS dim;
+EOSQL
+echo "'dim' schema created successfully in $POSTGRES_DB."
+
+# Create 'fact' schema for all environments
+echo "Creating 'fact' schema in $POSTGRES_DB..."
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EOSQL
+    CREATE SCHEMA IF NOT EXISTS fact;
+EOSQL
+echo "'fact' schema created successfully in $POSTGRES_DB."
+
+# Create 'utility' schema for all environments
+echo "Creating 'utility' schema in $POSTGRES_DB..."
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EOSQL
+    CREATE SCHEMA IF NOT EXISTS utility;
+EOSQL
+echo "'utility' schema created successfully in $POSTGRES_DB."
+
 # Run the appropriate SQL file based on the environment
 case "$ENVIRONMENT" in
     dev)
-        SQL_FILE="deployment-sql/create-stage-tables.sql"
+        SQL_FILE="deployment-sql/create-dev-tables.sql"
         ;;
     stage)
         SQL_FILE="deployment-sql/create-stage-tables.sql"
@@ -69,3 +90,9 @@ fi
 echo "Running auto-partition.sql on $POSTGRES_DB..."
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" -f ./deployment-sql/auto-partition.sql
 echo "auto-partition.sql executed successfully on $POSTGRES_DB."
+
+# Set the search_path to make the function globally available
+echo "Setting search_path to include the utility schema..."
+PGPASSWORD="${POSTGRES_PASSWORD}" psql -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}" -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -c "ALTER DATABASE ${POSTGRES_DB} SET search_path TO utility, public;"
+
+echo "search_path set to include utility schema for $POSTGRES_DB."
