@@ -1,0 +1,50 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: trigger_dim_pipelines
+  retry_config: null
+  status: failed
+  timeout: null
+  type: data_exporter
+  upstream_blocks: []
+  uuid: trigger_dim_pipelines
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals: []
+created_at: '2024-10-19 07:48:52.445892+00:00'
+data_integration: null
+description: 'Pipeline that will refresh specified dim materialized views. '
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: refresh_dim_materialized_views
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags:
+- dim.materialized_views
+- production
+type: python
+uuid: refresh_dim_materialized_views
+variables:
+  dim_pipelines:
+  - payment_type
+  - rate_code
+  - time
+  - vendor_type
+  - zone
+  - unknown
+variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
+widgets: []

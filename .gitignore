@@ -181,3 +181,6 @@ scratch*
 magic-zoomcamp
 *.json
 
+# Resources
+de_zoomcamp_nyc_taxi/resources/csv
+dim_*.csv

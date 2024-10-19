@@ -1,0 +1,95 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: production_db
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: append
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - create_or_refresh_dim_cab_payment_type_summary_mv
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: create_dim_payment_type_table_if_not_exists
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: create_dim_payment_type_table_if_not_exists
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: production_db
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: append
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - export_dim_cab_payment_type_summary_to_csv_file
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: create_or_refresh_dim_cab_payment_type_summary_mv
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - create_dim_payment_type_table_if_not_exists
+  uuid: create_or_refresh_dim_cab_payment_type_summary_mv
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: production_db
+    export_write_policy: append
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: export_dim_cab_payment_type_summary_to_csv_file
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - create_or_refresh_dim_cab_payment_type_summary_mv
+  uuid: export_dim_cab_payment_type_summary_to_csv_file
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals: []
+created_at: '2024-10-10 13:11:55.564003+00:00'
+data_integration: null
+description: Pipeline that will create/update the dimension table and materialized
+  views for dim_zone table
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: dim_payment_type_pipeline
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags:
+- dim
+- materialized views
+- production
+type: python
+uuid: dim_payment_type_pipeline
+variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
+widgets: []

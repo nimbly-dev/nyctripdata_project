@@ -1,0 +1,115 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: trigger_fact_trip_data_to_stage
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - conditional_run_trigger_fact_trip_data_to_env
+  uuid: trigger_fact_trip_data_to_stage
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: trigger_fact_trip_data_to_prod
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - conditional_run_trigger_fact_trip_data_to_env
+  uuid: trigger_fact_trip_data_to_prod
+- all_upstream_blocks_executed: true
+  color: teal
+  configuration: {}
+  downstream_blocks:
+  - trigger_fact_trip_data_to_stage
+  - trigger_fact_trip_data_to_prod
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: conditional_run_trigger_fact_trip_data_to_env
+  retry_config: null
+  status: updated
+  timeout: null
+  type: custom
+  upstream_blocks: []
+  uuid: conditional_run_trigger_fact_trip_data_to_env
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_trigger_fact_trip_data_to_prod
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - trigger_fact_trip_data_to_stage
+  uuid: run_trigger_fact_trip_data_to_prod
+- all_upstream_blocks_executed: false
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: run_trigger_fact_trip_data_to_stage
+  retry_config: null
+  status: updated
+  timeout: null
+  type: conditional
+  upstream_blocks:
+  - trigger_fact_trip_data_to_prod
+  uuid: run_trigger_fact_trip_data_to_stage
+created_at: '2024-09-29 11:02:23.031658+00:00'
+data_integration: null
+description: Pipeline Orhcestration that will populate stage/production fact_tripdata
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: populate_fact_tripdata_orchestration
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags:
+- production
+- staging
+- fact
+type: python
+uuid: populate_fact_tripdata_orchestration
+variables:
+  end_month: 12
+  end_year: 2022
+  env_to_populate: stage
+  start_month: 1
+  start_year: 2021
+variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
+widgets: []

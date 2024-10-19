@@ -1,0 +1,10 @@
+config:
+  database: nyc_taxi_production_postgres
+  host: postgres-production
+  password: password123!
+  port: 5434
+  schema: public
+  username: production-service-account@de-nyctripdata-project.iam.com
+  replication_slot: null
+  publication_name: null
+source: postgresql

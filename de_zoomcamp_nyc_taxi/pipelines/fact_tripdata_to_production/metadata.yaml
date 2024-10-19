@@ -1,0 +1,99 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: production_db
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: append
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - clean_fact_staging_tripdata
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: get_fact_tripdata_from_stage
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: get_fact_tripdata_from_stage
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: production_db
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: append
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - load_stage_fact_tripdata_to_prod_fact_tripdata
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: clean_fact_staging_tripdata
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - get_fact_tripdata_from_stage
+  uuid: clean_fact_staging_tripdata
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: production_db
+    dbt: {}
+    disable_query_preprocessing: false
+    export_write_policy: append
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: load_stage_fact_tripdata_to_prod_fact_tripdata
+  retry_config: null
+  status: updated
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - clean_fact_staging_tripdata
+  uuid: load_stage_fact_tripdata_to_prod_fact_tripdata
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config: {}
+conditionals: []
+created_at: '2024-09-29 07:57:55.148032+00:00'
+data_integration: null
+description: Sync fact tripdata table to production fact tripdata
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: fact_tripdata_to_production
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags:
+- fact
+- production
+type: python
+uuid: fact_tripdata_to_production
+variables:
+  year_month: '2022_01'
+variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
+widgets: []
