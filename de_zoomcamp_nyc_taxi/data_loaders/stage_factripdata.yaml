@@ -1,0 +1,10 @@
+config:
+  database: nyc_taxi_staging_postgres
+  host: postgres-staging
+  password: password123!
+  port: 5433
+  schema: fact
+  username: staging-service-account@de-nyctripdata-project.iam.com
+  replication_slot: null
+  publication_name: null
+source: postgresql

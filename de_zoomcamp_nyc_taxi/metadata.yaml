@@ -31,5 +31,6 @@ features:
   add_new_block_v2: true
   automatic_kernel_cleanup: true
   compute_management: true
+  interactions: true
 pipelines:
 remote_variables_dir:

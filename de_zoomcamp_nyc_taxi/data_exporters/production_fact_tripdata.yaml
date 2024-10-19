@@ -1,0 +1,8 @@
+config:
+  database: nyc_taxi_production_postgres
+  host: postgres-production
+  password: postgres
+  port: 5434
+  schema: fact
+  username: postgres
+destination: postgresql

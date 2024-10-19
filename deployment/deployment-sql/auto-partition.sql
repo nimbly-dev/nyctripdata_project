@@ -1,41 +1,49 @@
--- Create a central schema for shared functions if it doesn't already exist
-CREATE SCHEMA IF NOT EXISTS utility;
+-- FUNCTION: public.create_partition_if_not_exists(schema_name, base_table_name, target_date)
 
--- Set the search path to include the utility schema
-SET search_path TO utility, public;
+-- DROP FUNCTION IF EXISTS public.create_partition_if_not_exists(text, text, date);
 
--- Create the function in the utility schema
-CREATE OR REPLACE FUNCTION utility.create_partition_if_not_exists(table_name TEXT, target_date DATE) RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION public.create_partition_if_not_exists(
+    schema_name text,
+    base_table_name text,
+    target_date date)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
     partition_start DATE := date_trunc('month', target_date);
     partition_end DATE := (partition_start + interval '1 month')::date;
-    schema_name TEXT;
     partition_table_name TEXT;
 BEGIN
-    -- Extract the schema and table name from the provided table_name argument
-    schema_name := split_part(table_name, '.', 1);
-    table_name := split_part(table_name, '.', 2);
-    
-    -- Construct the partition table name in the format schema.table_partition_YYYY_MM
-    partition_table_name := format('%I.%s_%s', schema_name, table_name, to_char(partition_start, 'YYYY_MM'));
+    -- Construct the partition table name in the format table_partition_YYYY_MM
+    partition_table_name := format('%I_%s', base_table_name, to_char(partition_start, 'YYYY_MM'));
 
     -- Check if the partition already exists
     IF NOT EXISTS (
         SELECT 1
         FROM pg_tables
         WHERE schemaname = schema_name
-        AND tablename = format('%s_%s', table_name, to_char(partition_start, 'YYYY_MM'))
+        AND tablename = partition_table_name
     ) THEN
         -- Create the partition table if it does not exist
         EXECUTE format('
-            CREATE TABLE %I PARTITION OF %I.%I
+            CREATE TABLE %I.%I PARTITION OF %I.%I
             FOR VALUES FROM (%L) TO (%L);',
-            partition_table_name,
-            schema_name,
-            table_name,
+            schema_name,                  -- Schema name for the partition
+            partition_table_name,         -- Name of the partition table
+            schema_name,                  -- Schema of the original table
+            base_table_name,              -- Base table name
             partition_start,
             partition_end
         );
+        RAISE NOTICE 'Created partition %I.%I', schema_name, partition_table_name;
+    ELSE
+        RAISE NOTICE 'Partition already exists: %I.%I', schema_name, partition_table_name;
     END IF;
 END;
-$$ LANGUAGE plpgsql;
+$BODY$;
+
+
+ALTER FUNCTION public.create_partition_if_not_exists(text, text, date)
+    OWNER TO postgres;

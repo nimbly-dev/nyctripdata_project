@@ -1,0 +1,155 @@
+blocks:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: stage_db
+    data_provider_schema: fact
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: replace
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - clean_trip_datasets_psql
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: get_yellow_cab_tripdata_from_production_psql
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: get_yellow_cab_tripdata_from_production_psql
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: stage_db
+    data_provider_schema: fact
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: replace
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - clean_trip_datasets_psql
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: get_green_cab_tripdata_from_production_psql
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: get_green_cab_tripdata_from_production_psql
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: stage_db
+    data_provider_schema: fact
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: replace
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - clean_trip_datasets_psql
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: get_fhv_tripdata_from_production_psql
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_loader
+  upstream_blocks: []
+  uuid: get_fhv_tripdata_from_production_psql
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: stage_db
+    data_provider_schema: fact
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: replace
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - load_tripdata_to_fact_tripdata_psql
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: clean_trip_datasets_psql
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - get_fhv_tripdata_from_production_psql
+  - get_yellow_cab_tripdata_from_production_psql
+  - get_green_cab_tripdata_from_production_psql
+  uuid: clean_trip_datasets_psql
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: stage_db
+    data_provider_schema: fact
+    data_provider_table: fact_tripdata
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: append
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: load_tripdata_to_fact_tripdata_psql
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - clean_trip_datasets_psql
+  uuid: load_tripdata_to_fact_tripdata_psql
+cache_block_output_in_memory: false
+callbacks: []
+concurrency_config:
+  pipeline_run_limit: 1
+conditionals: []
+created_at: '2024-09-28 03:28:23.554238+00:00'
+data_integration: null
+description: Combine tripdata from production table to Stage Environment
+executor_config: {}
+executor_count: 1
+executor_type: null
+extensions: {}
+name: fact_trip_data_to_stage
+notification_config: {}
+remote_variables_dir: null
+retry_config: {}
+run_pipeline_in_one_process: false
+settings:
+  triggers: null
+spark_config: {}
+tags:
+- fact
+- staging
+type: python
+uuid: fact_trip_data_to_stage
+variables:
+  environment: production
+  year_month: '2021_01'
+variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
+widgets: []
