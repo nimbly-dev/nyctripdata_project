@@ -8,6 +8,9 @@ BEGIN
             ft.do_location_id,                
             dzm.borough AS borough_dropoff, 
             dzm.zone AS zone_dropoff,
+            dzm.latitude AS latitude_dropoff,
+            dzm.longitude AS longitude_dropoff,
+            dzm.geolocation AS geolocation_dropoff,
             COUNT(ft.dwid) AS total_trips,
             ROUND(AVG(ft.fare_amount)::numeric, 2) AS avg_fare,
             ROUND(AVG(ft.trip_distance)::numeric, 2) AS avg_distance
@@ -19,7 +22,10 @@ BEGIN
             ft.do_location_id = dzm.location_id
         GROUP BY 
             ft.do_location_id, 
-            dzm.borough, 
+            dzm.borough,
+            dzm.latitude,
+            dzm.longitude,
+            dzm.geolocation, 
             dzm.zone;
     END IF;
 END $$;

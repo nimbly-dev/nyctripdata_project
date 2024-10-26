@@ -7,6 +7,13 @@ USER root
 # Download PostgreSQL JDBC driver
 RUN wget -P /usr/local/share/postgresql/ https://jdbc.postgresql.org/download/postgresql-42.7.3.jar
 
+# Install Tesseract OCR and required dependencies
+RUN apt-get update && \
+    apt-get install -y tesseract-ocr libtesseract-dev libleptonica-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+
 # Switch back to jovyan user for running Jupyter
 USER jovyan
 
@@ -14,6 +21,9 @@ USER jovyan
 RUN pip install \
     joblib \
     fuzzywuzzy \
+    pytesseract \
+    Image \
+    opencv-python \
     sqlalchemy \
     psycopg2-binary
 

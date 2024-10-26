@@ -132,7 +132,7 @@ def test_columns_name_and_type(*args, **kwargs):
         StructField("tolls_amount", FloatType(), True),
         StructField("improvement_surcharge", FloatType(), True),
         StructField("total_amount", FloatType(), True),
-        StructField("congestion_surcharge", FloatType(), True),  # Assuming this field is needed
+        StructField("congestion_surcharge", FloatType(), True),  
         StructField("airport_fee", FloatType(), True)
     ])
 
@@ -186,7 +186,6 @@ def test_columns_name_and_type(*args, **kwargs):
         else:
             month += 1
 
-        # Update current_date based on updated year and month
         current_date = datetime(year, month, 1)
 
 
