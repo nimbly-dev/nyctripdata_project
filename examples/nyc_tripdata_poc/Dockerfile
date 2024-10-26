@@ -20,12 +20,11 @@ USER jovyan
 # Install additional Python packages
 RUN pip install \
     joblib \
-    fuzzywuzzy \
-    pytesseract \
-    Image \
-    opencv-python \
     sqlalchemy \
-    psycopg2-binary
+    ipython-sql \
+    psycopg2-binary \
+    pandas \
+    geopy 
 
 # Copy the notebook files into the container
 COPY . /home/nimbly-dev/work
