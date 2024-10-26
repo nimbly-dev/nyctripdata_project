@@ -1,6 +1,6 @@
 DO $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM pg_matviews WHERE schemaname = 'dim' AND matviewname = 'dim_cab_pickup_location_summary_mv ') THEN
+    IF EXISTS (SELECT 1 FROM pg_matviews WHERE schemaname = 'dim' AND matviewname = 'dim_cab_pickup_location_summary_mv') THEN
         REFRESH MATERIALIZED VIEW dim.dim_cab_pickup_location_summary_mv;
     ELSE
         CREATE MATERIALIZED VIEW dim.dim_cab_pickup_location_summary_mv AS
@@ -8,6 +8,10 @@ BEGIN
             ft.pu_location_id,                
             dzm.borough AS borough_pickup, 
             dzm.zone AS zone_pickup,
+            dzm.latitude AS latitude_pickup,
+            dzm.longitude AS longitude_pickup,
+            -- Create a geographic point for geolocation
+            ST_SetSRID(ST_MakePoint(dzm.longitude, dzm.latitude), 4326) AS geolocation_pickup,
             COUNT(ft.dwid) AS total_trips,
             ROUND(AVG(ft.fare_amount)::numeric, 2) AS avg_fare,
             ROUND(AVG(ft.trip_distance)::numeric, 2) AS avg_distance
@@ -20,6 +24,8 @@ BEGIN
         GROUP BY 
             ft.pu_location_id, 
             dzm.borough, 
-            dzm.zone;
+            dzm.zone,
+            dzm.latitude,
+            dzm.longitude;
     END IF;
 END $$;

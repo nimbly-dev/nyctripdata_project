@@ -15,6 +15,7 @@ blocks:
   downstream_blocks:
   - create_or_refresh_dim_cab_pickup_location_summary_mv
   - create_or_refresh_dim_cab_dropoff_location_summary_mv
+  - create_or_refresh_dim_pickup_dropoff_heatmap_mv
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -71,7 +72,7 @@ blocks:
   language: sql
   name: create_or_refresh_dim_cab_dropoff_location_summary_mv
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: transformer
   upstream_blocks:
@@ -112,6 +113,49 @@ blocks:
   upstream_blocks:
   - create_or_refresh_dim_cab_pickup_location_summary_mv
   uuid: export_dim_cab_pickup_location_summary_to_csv_file
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: production_db
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: append
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - export_dim_pickup_dropoff_heatmap_to_csv_file_py
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: create_or_refresh_dim_pickup_dropoff_heatmap_mv
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - create_dim_zone_mapping_table_if_not_exists
+  uuid: create_or_refresh_dim_pickup_dropoff_heatmap_mv
+- all_upstream_blocks_executed: false
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: production_db
+    export_write_policy: append
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: export_dim_pickup_dropoff_heatmap_to_csv_file.py
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - create_or_refresh_dim_pickup_dropoff_heatmap_mv
+  uuid: export_dim_pickup_dropoff_heatmap_to_csv_file_py
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}

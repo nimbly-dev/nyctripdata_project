@@ -37,13 +37,13 @@ blocks:
   language: python
   name: spark_transform_yellow_taxi_data_column
   retry_config: {}
-  status: executed
+  status: updated
   timeout: null
   type: transformer
   upstream_blocks:
   - spark_download_and_partition_nyc_taxi_data
   uuid: spark_transform_yellow_taxi_data_column
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration:
     data_cleanup_mode: parquet
