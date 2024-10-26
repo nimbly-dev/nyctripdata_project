@@ -1,4 +1,4 @@
-#!/bin/bash
+# !/bin/sh
 set -e
 
 # Print environment variables
