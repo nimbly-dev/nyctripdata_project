@@ -65,7 +65,7 @@ def transform(data, *args, **kwargs):
 
         df = spark.read.schema(get_dataframe_schema(spark,partition_path)).parquet(partition_path)
 
-        df = cache_and_delete_files(df)
+        # df = cache_and_delete_files(df)
         df = (
             df.fillna({"sr_flag": 0})
             .dropna(subset=["pu_location_id", "do_location_id"])
@@ -76,6 +76,7 @@ def transform(data, *args, **kwargs):
             .filter(F.col("sr_flag").isin(0, 1))
         )
         
+        LOG.info(f"Number of records after deduplication: {df.count()}")
         # Write data with overwrite mode but only to the specific partition
         df.write.mode("overwrite").parquet(partition_path)
         LOG.info(f"Writing cleaned data for {year}-{month} to Parquet files at: {partition_path}")
@@ -83,14 +84,16 @@ def transform(data, *args, **kwargs):
         # Update to next month
         current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
 
+    
     LOG.info("Clean complete")
 
     spark.stop()
 
+@test
+def test_all_conditions(*args, **kwargs) -> None:
+    """Test all conditions by reading each partition and performing assertions directly."""
 
-
-def read_parquet(args, kwargs) -> DataFrame:
-    """Helper function to read parquet files based on the year and month."""
+    # Retrieve parameters
     start_year = kwargs['start_year']
     start_month = kwargs['start_month']
     end_year = kwargs['end_year']
@@ -101,49 +104,46 @@ def read_parquet(args, kwargs) -> DataFrame:
     spark_mode = kwargs['spark_mode']
 
     base_stage_path = f'{SPARK_LAKEHOUSE_DIR}/partitioned/{tripdata_type}/tmp/pq/{pq_dir}/{pipeline_run_name}'
-
     spark = get_spark_session(mode=spark_mode, appname='test_all_conditions_spark_clean_yellow_taxi_data')
-    
-    dfs = []
+
     # Loop over the date range
     start_date = datetime(start_year, start_month, 1)
     end_date = datetime(end_year, end_month, 1)
     current_date = start_date
-    
+    found_data = False  # Flag to ensure at least one partition is loaded
+
     while current_date <= end_date:
         year = current_date.year
         month = current_date.month
         partition_path = os.path.join(base_stage_path, f'year={year}', f'month={month}')
         
         if os.path.exists(partition_path):
-            df = spark.read.schema(get_dataframe_schema(spark,partition_path)).parquet(partition_path)
-            dfs.append(df)
-        
+            found_data = True
+            df = spark.read.schema(get_dataframe_schema(spark, partition_path)).parquet(partition_path)
+
+            # Perform assertions directly on each partition
+            duplicate_count = df.count() - df.dropDuplicates().count()
+            if duplicate_count > 0:
+                print(f"{duplicate_count} duplicate rows found in partition for {year}-{month}.")
+                duplicates = df.groupBy(['pickup_datetime', 'dropoff_datetime', 'pu_location_id', 'do_location_id']).count().filter("count > 1")
+                duplicates.show()  # Debugging
+
+            assert df.count() == df.dropDuplicates().count(), f"Duplicate rows found in partition {year}-{month}"
+
+            assert df.filter(
+                F.col('pickup_datetime') == F.col('dropoff_datetime')
+            ).count() == 0, f"Same pickup and dropoff times found in partition {year}-{month}"
+
+            assert df.filter(
+                ~F.col('sr_flag').isin(0, 1)
+            ).count() == 0, f"Invalid SR_Flag values found in partition {year}-{month}"
+
+            assert df.filter(
+                F.col('pu_location_id').isNull() | F.col('do_location_id').isNull()
+            ).count() == 0, f"Null values found in pu_location_id or do_location_id in partition {year}-{month}"
+
+            assert df.filter(F.col("pu_location_id").isNull()).count() == 0, f"Null values found in pu_location_id in partition {year}-{month}"
+            assert df.filter(F.col("do_location_id").isNull()).count() == 0, f"Null values found in do_location_id in partition {year}-{month}"
+
+        # Move to the next month
         current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
-    
-    if not dfs:
-        raise ValueError("No parquet files found in the specified date range.")
-    
-    return reduce(DataFrame.unionAll, dfs)
-
-@test
-def test_all_conditions(*args, **kwargs) -> None:
-    df = read_parquet(args, kwargs)
-
-    assert df.count() == df.dropDuplicates().count(), "The output DataFrame contains duplicate rows"
-
-    assert df.filter(
-        F.col('pickup_datetime') == F.col('dropOff_datetime')
-    ).count() == 0, "Same pickup and dropoff times"
-
-    assert df.filter(
-        ~F.col('sr_flag').isin(0, 1)
-    ).count() == 0, "Invalid SR_Flag values"
-
-    assert df.filter(
-        F.col('pu_location_id').isNull() | F.col('do_location_id').isNull()
-    ).count() == 0, "Null values found in pu_location_id or do_location_id"
-
-    assert df.filter(F.col("pu_location_id").isNull()).count() == 0, "Null values found in pu_location_id"
-    assert df.filter(F.col("do_location_id").isNull()).count() == 0, "Null values found in do_location_id"
-

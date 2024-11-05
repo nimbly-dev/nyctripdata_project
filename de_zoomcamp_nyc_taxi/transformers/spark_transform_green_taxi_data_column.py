@@ -53,37 +53,39 @@ def transform(*args, **kwargs):
     while current_date <= end_date:
         year = current_date.year
         month = current_date.month
-
-        # Get the last day of the current month
         last_day = monthrange(year, month)[1]
+        
         LOG.info(f"Processing data for {year}-{month} (Last day: {last_day})")
-
+        
+        # Define the path to read parquet data
         partition_path = os.path.join(partitioned_path, f'year={year}', f'month={month}')
         LOG.info(f'Partition path: {partition_path}')
-
-        # df.printSchema()
+        
+        # Load the DataFrame from parquet files
+        df = spark.read.parquet(partition_path)
+        
+        # Apply schema transformations
         df = green_tripdata_schema.cast_columns(df)
+        
         # Add year and month columns based on pickup_datetime
         df = df.withColumn("year", pyspark_year(df["lpep_pickup_datetime"])) \
-            .withColumn("month", pyspark_month(df["lpep_pickup_datetime"]))
+               .withColumn("month", pyspark_month(df["lpep_pickup_datetime"]))
         df = df.drop("ehail_fee")
         
-        # # Apply column renaming
+        # Rename columns
         df = df.withColumnRenamed("PULocationID", "pu_location_id") \
-            .withColumnRenamed("DOLocationID", "do_location_id") \
-            .withColumnRenamed("lpep_pickup_datetime", "pickup_datetime") \
-            .withColumnRenamed("lpep_dropoff_datetime", "dropoff_datetime") \
-            .withColumnRenamed("RatecodeID", "ratecode_id") \
-            .withColumnRenamed("VendorID", "vendor_id")
-
-
-        # Write partitioned data
+               .withColumnRenamed("DOLocationID", "do_location_id") \
+               .withColumnRenamed("lpep_pickup_datetime", "pickup_datetime") \
+               .withColumnRenamed("lpep_dropoff_datetime", "dropoff_datetime") \
+               .withColumnRenamed("RatecodeID", "ratecode_id") \
+               .withColumnRenamed("VendorID", "vendor_id")
+        
+        # Write partitioned data to the specified path
         LOG.info("Writing partitioned data to parquet...")
-
         write_path = os.path.join(dev_path, f'year={year}', f'month={month}')
         df.write.mode("overwrite").parquet(write_path)
-
-        # Update to next month
+        
+        # Move to the next month
         current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
 
     LOG.info("Green Taxi Transformation complete")

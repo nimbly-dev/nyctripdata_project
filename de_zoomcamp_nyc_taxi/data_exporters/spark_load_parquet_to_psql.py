@@ -89,6 +89,9 @@ def export_data(data, *args, **kwargs):
             partition_path = os.path.join(base_read_path, f'year={year}', f'month={month}')
             df = spark.read.parquet(partition_path)
 
+            # DATAENG-17: year and month is being included on psql copy for spark_load_parquet_to_psql Pipeline
+            df = df.drop('year', 'month')
+
             temp_csv_dir = os.path.join(base_csv_temp_path, f'year={year}', f'month={month}')
             df.write.csv(temp_csv_dir, header=True, mode="overwrite")
 
@@ -98,7 +101,7 @@ def export_data(data, *args, **kwargs):
 
             LOG.info(f"Creating partition for date: {year}-{month:02d}")
             target_date = f"{year}-{month:02d}-01"
-            partition_query = f"SELECT public.create_partition_if_not_exists('{source_table_name}', '{target_date}');"
+            partition_query = f"SELECT public.create_partition_if_not_exists('public','{source_table_name}', '{target_date}');"
             loader.execute(partition_query)
             loader.commit()
 

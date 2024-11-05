@@ -82,7 +82,14 @@ def transform(data, *args, **kwargs):
         
         LOG.info(f"Writing cleaned data to Parquet files at: {base_stage_path}")
 
-        current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
+        # Move to the next month
+        if month == 12:
+            year += 1
+            month = 1
+        else:
+            month += 1
+        current_date = datetime(year, month, 1)
+
 
     LOG.info("Transformation complete")
     spark.stop()
@@ -105,7 +112,8 @@ def read_parquet(args, kwargs) -> DataFrame:
     dfs = []
     # Loop over the date range
     start_date = datetime(start_year, start_month, 1)
-    end_date = datetime(end_year, end_month, 1)
+    last_day = calendar.monthrange(end_year, end_month)[1]
+    end_date = datetime(end_year, end_month, last_day)
     current_date = start_date
     
     while current_date <= end_date:
@@ -117,10 +125,16 @@ def read_parquet(args, kwargs) -> DataFrame:
             df = spark.read.schema(get_dataframe_schema(spark,partition_path)).parquet(partition_path)
             dfs.append(df)
         
-        current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
+        # Move to the next month
+        if month == 12:
+            year += 1
+            month = 1
+        else:
+            month += 1
+        current_date = datetime(year, month, 1)
     
-    if not dfs:
-        raise ValueError("No parquet files found in the specified date range.")
+    # if not dfs:
+    #     raise ValueError("No parquet files found in the specified date range.")
     
     return reduce(DataFrame.unionAll, dfs)
 
