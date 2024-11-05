@@ -20,7 +20,7 @@ blocks:
   type: data_loader
   upstream_blocks: []
   uuid: spark_download_and_partition_nyc_taxi_data
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration:
     pq_dir: dev
@@ -50,7 +50,7 @@ blocks:
   language: python
   name: spark_transform_green_taxi_data_column
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: transformer
   upstream_blocks:
@@ -65,7 +65,7 @@ data_integration: null
 description: 'Load from NYC tripdata website to PSQL temp stage table '
 executor_config: {}
 executor_count: 1
-executor_type: null
+executor_type: local_python
 extensions: {}
 name: spark_green_taxi_etl_to_dev_partition
 notification_config: {}
@@ -83,11 +83,11 @@ type: python
 uuid: spark_green_taxi_etl_to_dev_partition
 variables:
   dev_limit_rows: -1
-  end_month: 2
+  end_month: 1
   end_year: 2024
-  pipeline_run_name: development_pipeline
+  pipeline_run_name: development_pipeline_2023_2024
   spark_mode: cluster
-  start_month: 1
+  start_month: 12
   start_year: 2023
   tripdata_type: green_cab_tripdata
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi

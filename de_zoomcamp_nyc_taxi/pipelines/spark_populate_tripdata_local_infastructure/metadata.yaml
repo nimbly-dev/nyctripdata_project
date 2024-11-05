@@ -49,7 +49,7 @@ blocks:
   language: python
   name: trigger_spark_green_taxi_etl_to_dev_partition
   retry_config: null
-  status: updated
+  status: failed
   timeout: null
   type: data_exporter
   upstream_blocks:
@@ -242,12 +242,12 @@ variables:
   data_loss_threshold: very_strict
   dev_limit_rows: -1
   end_month: 12
-  end_year: 2022
+  end_year: 2023
   overwrite_enabled: true
-  pipeline_run_name: development_pipeline
+  pipeline_run_name: development_pipeline_2023_2024
   spark_mode: cluster
   start_month: 1
-  start_year: 2022
+  start_year: 2024
   tripdata_type: yellow_cab_tripdata
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

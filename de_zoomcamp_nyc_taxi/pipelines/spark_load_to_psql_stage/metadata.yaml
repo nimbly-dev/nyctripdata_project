@@ -152,7 +152,7 @@ blocks:
   language: python
   name: spark_load_parquet_to_psql
   retry_config: {}
-  status: executed
+  status: updated
   timeout: null
   type: data_exporter
   upstream_blocks:

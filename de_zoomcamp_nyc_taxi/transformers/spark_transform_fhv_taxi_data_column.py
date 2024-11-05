@@ -43,6 +43,8 @@ def transform(*args, **kwargs):
     dev_path = f'{SPARK_LAKEHOUSE_DIR}/partitioned/{tripdata_type}/tmp/pq/dev/{pipeline_run_name}'
     schema_manager = FHVTripDataSchema(spark)
 
+    stage_path = dev_path
+
     # Loop over the date range
     start_date = datetime(start_year, start_month, 1)
     last_day = calendar.monthrange(end_year, end_month)[1]

@@ -41,6 +41,8 @@ def load_data(*args, **kwargs):
 
     current_date = start_date
     output_path = f'{SPARK_LAKEHOUSE_DIR}/partitioned/{tripdata_type}/tmp/pq/raw/{pipeline_run_name}'
+
+    os.makedirs(output_path, exist_ok=True)
     while current_date <= end_date:
         year = current_date.year
         month = current_date.month
