@@ -5,136 +5,9 @@ blocks:
     data_provider: postgres
     data_provider_profile: stage_db
     data_provider_schema: fact
-    data_provider_table: fact_tripdata
-    dbt: {}
-    disable_query_preprocessing: true
-    export_write_policy: append
-    limit: 1000
-    use_raw_sql: true
-  downstream_blocks: []
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: sql
-  name: load_tripdata_to_fact_tripdata_psql
-  retry_config: null
-  status: executed
-  timeout: null
-  type: data_exporter
-  upstream_blocks:
-  - unionize_all_tripdata_psql
-  uuid: load_tripdata_to_fact_tripdata_psql
-- all_upstream_blocks_executed: true
-  color: null
-  configuration:
-    data_provider: postgres
-    data_provider_profile: stage_db
-    data_provider_schema: fact
-    dbt: {}
-    disable_query_preprocessing: true
-    export_write_policy: append
-    limit: 1000
-    use_raw_sql: true
-  downstream_blocks:
-  - unionize_all_tripdata_psql
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: sql
-  name: clean_yellow_tripdata_psql
-  retry_config: null
-  status: executed
-  timeout: null
-  type: transformer
-  upstream_blocks:
-  - get_yellow_cab_tripdata_from_production
-  uuid: clean_yellow_tripdata_psql
-- all_upstream_blocks_executed: true
-  color: null
-  configuration:
-    data_provider: postgres
-    data_provider_profile: stage_db
-    data_provider_schema: fact
-    dbt: {}
-    disable_query_preprocessing: true
-    export_write_policy: append
-    limit: 1000
-    use_raw_sql: true
-  downstream_blocks:
-  - unionize_all_tripdata_psql
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: sql
-  name: clean_green_tripdata_psql
-  retry_config: null
-  status: executed
-  timeout: null
-  type: transformer
-  upstream_blocks:
-  - get_green_cab_tripdata_from_production
-  uuid: clean_green_tripdata_psql
-- all_upstream_blocks_executed: true
-  color: null
-  configuration:
-    data_provider: postgres
-    data_provider_profile: stage_db
-    data_provider_schema: fact
-    dbt: {}
-    disable_query_preprocessing: true
-    export_write_policy: append
-    limit: 1000
-    use_raw_sql: true
-  downstream_blocks:
-  - unionize_all_tripdata_psql
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: sql
-  name: clean_fhv_tripdata_psql
-  retry_config: null
-  status: executed
-  timeout: null
-  type: transformer
-  upstream_blocks:
-  - get_fhv_cab_tripdata_from_production
-  uuid: clean_fhv_tripdata_psql
-- all_upstream_blocks_executed: true
-  color: null
-  configuration:
-    data_provider: postgres
-    data_provider_profile: stage_db
-    data_provider_schema: fact
-    dbt: {}
-    disable_query_preprocessing: true
-    export_write_policy: append
-    limit: 1000
-    use_raw_sql: true
-  downstream_blocks:
-  - load_tripdata_to_fact_tripdata_psql
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: sql
-  name: unionize_all_tripdata_psql
-  retry_config: null
-  status: executed
-  timeout: null
-  type: transformer
-  upstream_blocks:
-  - clean_yellow_tripdata_psql
-  - clean_green_tripdata_psql
-  - clean_fhv_tripdata_psql
-  uuid: unionize_all_tripdata_psql
-- all_upstream_blocks_executed: true
-  color: null
-  configuration:
-    data_provider: postgres
-    data_provider_profile: stage_db
-    data_provider_schema: fact
     export_write_policy: append
   downstream_blocks:
-  - clean_yellow_tripdata_psql
+  - clean_yellow_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -150,7 +23,7 @@ blocks:
   color: null
   configuration: {}
   downstream_blocks:
-  - clean_green_tripdata_psql
+  - clean_green_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -166,7 +39,7 @@ blocks:
   color: null
   configuration: {}
   downstream_blocks:
-  - clean_fhv_tripdata_psql
+  - clean_fhv_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -178,6 +51,92 @@ blocks:
   type: data_loader
   upstream_blocks: []
   uuid: get_fhv_cab_tripdata_from_production
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - unionize_all_tripdata
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: clean_yellow_tripdata
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - get_yellow_cab_tripdata_from_production
+  uuid: clean_yellow_tripdata
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - unionize_all_tripdata
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: clean_green_tripdata
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - get_green_cab_tripdata_from_production
+  uuid: clean_green_tripdata
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - unionize_all_tripdata
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: clean_fhv_tripdata
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - get_fhv_cab_tripdata_from_production
+  uuid: clean_fhv_tripdata
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - load_tripdata_to_fact_tripdata
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: unionize_all_tripdata
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - clean_yellow_tripdata
+  - clean_green_tripdata
+  - clean_fhv_tripdata
+  uuid: unionize_all_tripdata
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: load_tripdata_to_fact_tripdata
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - unionize_all_tripdata
+  uuid: load_tripdata_to_fact_tripdata
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config:
@@ -205,7 +164,7 @@ type: python
 uuid: fact_trip_data_to_stage
 variables:
   environment: production
-  get_data_from: '[''yellow'',''fhv'',''green'']'
-  year_month: '2023_12'
+  get_data_from: '[''green'']'
+  year_month: '2023_11'
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

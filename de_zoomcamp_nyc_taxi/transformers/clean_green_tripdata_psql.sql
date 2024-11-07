@@ -1,7 +1,18 @@
+-- Define a CTE to check if df_1 has any data
+WITH df_1_data AS (
+    SELECT * FROM {{ df_1 }}
+),
+
+data_count AS (
+    SELECT COUNT(*) AS cnt FROM df_1_data
+)
+
+-- Main query
 SELECT * FROM (
+    -- Case when df_1 has data
     SELECT 
         CAST(dwid AS TEXT) AS dwid,
-        'green' AS cab_type,
+        'fhv' AS cab_type,
         NULL::REAL AS fare_amount,
         NULL::REAL AS total_amount,
         NULL::REAL AS trip_distance,
@@ -14,20 +25,21 @@ SELECT * FROM (
         NULL::INT AS payment_type,
         dispatching_base_num::VARCHAR,
         affiliated_base_number::VARCHAR
-    FROM {{ df_1 }}
+    FROM df_1_data
     WHERE 
         pickup_datetime IS NOT NULL 
         AND dropoff_datetime IS NOT NULL 
         AND pu_location_id IS NOT NULL 
         AND do_location_id IS NOT NULL
 ) AS subquery
-WHERE (SELECT COUNT(*) FROM {{ df_1 }}) > 0
+WHERE (SELECT cnt FROM data_count) > 0
 
 UNION ALL
 
+-- Case when df_1 is empty
 SELECT 
     NULL::TEXT AS dwid,
-    'green' AS cab_type,
+    'fhv' AS cab_type,
     NULL::REAL AS fare_amount,
     NULL::REAL AS total_amount,
     NULL::REAL AS trip_distance,
@@ -40,4 +52,4 @@ SELECT
     NULL::INT AS payment_type,
     NULL::VARCHAR AS dispatching_base_num,
     NULL::VARCHAR AS affiliated_base_number
-WHERE (SELECT COUNT(*) FROM {{ df_1 }}) = 0
+WHERE (SELECT cnt FROM data_count) = 0
