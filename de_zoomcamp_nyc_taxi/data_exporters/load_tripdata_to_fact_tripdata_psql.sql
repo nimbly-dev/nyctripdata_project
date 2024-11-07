@@ -1,3 +1,13 @@
+DO $$
+DECLARE
+    partition_date DATE := TO_DATE('{{ year_month }}' || '_01', 'YYYY_MM_DD');
+BEGIN
+    PERFORM public.create_partition_if_not_exists(
+        'fact',               
+        'fact_tripdata',        
+        partition_date           
+    );
+END $$;
 WITH unique_data AS (
     SELECT DISTINCT ON (dwid, pickup_datetime, dropoff_datetime)
         dwid,
@@ -15,6 +25,10 @@ WITH unique_data AS (
         dispatching_base_num,
         affiliated_base_number
     FROM {{ df_1 }}
+    WHERE pickup_datetime IS NOT NULL 
+          AND dropoff_datetime IS NOT NULL 
+          AND pu_location_id IS NOT NULL 
+          AND do_location_id IS NOT NULL
     ORDER BY dwid, pickup_datetime, dropoff_datetime
 )
 INSERT INTO fact.fact_tripdata_{{ year_month }} (
