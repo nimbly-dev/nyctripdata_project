@@ -3,5 +3,5 @@ if 'condition' not in globals():
 
 
 @condition
-def evaluate_condition(*args, **kwargs) -> bool:
+def evaluate_condition(data, *args, **kwargs) -> bool:
     return data.get("fhv", False)

@@ -1,5 +1,5 @@
 blocks:
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks: []
@@ -9,13 +9,13 @@ blocks:
   language: python
   name: trigger_fact_trip_data_to_stage
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: data_exporter
   upstream_blocks:
   - conditional_run_trigger_fact_trip_data_to_env
   uuid: trigger_fact_trip_data_to_stage
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks: []
@@ -52,7 +52,7 @@ cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}
 conditionals:
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks: []
@@ -109,6 +109,10 @@ variables:
   end_month: 12
   end_year: 2022
   env_to_populate: stage
+  get_data_from:
+  - yellow
+  - fhv
+  - green
   start_month: 1
   start_year: 2021
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi

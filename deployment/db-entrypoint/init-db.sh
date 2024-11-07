@@ -96,3 +96,10 @@ echo "Setting search_path to include the utility schema..."
 PGPASSWORD="${POSTGRES_PASSWORD}" psql -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}" -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" -c "ALTER DATABASE ${POSTGRES_DB} SET search_path TO utility, public;"
 
 echo "search_path set to include utility schema for $POSTGRES_DB."
+
+# Enable dblink extension in the public schema
+echo "Enabling dblink extension in the public schema of $POSTGRES_DB..."
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EOSQL
+    CREATE EXTENSION IF NOT EXISTS dblink SCHEMA public;
+EOSQL
+echo "dblink extension enabled in the public schema of $POSTGRES_DB."

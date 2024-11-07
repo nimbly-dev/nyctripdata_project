@@ -9,6 +9,7 @@ def trigger(*args, **kwargs):
     start_month = kwargs['start_month']
     end_year = kwargs['end_year']
     end_month = kwargs['end_month']
+    get_data_from = kwargs['get_data_from']
 
     # Loop through the years and months
     for year in range(start_year, end_year + 1):
@@ -24,7 +25,8 @@ def trigger(*args, **kwargs):
             trigger_pipeline(
                 'fact_trip_data_to_stage',
                 variables={
-                    "year_month": year_month
+                    "year_month": year_month,
+                    "get_data_from" : get_data_from
                 },
                 check_status=True,
                 error_on_failure=True,

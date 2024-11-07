@@ -1,5 +1,20 @@
 SELECT * FROM (
-    SELECT * FROM {{ df_1 }}
+    SELECT 
+        CAST(dwid AS TEXT) AS dwid,
+        'fhv' AS cab_type,
+        NULL::REAL AS fare_amount,
+        NULL::REAL AS total_amount,
+        NULL::REAL AS trip_distance,
+        NULL::INT AS ratecode_id,
+        NULL::INT AS vendor_id,
+        pu_location_id::INT,
+        do_location_id::INT,
+        pickup_datetime::TIMESTAMP,
+        dropoff_datetime::TIMESTAMP,
+        NULL::INT AS payment_type,
+        dispatching_base_num::VARCHAR,
+        affiliated_base_number::VARCHAR
+    FROM {{ df_1 }}
     WHERE 
         pickup_datetime IS NOT NULL 
         AND dropoff_datetime IS NOT NULL 
@@ -7,10 +22,12 @@ SELECT * FROM (
         AND do_location_id IS NOT NULL
 ) AS subquery
 WHERE (SELECT COUNT(*) FROM {{ df_1 }}) > 0
+
 UNION ALL
+
 SELECT 
     NULL::TEXT AS dwid,
-    NULL::TEXT AS cab_type,
+    'fhv' AS cab_type,
     NULL::REAL AS fare_amount,
     NULL::REAL AS total_amount,
     NULL::REAL AS trip_distance,
