@@ -16,3 +16,8 @@ def validate_parquet_files(directory: str) -> bool:
             return True
     
     return False
+
+
+def extract_year_month(date_str: str) -> dict:
+    year, month = map(int, date_str.split('_'))
+    return {'year': year, 'month': month}

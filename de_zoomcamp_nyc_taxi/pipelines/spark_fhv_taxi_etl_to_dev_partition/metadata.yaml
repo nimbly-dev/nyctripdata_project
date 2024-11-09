@@ -47,7 +47,7 @@ blocks:
   language: python
   name: spark_clean_fhv_taxi_data
   retry_config: {}
-  status: updated
+  status: executed
   timeout: null
   type: transformer
   upstream_blocks:
@@ -80,12 +80,9 @@ type: python
 uuid: spark_fhv_taxi_etl_to_dev_partition
 variables:
   dev_limit_rows: -1
-  end_month: 1
-  end_year: 2024
-  pipeline_run_name: development_pipeline_2023_2024
+  pipeline_run_name: dataeng_21_enchancement_1
   spark_mode: cluster
-  start_month: 12
-  start_year: 2023
   tripdata_type: fhv_cab_tripdata
+  year_month: '2023_10'
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

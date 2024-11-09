@@ -7,28 +7,23 @@ from de_zoomcamp_nyc_taxi.utils.sql.sql_util import get_service_account
 import os
 from os import path
 
-import pandas as pd
-
 if 'data_loader' not in globals():
     from mage_ai.data_preparation.decorators import data_loader
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
 
-SPARK_LAKEHOUSE_FILES_DIR = os.getenv('SPARK_LAKEHOUSE_DIR_FILES', '/opt/spark/spark-lakehouse/partitioned')
+SPARK_LAKEHOUSE_FILES_DIR = os.getenv('SPARK_LAKEHOUSE_FILES_DIR', '/opt/spark/spark-lakehouse/partitioned')
 
 @data_loader
 def load_data_from_postgres(*args, **kwargs):
     LOG = kwargs.get('logger')
-    start_year = kwargs['start_year']
-    start_month = kwargs['start_month']
-    end_year = kwargs['end_year']
-    end_month = kwargs['end_month']
+    year_month = kwargs['year_month']  # Expected format: '2023_10'
     pipeline_run_name = kwargs['pipeline_run_name']
     spark_mode = kwargs['spark_mode']
     tripdata_type = kwargs['tripdata_type']
 
-    if not all([start_year, start_month, end_year, end_month, tripdata_type]):
-        raise ValueError("Error: 'start_year', 'start_month', 'end_year', 'end_month', and 'tripdata_type' must be provided.")
+    if not year_month or not tripdata_type:
+        raise ValueError("Error: 'year_month' and 'tripdata_type' must be provided.")
 
     schema_name = 'public'
     target_dir = kwargs['configuration'].get('target_dir')
@@ -59,59 +54,50 @@ def load_data_from_postgres(*args, **kwargs):
     )
 
     base_target_path = os.path.join(SPARK_LAKEHOUSE_FILES_DIR, f'{tripdata_type}/tmp/pq/{target_dir}/{pipeline_run_name}')
-    current_date = datetime(start_year, start_month, 1)
-    end_date = datetime(end_year, end_month, 1)
+    year, month = map(int, year_month.split('_'))
+    partition_table_name = f'{tripdata_type}_{psql_environment}_{year}_{month:02d}'
 
-    while current_date <= end_date:
-        year = current_date.year
-        month = current_date.month
-        partition_table_name = f'{tripdata_type}_{psql_environment}_{year}_{month:02d}'
+    LOG.info(f"Processing data for year={year}, month={month}...")
 
-        LOG.info(f"Processing data for year={year}, month={month}...")
+    min_max_query = f"""
+        SELECT MIN(pickup_datetime) as min_date, MAX(pickup_datetime) as max_date
+        FROM {schema_name}.{source_table_name}
+        WHERE pickup_datetime >= '{year}-{month:02d}-01'
+        AND pickup_datetime < '{year + (month // 12)}-{(month % 12) + 1:02d}-01'
+    """
 
-        min_max_query = f"""
-            SELECT MIN(pickup_datetime) as min_date, MAX(pickup_datetime) as max_date
-            FROM {schema_name}.{source_table_name}
-            WHERE pickup_datetime >= '{year}-{month:02d}-01'
-            AND pickup_datetime < '{year + (month // 12)}-{(month % 12) + 1:02d}-01'
-        """
+    min_max_df = spark.read.format('jdbc').options(
+        url=jdbc_url,
+        dbtable=f"({min_max_query}) AS min_max_dates",
+        driver='org.postgresql.Driver',
+        user=service_account_name,
+        password=service_account_password
+    ).load()
 
-        min_max_df = spark.read.format('jdbc').options(
-            url=jdbc_url,
-            dbtable=f"({min_max_query}) AS min_max_dates",
-            driver='org.postgresql.Driver',
-            user=f'{service_account_name}',
-            password=f'{service_account_password}'
-        ).load()
+    if min_max_df.count() == 0:
+        LOG.info(f"No data found for year={year}, month={month}. Skipping...")
+        return
 
-        if min_max_df.count() == 0:
-            LOG.info(f"No data found for year={year}, month={month}. Skipping...")
-            current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
-            continue
+    min_value = min_max_df.first()['min_date']
+    max_value = min_max_df.first()['max_date']
 
-        min_value = min_max_df.first()['min_date']
-        max_value = min_max_df.first()['max_date']
+    LOG.info(f"Reading data from database for year={year}, month={month} with bounds {min_value} to {max_value}...")
 
-        LOG.info(f"Reading data from database for year={year}, month={month} with bounds {min_value} to {max_value}...")
+    df = spark.read.format('jdbc').options(
+        url=jdbc_url,
+        dbtable=f"(SELECT * FROM {schema_name}.{partition_table_name}) AS data",
+        driver='org.postgresql.Driver',
+        user=service_account_name,
+        password=service_account_password,
+        partitionColumn="pickup_datetime",
+        lowerBound=min_value.isoformat(),
+        upperBound=max_value.isoformat(),
+        numPartitions=8
+    ).load()
 
-        df = spark.read.format('jdbc').options(
-            url=jdbc_url,
-            dbtable=f"(SELECT * FROM {schema_name}.{partition_table_name}) AS data",
-            driver='org.postgresql.Driver',
-            user=service_account_name,
-            password=service_account_password,
-            partitionColumn="pickup_datetime",
-            lowerBound=min_value.isoformat(),
-            upperBound=max_value.isoformat(),
-            numPartitions=8
-        ).load()
+    partition_path = os.path.join(base_target_path, f'year={year}', f'month={month}')
+    LOG.info(f"Writing data to {partition_path}...")
+    df.write.mode("overwrite").parquet(partition_path)
 
-        partition_path = os.path.join(base_target_path, f'year={year}', f'month={month}')
-        LOG.info(f"Writing data to {partition_path}...")
-        df.write.mode("overwrite").parquet(partition_path)
-
-        LOG.info(f"Finished processing for year={year}, month={month}.")
-        current_date = datetime(year + (month // 12), (month % 12) + 1, 1)
-
-    LOG.info("Data load from PostgreSQL completed.")
+    LOG.info(f"Finished processing for year={year}, month={month}.")
     spark.stop()

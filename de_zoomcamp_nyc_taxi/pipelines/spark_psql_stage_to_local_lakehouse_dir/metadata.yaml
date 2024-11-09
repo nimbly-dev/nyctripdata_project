@@ -62,13 +62,10 @@ tags:
 type: python
 uuid: spark_psql_stage_to_local_lakehouse_dir
 variables:
-  end_month: 12
-  end_year: 2022
-  pipeline_run_name: populate_yellowtripdata_2021_2022
+  pipeline_run_name: ' dataeng_21_enchancement_6'
   spark_mode: cluster
-  start_month: 1
-  start_year: 2021
   tripdata_type: yellow_cab_tripdata
+  year_month: ' 2023_10'
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets:
 - all_upstream_blocks_executed: true
