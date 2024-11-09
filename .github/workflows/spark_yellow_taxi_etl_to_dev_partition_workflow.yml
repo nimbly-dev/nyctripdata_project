@@ -1,0 +1,41 @@
+name: Trigger spark_yellow_taxi_etl_to_dev_partition Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main  
+
+jobs:
+  run_pipeline:
+    runs-on: self-hosted
+    steps:
+      - name: Trigger Pipeline via API Request
+        env:
+          API_URL: "http://localhost:6789/api/pipeline_schedules/26/api_trigger"
+          BEARER_TOKEN: "fa7ee91aa29e48fc9ad62245255ae2df"  # Replace with a GitHub Secret for security
+        run: |
+          # Send the POST request and capture the HTTP status code
+          HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
+            -H "Authorization: Bearer $BEARER_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+                  "pipeline_run": {
+                    "variables": {
+                      "dev_limit_rows": 1000,
+                      "pipeline_run_name": "test_workflow_run",
+                      "spark_mode": "cluster",
+                      "tripdata_type": "yellow_cab_tripdata",
+                      "year_month": "2023_1"
+                    }
+                  }
+                }')
+
+          # Check if the response code is in the 2xx range (indicating success)
+          if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
+            echo "Pipeline triggered successfully."
+          else
+            echo "Error triggering pipeline. HTTP Status: $HTTP_RESPONSE"
+            echo "Response Body:"
+            cat response.json  # Print the response body for more information
+            exit 1  # Exit with a non-zero status to fail the GitHub Actions job
+          fi
