@@ -11,17 +11,15 @@ def trigger(*args, **kwargs):
     end_month = kwargs['end_month']
     get_data_from = kwargs['get_data_from']
 
-    # Loop through the years and months
+
     for year in range(start_year, end_year + 1):
         for month in range(1, 13):
-            # Ensure that the month falls within the range for the start and end years
+
             if (year == start_year and month < start_month) or (year == end_year and month > end_month):
                 continue
             
-            # Construct the year_month in the format "YYYY_MM"
             year_month = f"{year}_{month:02d}"
             
-            # Trigger the pipeline for each year_month
             trigger_pipeline(
                 'fact_trip_data_to_stage',
                 variables={

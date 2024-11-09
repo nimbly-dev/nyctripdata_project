@@ -49,7 +49,7 @@ blocks:
   language: python
   name: trigger_spark_green_taxi_etl_to_dev_partition
   retry_config: null
-  status: failed
+  status: updated
   timeout: null
   type: data_exporter
   upstream_blocks:
@@ -77,6 +77,7 @@ blocks:
 - all_upstream_blocks_executed: false
   color: null
   configuration:
+    dynamic: false
     file_path: data_exporters/trigger_spark_load_to_psql_stage.py
     file_source:
       path: data_exporters/trigger_spark_load_to_psql_stage.py
@@ -134,22 +135,6 @@ blocks:
   upstream_blocks:
   - trigger_spark_psql_stage_to_local_lakehouse_dir
   uuid: trigger_spark_psql_stage_to_production
-- all_upstream_blocks_executed: true
-  color: null
-  configuration: {}
-  downstream_blocks:
-  - trigger_spark_load_to_psql_stage
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: python
-  name: check_if_spark_taxi_etil_to_dev_partition_is_done
-  retry_config: null
-  status: updated
-  timeout: null
-  type: sensor
-  upstream_blocks: []
-  uuid: check_if_spark_taxi_etil_to_dev_partition_is_done
 - all_upstream_blocks_executed: false
   color: grey
   configuration: {}
@@ -166,6 +151,24 @@ blocks:
   upstream_blocks:
   - trigger_spark_psql_stage_to_production
   uuid: data_tmp_cleanup
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_source:
+      path: sensors/check_if_spark_taxi_etil_to_dev_partition_is_done.py
+  downstream_blocks:
+  - trigger_spark_load_to_psql_stage
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: check_if_spark_taxi_etil_to_dev_partition_is_done
+  retry_config: null
+  status: not_executed
+  timeout: null
+  type: sensor
+  upstream_blocks: []
+  uuid: check_if_spark_taxi_etil_to_dev_partition_is_done
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}
@@ -241,13 +244,13 @@ uuid: spark_populate_tripdata_local_infastructure
 variables:
   data_loss_threshold: very_strict
   dev_limit_rows: -1
-  end_month: 12
+  end_month: 11
   end_year: 2023
   overwrite_enabled: true
-  pipeline_run_name: development_pipeline_2023_2024
+  pipeline_run_name: dataeng_22_enchancement_2
   spark_mode: cluster
-  start_month: 1
-  start_year: 2024
+  start_month: 10
+  start_year: 2023
   tripdata_type: yellow_cab_tripdata
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

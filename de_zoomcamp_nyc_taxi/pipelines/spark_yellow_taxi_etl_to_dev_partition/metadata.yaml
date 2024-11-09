@@ -28,7 +28,7 @@ blocks:
     file_path: transformers/spark_transform_yellow_taxi_data_column.py
     file_source:
       path: transformers/spark_transform_yellow_taxi_data_column.py
-    pq_dir: stage
+    pq_dir: dev
   downstream_blocks:
   - spark_clean_yellow_taxi_data
   executor_config: null
@@ -37,13 +37,13 @@ blocks:
   language: python
   name: spark_transform_yellow_taxi_data_column
   retry_config: {}
-  status: updated
+  status: executed
   timeout: null
   type: transformer
   upstream_blocks:
   - spark_download_and_partition_nyc_taxi_data
   uuid: spark_transform_yellow_taxi_data_column
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration:
     data_cleanup_mode: parquet
@@ -90,17 +90,10 @@ tags:
 type: python
 uuid: spark_yellow_taxi_etl_to_dev_partition
 variables:
-  cleanup_enabled: true
-  cleanup_pq_list:
-  - raw
-  - stage
   dev_limit_rows: -1
-  end_month: 12
-  end_year: 2022
-  pipeline_run_name: populate_yellowtripdata_2021_2022
+  pipeline_run_name: dataeng_21_enchancement_6
   spark_mode: cluster
-  start_month: 1
-  start_year: 2021
   tripdata_type: yellow_cab_tripdata
+  year_month: '2023_10'
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

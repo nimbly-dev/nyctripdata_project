@@ -13,16 +13,13 @@ SPARK_LAKEHOUSE_FILES_DIR = os.getenv('SPARK_LAKEHOUSE_DIR_FILES', '/opt/spark/s
 @data_loader
 def load_data(*args, **kwargs):
     LOG = kwargs.get('logger')
-    start_year = kwargs['start_year']
-    start_month = kwargs['start_month']
-    end_year = kwargs['end_year']
-    end_month = kwargs['end_month']
+    year_month = kwargs['year_month']  # Expected format: '2023_10'
     pipeline_run_name = kwargs['pipeline_run_name']
     spark_mode = kwargs['spark_mode']
     tripdata_type = kwargs['tripdata_type']
 
-    if not start_year or not start_month or not end_year or not end_month or not tripdata_type:
-        raise ValueError("Error: 'start_year', 'start_month', 'end_year', 'end_month', and 'tripdata_type' must be provided.")
+    if not year_month or not tripdata_type:
+        raise ValueError("Error: 'year_month' and 'tripdata_type' must be provided.")
 
     LOG.info(f"Initializing Spark session for pipeline run: {pipeline_run_name} in {spark_mode} mode...")
 
@@ -34,35 +31,30 @@ def load_data(*args, **kwargs):
     
     base_read_lakehouse_path = os.path.join(SPARK_LAKEHOUSE_FILES_DIR, f'{tripdata_type}/data')
     base_write_path = os.path.join(SPARK_LAKEHOUSE_FILES_DIR, f'{tripdata_type}/tmp/pq/pre_lakehouse_to_psql_production/{pipeline_run_name}')
-    LOG.info(f"Processing data from {start_year}-{start_month:02d} to {end_year}-{end_month:02d}...")
-    
-    current_date = datetime(start_year, start_month, 1)
-    end_date = datetime(end_year, end_month, 31)
 
+    # Extract year and month from `year_month`
+    year, month = map(int, year_month.split('_'))
+    LOG.info(f"Processing data for {year}-{month:02d}...")
+
+    # Generate file paths for each day of the specified month
     file_paths = []
-    while current_date <= end_date:
-        year = current_date.year
-        month = current_date.month
-        day = current_date.day
-
-        LOG.info(f"Processing data for {year}-{month:02d}-{day:02d}...")
+    num_days = (datetime(year, month, 1).replace(month=(month % 12) + 1) - timedelta(days=1)).day
+    for day in range(1, num_days + 1):
         file_path = os.path.join(base_read_lakehouse_path, f'partition-date={year}-{month:02d}-{day:02d}/data.parquet')
-
         if os.path.exists(file_path):
             file_paths.append(file_path)
         else:
             LOG.warning(f"File not found: {file_path}")
-        current_date += timedelta(days=1)
     
     LOG.info(f"Found {len(file_paths)} files to process.")
 
     # Reading data into a DataFrame
-    df = spark.read.parquet(*file_paths)
-    # df.printSchema()
-    df = df.withColumn("year", spark_year("pickup_datetime")).withColumn("month", spark_month("pickup_datetime"))
-    df.write.partitionBy('year', 'month').parquet(base_write_path, mode='overwrite')
+    if file_paths:
+        df = spark.read.parquet(*file_paths)
+        df = df.withColumn("year", spark_year("pickup_datetime")).withColumn("month", spark_month("pickup_datetime"))
+        df.write.partitionBy('year', 'month').parquet(base_write_path, mode='overwrite')
+        LOG.info(f'Data export completed with {df.count()} rows written.')
+    else:
+        LOG.warning("No valid files found for processing.")
 
-    LOG.info(f'Data export completed with {df.count()} written. Stopping Spark session.')
     spark.stop()
-
-
