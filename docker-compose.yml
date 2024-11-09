@@ -325,6 +325,8 @@ services:
       - ./de_zoomcamp_nyc_taxi:/de_zoomcamp_nyc_taxi  # Mount specific directory
     working_dir: /de_zoomcamp_nyc_taxi
     entrypoint: /de_zoomcamp_nyc_taxi/start_runner.sh
+    networks:
+      - mage-network
 
 
 networks:
