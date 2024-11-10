@@ -22,7 +22,7 @@ jobs:
                   "pipeline_run": {
                     "variables": {
                       "dev_limit_rows": 1000,
-                      "pipeline_run_name": "test_workflow_run",
+                      "pipeline_run_name": "this_was_run_from_a_pipeline",
                       "spark_mode": "cluster",
                       "tripdata_type": "yellow_cab_tripdata",
                       "year_month": "2023_1"
