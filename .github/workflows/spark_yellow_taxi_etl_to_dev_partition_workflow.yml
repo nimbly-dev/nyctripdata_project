@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Trigger Pipeline via API Request
         env:
-          API_URL: "http://magic:6789/api/pipeline_schedules/26/api_trigger"
+          API_URL: "http://magic:6789/api/pipeline_schedules/27/api_trigger"
           BEARER_TOKEN: "098b10876caf4d589d61c41752515731"  # Replace with a GitHub Secret for security
         run: |
           # Send the POST request and capture the HTTP status code
