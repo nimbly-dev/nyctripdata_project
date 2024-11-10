@@ -1,17 +1,29 @@
-name: Trigger spark_yellow_taxi_etl_to_dev_partition Pipeline
+name: Run Pipeline on PR Comment Command
 
 on:
-  pull_request:
-    branches:
-      - master  
+  issue_comment:
+    types: [created]
 
 jobs:
-  run_pipeline:
+  run_pipeline_on_comment:
+    if: github.event.issue.pull_request != null  # Only run on PR comments
     runs-on: self-hosted
+
     steps:
+      - name: Check Comment for Command
+        id: check_comment
+        run: |
+          if [[ "${{ github.event.comment.body }}" == "CI:run_yellow_etl_dev" ]]; then
+            echo "Triggered by CI:run_yellow_etl_dev comment."
+            echo "::set-output name=run_pipeline::true"
+          else
+            echo "No matching command found in comment."
+            echo "::set-output name=run_pipeline::false"
+          fi
+
       - name: Trigger Pipeline via API Request
         env:
-          API_URL: "http://magic:6789/api/pipeline_schedules/26/api_trigger"
+          API_URL: "http://magic:6789/api/pipeline_schedules/27/api_trigger"
           BEARER_TOKEN: "098b10876caf4d589d61c41752515731"  # Replace with a GitHub Secret for security
         run: |
           # Send the POST request and capture the HTTP status code
@@ -22,14 +34,13 @@ jobs:
                   "pipeline_run": {
                     "variables": {
                       "dev_limit_rows": 1000,
-                      "pipeline_run_name": "test_workflow_run",
+                      "pipeline_run_name": "this_was_run_from_a_pipeline",
                       "spark_mode": "cluster",
                       "tripdata_type": "yellow_cab_tripdata",
                       "year_month": "2023_1"
                     }
                   }
                 }')
-
           # Check if the response code is in the 2xx range (indicating success)
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
             echo "Pipeline triggered successfully."
