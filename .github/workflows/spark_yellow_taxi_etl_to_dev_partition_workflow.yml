@@ -1,12 +1,12 @@
 name: Run Pipeline on PR Comment Command
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  issue_comment:
+    types: [created]
 
 jobs:
   run_pipeline_on_comment:
-    if: github.event.comment != null && contains(github.event.comment.body, 'CI:run_yellow_etl_dev')
+    if: github.event.issue.pull_request != null && contains(github.event.comment.body, 'CI:run_yellow_etl_dev')
     runs-on: self-hosted
 
     steps:
@@ -26,7 +26,7 @@ jobs:
         id: trigger_pipeline
         env:
           API_URL: "http://magic:6789/api/pipeline_schedules/27/api_trigger"
-          BEARER_TOKEN: "098b10876caf4d589d61c41752515731" 
+          BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
         run: |
           # Send the POST request and capture the HTTP status code
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
