@@ -310,6 +310,7 @@ services:
     networks:
       - mage-network
 
+
   github-runner:
     image: myoung34/github-runner:latest
     container_name: nyc-tripdata-project-runner
@@ -320,14 +321,13 @@ services:
       RUNNER_WORKDIR: "/runner/_work"
       RUNNER_ALLOW_RUNASROOT: "1"
       GITHUB_URL: "https://github.com/nimbly-dev/nyctripdata_project"  
-      GITHUB_TOKEN: "AOYH3BY3HINA6Y6UOIBS64DHF57YG"
+      GITHUB_TOKEN: "AOYH3B5SDZSYQJPERNP6WRDHGCXHW"
     volumes:
-      - ./de_zoomcamp_nyc_taxi:/de_zoomcamp_nyc_taxi  # Mount specific directory
+      - "./de_zoomcamp_nyc_taxi:/de_zoomcamp_nyc_taxi"  
     working_dir: /de_zoomcamp_nyc_taxi
-    entrypoint: /de_zoomcamp_nyc_taxi/start_runner.sh
+    entrypoint: ['/bin/bash', '/de_zoomcamp_nyc_taxi/start_runner.sh']
     networks:
       - mage-network
-
 
 networks:
   mage-network:
