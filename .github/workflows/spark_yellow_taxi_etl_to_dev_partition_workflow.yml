@@ -6,7 +6,7 @@ on:
 
 jobs:
   run_pipeline_on_comment:
-    if: github.event.issue.pull_request != null  # Only run on PR comments
+    if: github.event.issue.pull_request != null  
     runs-on: self-hosted
 
     steps:
@@ -22,9 +22,11 @@ jobs:
           fi
 
       - name: Trigger Pipeline via API Request
+        if: steps.check_comment.outputs.run_pipeline == 'true'
+        id: trigger_pipeline
         env:
           API_URL: "http://magic:6789/api/pipeline_schedules/27/api_trigger"
-          BEARER_TOKEN: "098b10876caf4d589d61c41752515731"  # Replace with a GitHub Secret for security
+          BEARER_TOKEN: "098b10876caf4d589d61c41752515731" 
         run: |
           # Send the POST request and capture the HTTP status code
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
@@ -34,19 +36,38 @@ jobs:
                   "pipeline_run": {
                     "variables": {
                       "dev_limit_rows": 1000,
-                      "pipeline_run_name": "this_was_run_from_a_pipeline",
+                      "pipeline_run_name": "test_workflow_run",
                       "spark_mode": "cluster",
                       "tripdata_type": "yellow_cab_tripdata",
                       "year_month": "2023_1"
                     }
                   }
                 }')
+
           # Check if the response code is in the 2xx range (indicating success)
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
             echo "Pipeline triggered successfully."
+            echo "status=success" >> $GITHUB_ENV
           else
             echo "Error triggering pipeline. HTTP Status: $HTTP_RESPONSE"
             echo "Response Body:"
             cat response.json  # Print the response body for more information
+            echo "status=failure" >> $GITHUB_ENV
             exit 1  # Exit with a non-zero status to fail the GitHub Actions job
           fi
+
+      - name: Post Comment on PR
+        if: steps.check_comment.outputs.run_pipeline == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
+          if [ "$status" == "success" ]; then
+            COMMENT="✅ Pipeline triggered successfully for CI:run_yellow_etl_dev."
+          else
+            COMMENT="❌ Pipeline failed to trigger for CI:run_yellow_etl_dev."
+          fi
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\": \"$COMMENT\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
