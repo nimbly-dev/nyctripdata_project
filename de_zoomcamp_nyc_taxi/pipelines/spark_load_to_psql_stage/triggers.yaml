@@ -19,3 +19,21 @@ triggers:
     start_month: 6
     start_year: 2022
     tripdata_type: green_cab_tripdata
+- description: null
+  envs: []
+  last_enabled_at: 2024-11-11 12:33:10.773530
+  name: TRIGGER_PIPELINE_VIA_API
+  pipeline_uuid: spark_load_to_psql_stage
+  schedule_interval: null
+  schedule_type: api
+  settings: null
+  sla: null
+  start_time: 2024-11-11 12:33:00
+  status: active
+  token: c8967de48c5c43d8a0d85237b2d72f54
+  variables:
+    overwrite_enabled: true
+    pipeline_run_name: dataeng_21_enchancement_6
+    spark_mode: cluster
+    tripdata_type: yellow_cab_tripdata
+    year_month: '2023_10'
