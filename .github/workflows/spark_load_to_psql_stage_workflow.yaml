@@ -19,21 +19,21 @@ jobs:
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
           if [[ "$COMMENT_BODY" == "CI:yellow:run_load_to_psql_stage" ]]; then
-            echo "api_url=http://magic:6789/api/pipeline_schedules/27/pipeline_runs" >> $GITHUB_ENV
-            echo "bearer_token=${{ secrets.YELLOW_TOKEN }}" >> $GITHUB_ENV
-            echo "tripdata_type=yellow_cab_tripdata" >> $GITHUB_ENV
+            echo "api_url=http://magic:6789/api/pipeline_schedules/27/pipeline_runs" >> $GITHUB_OUTPUT
+            echo "bearer_token=098b10876caf4d589d61c41752515731" >> $GITHUB_OUTPUT
+            echo "tripdata_type=yellow_cab_tripdata" >> $GITHUB_OUTPUT
           elif [[ "$COMMENT_BODY" == "CI:green:run_load_to_psql_stage" ]]; then
-            echo "api_url=http://magic:6789/api/pipeline_schedules/28/pipeline_runs" >> $GITHUB_ENV
-            echo "bearer_token=${{ secrets.GREEN_TOKEN }}" >> $GITHUB_ENV
-            echo "tripdata_type=green_cab_tripdata" >> $GITHUB_ENV
+            echo "api_url=http://magic:6789/api/pipeline_schedules/28/pipeline_runs" >> $GITHUB_OUTPUT
+            echo "bearer_token=5809a974ec34498b817e08f7720e2324" >> $GITHUB_OUTPUT
+            echo "tripdata_type=green_cab_tripdata" >> $GITHUB_OUTPUT
           elif [[ "$COMMENT_BODY" == "CI:fhv:run_load_to_psql_stage" ]]; then
-            echo "api_url=http://magic:6789/api/pipeline_schedules/29/pipeline_runs" >> $GITHUB_ENV
-            echo "bearer_token=${{ secrets.FHV_TOKEN }}" >> $GITHUB_ENV
-            echo "tripdata_type=fhv_cab_tripdata" >> $GITHUB_ENV
+            echo "api_url=http://magic:6789/api/pipeline_schedules/29/pipeline_runs" >> $GITHUB_OUTPUT
+            echo "bearer_token=0b46a5d018c747de852700932756e1a7" >> $GITHUB_OUTPUT
+            echo "tripdata_type=fhv_cab_tripdata" >> $GITHUB_OUTPUT
           else
             echo "No matching command found or unsupported cab type."
             exit 1
-
+            
       - name: Trigger Prerequisite Pipeline
         id: trigger_prerequisite
         env:
