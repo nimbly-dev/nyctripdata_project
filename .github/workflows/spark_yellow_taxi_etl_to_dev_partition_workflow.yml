@@ -61,10 +61,24 @@ jobs:
         env:
           BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
           STATUS_API_URL: "http://magic:6789/api/pipeline_runs/${{ steps.trigger_pipeline.outputs.pipeline_run_id }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
           MAX_ATTEMPTS=30
           ATTEMPT=0
           pipeline_status="RUNNING"
+
+          post_status_comment() {
+            local status_message=$1
+            COMMENT="Current pipeline status: $status_message"
+            curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"body\": \"$COMMENT\"}" \
+              "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
+          }
+
+          post_status_comment "Pipeline initiated. Checking status..."
+
           while [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; do
             RESPONSE=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$STATUS_API_URL")
             PIPELINE_STATUS=$(echo "$RESPONSE" | jq -r '.pipeline_run.status')
@@ -76,13 +90,16 @@ jobs:
             if echo "$BLOCK_STATUSES" | grep -q "running"; then
               echo "Pipeline is still running..."
               pipeline_status="RUNNING"
+              post_status_comment "Pipeline is still running..."
             elif echo "$BLOCK_STATUSES" | grep -q -E "failed|error"; then
               echo "Pipeline failed."
               pipeline_status="FAILED"
+              post_status_comment "Pipeline failed."
               break
             elif ! echo "$BLOCK_STATUSES" | grep -vq "completed"; then
               echo "Pipeline completed successfully."
               pipeline_status="COMPLETED"
+              post_status_comment "Pipeline completed successfully."
               break
             fi
             
@@ -93,5 +110,6 @@ jobs:
           if [[ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]]; then
             echo "Pipeline status check timed out."
             pipeline_status="TIMED_OUT"
+            post_status_comment "Pipeline status check timed out."
           fi
           echo "pipeline_status=$pipeline_status" >> $GITHUB_ENV
