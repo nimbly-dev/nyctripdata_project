@@ -1,4 +1,4 @@
-name: Run spark_yellow_taxi_etl_to_dev_partition Pipeline on PR Comment Command
+name: Run CI:run_yellow_etl_dev
 
 on:
   issue_comment:
