@@ -19,17 +19,17 @@ jobs:
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
           if [[ "$COMMENT_BODY" == "CI:yellow:run_load_to_psql_stage" ]]; then
-            echo "api_url=http://magic:6789/api/pipeline_schedules/27/pipeline_runs" >> $GITHUB_OUTPUT
-            echo "bearer_token=098b10876caf4d589d61c41752515731" >> $GITHUB_OUTPUT
-            echo "tripdata_type=yellow_cab_tripdata" >> $GITHUB_OUTPUT
+            echo "::set-output name=api_url::http://magic:6789/api/pipeline_schedules/27/pipeline_runs"
+            echo "::set-output name=bearer_token::098b10876caf4d589d61c41752515731"
+            echo "::set-output name=tripdata_type::yellow_cab_tripdata"
           elif [[ "$COMMENT_BODY" == "CI:green:run_load_to_psql_stage" ]]; then
-            echo "api_url=http://magic:6789/api/pipeline_schedules/28/pipeline_runs" >> $GITHUB_OUTPUT
-            echo "bearer_token=5809a974ec34498b817e08f7720e2324" >> $GITHUB_OUTPUT
-            echo "tripdata_type=green_cab_tripdata" >> $GITHUB_OUTPUT
+            echo "::set-output name=api_url::http://magic:6789/api/pipeline_schedules/28/pipeline_runs"
+            echo "::set-output name=bearer_token::5809a974ec34498b817e08f7720e2324"
+            echo "::set-output name=tripdata_type::green_cab_tripdata"
           elif [[ "$COMMENT_BODY" == "CI:fhv:run_load_to_psql_stage" ]]; then
-            echo "api_url=http://magic:6789/api/pipeline_schedules/29/pipeline_runs" >> $GITHUB_OUTPUT
-            echo "bearer_token=0b46a5d018c747de852700932756e1a7" >> $GITHUB_OUTPUT
-            echo "tripdata_type=fhv_cab_tripdata" >> $GITHUB_OUTPUT
+            echo "::set-output name=api_url::http://magic:6789/api/pipeline_schedules/29/pipeline_runs"
+            echo "::set-output name=bearer_token::0b46a5d018c747de852700932756e1a7"
+            echo "::set-output name=tripdata_type::fhv_cab_tripdata"
           else
             echo "No matching command found or unsupported cab type."
             exit 1
