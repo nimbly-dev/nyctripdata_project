@@ -42,6 +42,7 @@ jobs:
           BEARER_TOKEN: ${{ env.bearer_token }}
           TRIPDATA_TYPE: ${{ env.tripdata_type }}
         run: |
+          # Send the POST request
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
             -H "Authorization: Bearer $BEARER_TOKEN" \
             -H "Content-Type: application/json" \
@@ -57,24 +58,37 @@ jobs:
                   }
                 }")
 
-          # Log HTTP response code
+          # Log HTTP response code for debugging
           echo "HTTP Response Code: $HTTP_RESPONSE"
 
-          # Check if the response JSON file exists and is non-empty
-          if [ -s response.json ]; then
-            # Try extracting the pipeline_run id, handle any jq errors
-            PREREQUISITE_RUN_ID=$(jq -r '.pipeline_run.id' response.json || echo "null")
-            if [ "$PREREQUISITE_RUN_ID" != "null" ]; then
-              echo "prerequisite_run_id=$PREREQUISITE_RUN_ID" >> $GITHUB_ENV
-              echo "status=success" >> $GITHUB_ENV
+          # Check if HTTP response is within success range (200-299)
+          if [[ "$HTTP_RESPONSE" -ge 200 && "$HTTP_RESPONSE" -lt 300 ]]; then
+            # Check if the response JSON file is non-empty
+            if [ -s response.json ]; then
+              # Attempt to parse 'pipeline_run.id' using jq
+              PREREQUISITE_RUN_ID=$(jq -r '.pipeline_run.id' response.json 2>/dev/null || echo "null")
+              
+              if [ "$PREREQUISITE_RUN_ID" != "null" ]; then
+                # Successfully retrieved ID, set output
+                echo "prerequisite_run_id=$PREREQUISITE_RUN_ID" >> $GITHUB_ENV
+                echo "status=success" >> $GITHUB_ENV
+              else
+                # Log error if 'pipeline_run.id' could not be parsed
+                echo "Error: Failed to parse 'pipeline_run.id'. Full response:"
+                cat response.json
+                echo "status=failure" >> $GITHUB_ENV
+                exit 1
+              fi
             else
-              echo "Failed to extract pipeline_run.id. Full response:"
+              # Handle empty or missing response.json file
+              echo "Error: Response file is empty or missing."
               cat response.json
               echo "status=failure" >> $GITHUB_ENV
               exit 1
             fi
           else
-            echo "Response file is empty or not found. HTTP response body:"
+            # Handle non-2xx HTTP response
+            echo "Error: Non-success HTTP response code ($HTTP_RESPONSE). Full response:"
             cat response.json
             echo "status=failure" >> $GITHUB_ENV
             exit 1
