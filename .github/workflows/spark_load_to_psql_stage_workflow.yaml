@@ -47,10 +47,21 @@ jobs:
       - name: Trigger Prerequisite Pipeline
         id: trigger_prerequisite
         env:
-          API_URL: ${{ env.api_url }}
-          BEARER_TOKEN: ${{ env.bearer_token }}
-          TRIPDATA_TYPE: ${{ env.tripdata_type }}
+          API_URL: ${{ steps.set_variables.outputs.api_url }}
+          BEARER_TOKEN: ${{ steps.set_variables.outputs.bearer_token }}
+          TRIPDATA_TYPE: ${{ steps.set_variables.outputs.tripdata_type }}
         run: |
+          # Debugging: Print environment variables to verify they are set
+          echo "API URL: $API_URL"
+          echo "Bearer Token: $BEARER_TOKEN"
+          echo "Tripdata Type: $TRIPDATA_TYPE"
+          
+          # Verify variables are not empty
+          if [[ -z "$API_URL" || -z "$BEARER_TOKEN" || -z "$TRIPDATA_TYPE" ]]; then
+            echo "Error: One or more required environment variables are missing."
+            exit 1
+          fi
+
           # Send the POST request and capture the HTTP response code
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
             -H "Authorization: Bearer $BEARER_TOKEN" \
@@ -102,7 +113,7 @@ jobs:
             echo "::set-output name=status::failure"
             exit 1
           fi
-
+          
   monitor_prerequisite:
     runs-on: self-hosted
     needs: trigger_prerequisite
