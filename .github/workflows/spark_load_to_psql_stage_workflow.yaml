@@ -33,6 +33,7 @@ jobs:
           else
             echo "No matching command found or unsupported cab type."
             exit 1
+          fi
             
       - name: Trigger Prerequisite Pipeline
         id: trigger_prerequisite
