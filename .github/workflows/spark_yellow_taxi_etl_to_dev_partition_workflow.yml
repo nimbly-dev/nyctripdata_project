@@ -23,27 +23,36 @@ jobs:
             echo "::set-output name=run_pipeline::false"
           fi
 
+      - name: Generate Dynamic Pipeline Run Name
+        if: steps.check_comment.outputs.run_pipeline == 'true'
+        id: generate_run_name
+        run: |
+          TIMESTAMP=$(date +"%d%m%Y_%H%M")
+          RUN_NAME="workflow_run_spark_yellow_taxi_etl_to_dev_partition_${TIMESTAMP}"
+          echo "pipeline_run_name=$RUN_NAME" >> $GITHUB_ENV
+
       - name: Trigger Pipeline via API Request
         if: steps.check_comment.outputs.run_pipeline == 'true'
         id: trigger_pipeline
         env:
           API_URL: "http://magic:6789/api/pipeline_schedules/27/pipeline_runs"
           BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
+          PIPELINE_RUN_NAME: ${{ env.pipeline_run_name }}
         run: |
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
             -H "Authorization: Bearer $BEARER_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '{
-                  "pipeline_run": {
-                    "variables": {
-                      "dev_limit_rows": 1000,
-                      "pipeline_run_name": "test_workflow_run",
-                      "spark_mode": "cluster",
-                      "tripdata_type": "yellow_cab_tripdata",
-                      "year_month": "2023_1"
+            -d "{
+                  \"pipeline_run\": {
+                    \"variables\": {
+                      \"dev_limit_rows\": 1000,
+                      \"pipeline_run_name\": \"${PIPELINE_RUN_NAME}\",
+                      \"spark_mode\": \"cluster\",
+                      \"tripdata_type\": \"yellow_cab_tripdata\",
+                      \"year_month\": \"2023_1\"
                     }
                   }
-                }')
+                }")
 
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
             echo "Pipeline triggered successfully."
