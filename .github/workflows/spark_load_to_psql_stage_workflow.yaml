@@ -19,17 +19,17 @@ jobs:
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
           if [[ "$COMMENT_BODY" == "CI:yellow:run_load_to_psql_stage" ]]; then
-            echo "::set-output name=api_url::http://magic:6789/api/pipeline_schedules/27/pipeline_runs"
-            echo "::set-output name=bearer_token::${{ secrets.YELLOW_TOKEN }}"
-            echo "::set-output name=tripdata_type::yellow_cab_tripdata"
+            echo "api_url=http://magic:6789/api/pipeline_schedules/27/pipeline_runs" >> $GITHUB_ENV
+            echo "bearer_token=${{ secrets.YELLOW_TOKEN }}" >> $GITHUB_ENV
+            echo "tripdata_type=yellow_cab_tripdata" >> $GITHUB_ENV
           elif [[ "$COMMENT_BODY" == "CI:green:run_load_to_psql_stage" ]]; then
-            echo "::set-output name=api_url::http://magic:6789/api/pipeline_schedules/28/pipeline_runs"
-            echo "::set-output name=bearer_token::${{ secrets.GREEN_TOKEN }}"
-            echo "::set-output name=tripdata_type::green_cab_tripdata"
+            echo "api_url=http://magic:6789/api/pipeline_schedules/28/pipeline_runs" >> $GITHUB_ENV
+            echo "bearer_token=${{ secrets.GREEN_TOKEN }}" >> $GITHUB_ENV
+            echo "tripdata_type=green_cab_tripdata" >> $GITHUB_ENV
           elif [[ "$COMMENT_BODY" == "CI:fhv:run_load_to_psql_stage" ]]; then
-            echo "::set-output name=api_url::http://magic:6789/api/pipeline_schedules/29/pipeline_runs"
-            echo "::set-output name=bearer_token::${{ secrets.FHV_TOKEN }}"
-            echo "::set-output name=tripdata_type::fhv_cab_tripdata"
+            echo "api_url=http://magic:6789/api/pipeline_schedules/29/pipeline_runs" >> $GITHUB_ENV
+            echo "bearer_token=${{ secrets.FHV_TOKEN }}" >> $GITHUB_ENV
+            echo "tripdata_type=fhv_cab_tripdata" >> $GITHUB_ENV
           else
             echo "No matching command found or unsupported cab type."
             exit 1
@@ -37,9 +37,9 @@ jobs:
       - name: Trigger Prerequisite Pipeline
         id: trigger_prerequisite
         env:
-          API_URL: ${{ steps.set_variables.outputs.api_url }}
-          BEARER_TOKEN: ${{ steps.set_variables.outputs.bearer_token }}
-          TRIPDATA_TYPE: ${{ steps.set_variables.outputs.tripdata_type }}
+          API_URL: ${{ env.api_url }}
+          BEARER_TOKEN: ${{ env.bearer_token }}
+          TRIPDATA_TYPE: ${{ env.tripdata_type }}
         run: |
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
             -H "Authorization: Bearer $BEARER_TOKEN" \
@@ -57,14 +57,11 @@ jobs:
                 }")
 
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
-            echo "Prerequisite pipeline triggered successfully."
-            PREREQUISITE_RUN_ID=$(jq -r '.pipeline_run.id' response.json)
-            echo "::set-output name=prerequisite_run_id::$PREREQUISITE_RUN_ID"
-            echo "::set-output name=status::success"
+            echo "prerequisite_run_id=$(jq -r '.pipeline_run.id' response.json)" >> $GITHUB_ENV
+            echo "status=success" >> $GITHUB_ENV
           else
-            echo "Error triggering prerequisite pipeline. HTTP Status: $HTTP_RESPONSE"
             cat response.json
-            echo "::set-output name=status::failure"
+            echo "status=failure" >> $GITHUB_ENV
             exit 1
 
   monitor_prerequisite:
@@ -87,12 +84,10 @@ jobs:
             STATUS=$(echo "$RESPONSE" | jq -r '.pipeline_run.status')
             
             if [[ "$STATUS" == "completed" ]]; then
-              echo "Prerequisite pipeline completed successfully."
-              echo "::set-output name=status::COMPLETED"
+              echo "status=COMPLETED" >> $GITHUB_ENV
               exit 0
             elif [[ "$STATUS" == "failed" || "$STATUS" == "error" ]]; then
-              echo "Prerequisite pipeline failed."
-              echo "::set-output name=status::FAILED"
+              echo "status=FAILED" >> $GITHUB_ENV
               exit 1
             fi
 
@@ -100,7 +95,7 @@ jobs:
             sleep 30
           done
 
-          echo "Timed out waiting for the prerequisite pipeline to complete."
+          echo "status=TIMED_OUT" >> $GITHUB_ENV
           exit 1
 
   trigger_psql_stage:
@@ -133,11 +128,8 @@ jobs:
                 }")
 
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
-            echo "PSQL stage triggered successfully."
-            PSQL_RUN_ID=$(jq -r '.pipeline_run.id' response.json)
-            echo "::set-output name=psql_run_id::$PSQL_RUN_ID"
+            echo "psql_run_id=$(jq -r '.pipeline_run.id' response.json)" >> $GITHUB_ENV
           else
-            echo "Error triggering PSQL stage. HTTP Status: $HTTP_RESPONSE"
             cat response.json
             exit 1
 
@@ -160,12 +152,10 @@ jobs:
             STATUS=$(echo "$RESPONSE" | jq -r '.pipeline_run.status')
             
             if [[ "$STATUS" == "completed" ]]; then
-              echo "PSQL stage completed successfully."
-              echo "::set-output name=status::COMPLETED"
+              echo "status=COMPLETED" >> $GITHUB_ENV
               exit 0
             elif [[ "$STATUS" == "failed" || "$STATUS" == "error" ]]; then
-              echo "PSQL stage failed."
-              echo "::set-output name=status::FAILED"
+              echo "status=FAILED" >> $GITHUB_ENV
               exit 1
             fi
 
@@ -173,7 +163,7 @@ jobs:
             sleep 30
           done
 
-          echo "Timed out waiting for the PSQL stage to complete."
+          echo "status=TIMED_OUT" >> $GITHUB_ENV
           exit 1
 
   post_final_comments:
