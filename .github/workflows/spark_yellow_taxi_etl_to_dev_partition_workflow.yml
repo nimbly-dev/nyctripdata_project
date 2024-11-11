@@ -1,4 +1,4 @@
-name: Run CI:run_yellow_etl_dev
+name: Run spark_yellow_taxi_etl_to_dev_partition Pipeline on PR Comment Command
 
 on:
   issue_comment:
@@ -72,7 +72,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
-          COMMENT="⏳ Pipeline is currently running..."
+          COMMENT="⏳ Pipeline is currently running...\n\n[View workflow run details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
           curl -s -H "Authorization: token $GITHUB_TOKEN" \
             -H "Content-Type: application/json" \
             -d "{\"body\": \"$COMMENT\"}" \
@@ -135,18 +135,21 @@ jobs:
       - name: Post Final Status Comment
         run: |
           PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
-          case "${{ needs.monitor_pipeline_status.outputs.final_status }}" in
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          FINAL_STATUS="${{ needs.monitor_pipeline_status.outputs.final_status }}"
+          
+          case "$FINAL_STATUS" in
             COMPLETED)
-              COMMENT="✅ Pipeline completed successfully."
+              COMMENT="✅ Pipeline completed successfully.\n\nStatus: **$FINAL_STATUS**\n\n[View workflow run details]($WORKFLOW_URL)"
               ;;
             FAILED)
-              COMMENT="❌ Pipeline failed during execution."
+              COMMENT="❌ Pipeline failed during execution.\n\nStatus: **$FINAL_STATUS**\n\n[View workflow run details]($WORKFLOW_URL)"
               ;;
             TIMED_OUT)
-              COMMENT="⚠️ Pipeline status check timed out."
+              COMMENT="⚠️ Pipeline status check timed out.\n\nStatus: **$FINAL_STATUS**\n\n[View workflow run details]($WORKFLOW_URL)"
               ;;
             *)
-              COMMENT="❓ Pipeline status is unknown."
+              COMMENT="❓ Pipeline status is unknown.\n\nStatus: **$FINAL_STATUS**\n\n[View workflow run details]($WORKFLOW_URL)"
               ;;
           esac
           curl -s -H "Authorization: token $GITHUB_TOKEN" \
