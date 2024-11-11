@@ -25,10 +25,9 @@ jobs:
         if: steps.check_comment.outputs.run_pipeline == 'true'
         id: trigger_pipeline
         env:
-          API_URL: "http://magic:6789/api/pipeline_schedules/27/api_trigger"
+          API_URL: "http://localhost:6789/api/pipeline_schedules/27/pipeline_runs"
           BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
         run: |
-          # Send the POST request and capture the HTTP status code
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
             -H "Authorization: Bearer $BEARER_TOKEN" \
             -H "Content-Type: application/json" \
@@ -44,29 +43,69 @@ jobs:
                   }
                 }')
 
-          # Check if the response code is in the 2xx range (indicating success)
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
             echo "Pipeline triggered successfully."
+            PIPELINE_RUN_ID=$(jq -r '.pipeline_run.id' response.json)
+            echo "::set-output name=pipeline_run_id::$PIPELINE_RUN_ID"
             echo "status=success" >> $GITHUB_ENV
           else
             echo "Error triggering pipeline. HTTP Status: $HTTP_RESPONSE"
-            echo "Response Body:"
-            cat response.json  # Print the response body for more information
+            cat response.json
             echo "status=failure" >> $GITHUB_ENV
-            exit 1  # Exit with a non-zero status to fail the GitHub Actions job
+            exit 1
           fi
 
-      - name: Post Comment on PR
+      - name: Check Pipeline Status
+        if: steps.check_comment.outputs.run_pipeline == 'true' && steps.trigger_pipeline.outputs.status == 'success'
+        id: check_pipeline_status
+        env:
+          BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
+          STATUS_API_URL: "http://localhost:6789/api/pipeline_runs/${{ steps.trigger_pipeline.outputs.pipeline_run_id }}"
+        run: |
+          MAX_ATTEMPTS=30
+          ATTEMPT=0
+          while [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; do
+            STATUS=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$STATUS_API_URL" | jq -r '.pipeline_run.status')
+            echo "Pipeline status: $STATUS"
+            if [[ "$STATUS" == "completed" ]]; then
+              echo "Pipeline completed successfully."
+              echo "pipeline_status=COMPLETED" >> $GITHUB_ENV
+              break
+            elif [[ "$STATUS" == "failed" || "$STATUS" == "error" ]]; then
+              echo "Pipeline failed."
+              echo "pipeline_status=FAILED" >> $GITHUB_ENV
+              break
+            elif [[ "$STATUS" == "running" ]]; then
+              echo "Pipeline is still running..."
+            fi
+            ATTEMPT=$((ATTEMPT+1))
+            sleep 30
+          done
+          if [[ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]]; then
+            echo "Pipeline status check timed out."
+            echo "pipeline_status=TIMED_OUT" >> $GITHUB_ENV
+          fi
+
+      - name: Post Comment on PR with Pipeline Status
         if: steps.check_comment.outputs.run_pipeline == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
-          if [ "$status" == "success" ]; then
-            COMMENT="✅ Pipeline triggered successfully for CI:run_yellow_etl_dev."
-          else
-            COMMENT="❌ Pipeline failed to trigger for CI:run_yellow_etl_dev."
-          fi
+          case "$pipeline_status" in
+            COMPLETED)
+              COMMENT="✅ Pipeline completed successfully for CI:run_yellow_etl_dev."
+              ;;
+            FAILED)
+              COMMENT="❌ Pipeline failed for CI:run_yellow_etl_dev."
+              ;;
+            TIMED_OUT)
+              COMMENT="⚠️ Pipeline status check timed out for CI:run_yellow_etl_dev."
+              ;;
+            *)
+              COMMENT="❓ Pipeline status is unknown for CI:run_yellow_etl_dev."
+              ;;
+          esac
           curl -s -H "Authorization: token $GITHUB_TOKEN" \
             -H "Content-Type: application/json" \
             -d "{\"body\": \"$COMMENT\"}" \

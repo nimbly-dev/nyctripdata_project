@@ -317,17 +317,16 @@ services:
     depends_on:
       - magic
     env_file:
-      - .env
+      - ./.env
     environment:
       RUNNER_NAME: "nyc-tripdata-project-runner"
       RUNNER_WORKDIR: "/runner/_work"
       RUNNER_ALLOW_RUNASROOT: "1"
-      GITHUB_URL: "https://github.com/nimbly-dev/nyctripdata_project"  
-      GITHUB_TOKEN: "AOYH3B5CT47QOKVWA2KXL4DHGDABG"
+      GITHUB_URL: "https://github.com/nimbly-dev/nyctripdata_project"
     volumes:
       - "./de_zoomcamp_nyc_taxi:/de_zoomcamp_nyc_taxi"  
     working_dir: /de_zoomcamp_nyc_taxi
-    entrypoint: ['/bin/bash', '/de_zoomcamp_nyc_taxi/start_runner.sh']
+    entrypoint: ['/bin/bash', '-c', 'apt-get update && apt-get install -y jq && /de_zoomcamp_nyc_taxi/start_runner.sh']
     networks:
       - mage-network
 
