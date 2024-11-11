@@ -57,6 +57,18 @@ jobs:
             exit 1
           fi
 
+      - name: Post Initial "Running" Comment
+        if: steps.check_comment.outputs.run_pipeline == 'true' && steps.trigger_pipeline.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
+          COMMENT="⏳ Pipeline is currently running..."
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\": \"$COMMENT\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
+
   monitor_pipeline_status:
     runs-on: self-hosted
     needs: trigger_pipeline
@@ -111,16 +123,6 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Post Initial Comment
-        if: needs.trigger_pipeline.outputs.status == 'success'
-        run: |
-          PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
-          COMMENT="⏳ Pipeline is currently running..."
-          curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "{\"body\": \"$COMMENT\"}" \
-            "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
-
       - name: Post Final Status Comment
         run: |
           PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
