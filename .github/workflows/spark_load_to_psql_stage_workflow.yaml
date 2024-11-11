@@ -41,6 +41,18 @@ jobs:
           BEARER_TOKEN: ${{ steps.set_variables.outputs.bearer_token }}
           TRIPDATA_TYPE: ${{ steps.set_variables.outputs.tripdata_type }}
         run: |
+          # Debugging: Print environment variables to verify they are set
+          echo "API URL: $API_URL"
+          echo "Bearer Token: $BEARER_TOKEN"
+          echo "Tripdata Type: $TRIPDATA_TYPE"
+          
+          # Verify variables are not empty
+          if [[ -z "$API_URL" || -z "$BEARER_TOKEN" || -z "$TRIPDATA_TYPE" ]]; then
+            echo "Error: One or more required environment variables are missing."
+            exit 1
+          fi
+
+          # Send the POST request and capture the HTTP response code
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
             -H "Authorization: Bearer $BEARER_TOKEN" \
             -H "Content-Type: application/json" \
@@ -55,29 +67,42 @@ jobs:
                     }
                   }
                 }")
-
-          echo "HTTP Response Code: $HTTP_RESPONSE"
           
+          # Log the HTTP response code
+          echo "HTTP Response Code: $HTTP_RESPONSE"
+
+          # Verify if the HTTP response is within the success range (200-299)
           if [[ "$HTTP_RESPONSE" -ge 200 && "$HTTP_RESPONSE" -lt 300 ]]; then
+            # Check if response.json is non-empty
             if [ -s response.json ]; then
+              # Attempt to parse 'pipeline_run.id' using jq
               PREREQUISITE_RUN_ID=$(jq -r '.pipeline_run.id' response.json 2>/dev/null || echo "null")
+              
+              # Verify if 'pipeline_run.id' was successfully retrieved
               if [ "$PREREQUISITE_RUN_ID" != "null" ]; then
                 echo "::set-output name=prerequisite_run_id::$PREREQUISITE_RUN_ID"
                 echo "::set-output name=status::success"
               else
-                echo "Error: Failed to parse 'pipeline_run.id'."
+                # Log the error if 'pipeline_run.id' could not be parsed
+                echo "Error: Failed to parse 'pipeline_run.id'. Full response:"
+                cat response.json
                 echo "::set-output name=status::failure"
                 exit 1
               fi
             else
-              echo "Error: Response file is empty."
+              # Handle empty or missing response.json file
+              echo "Error: Response file is empty or missing."
+              cat response.json
               echo "::set-output name=status::failure"
               exit 1
             fi
           else
-            echo "Error: Non-success HTTP response ($HTTP_RESPONSE)."
+            # Handle non-success HTTP responses
+            echo "Error: Non-success HTTP response code ($HTTP_RESPONSE). Full response:"
+            cat response.json
             echo "::set-output name=status::failure"
             exit 1
+          fi
 
   monitor_prerequisite:
     runs-on: self-hosted
