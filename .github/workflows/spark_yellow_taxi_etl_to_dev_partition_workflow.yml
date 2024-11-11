@@ -54,18 +54,17 @@ jobs:
             echo "status=failure" >> $GITHUB_ENV
             exit 1
           fi
-          
-      - name: Check Pipeline Status
+
+      - name: Monitor Pipeline Status
         if: steps.check_comment.outputs.run_pipeline == 'true' && steps.trigger_pipeline.outputs.status == 'success'
-        id: check_pipeline_status
+        id: monitor_pipeline_status
         env:
           BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
-          STATUS_API_URL: "http://localhost:6789/api/pipeline_runs/${{ steps.trigger_pipeline.outputs.pipeline_run_id }}"
+          STATUS_API_URL: "http://magic:6789/api/pipeline_runs/${{ steps.trigger_pipeline.outputs.pipeline_run_id }}"
         run: |
-          MAX_ATTEMPTS=100
+          MAX_ATTEMPTS=30
           ATTEMPT=0
           while [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; do
-            # Fetch the pipeline run status
             RESPONSE=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$STATUS_API_URL")
             PIPELINE_STATUS=$(echo "$RESPONSE" | jq -r '.pipeline_run.status')
             BLOCK_STATUSES=$(echo "$RESPONSE" | jq -r '.pipeline_run.block_runs[].status')
@@ -73,15 +72,12 @@ jobs:
             echo "Pipeline status: $PIPELINE_STATUS"
             echo "Block statuses: $BLOCK_STATUSES"
             
-            # Check if any block is still running
             if echo "$BLOCK_STATUSES" | grep -q "running"; then
               echo "Pipeline is still running..."
-            # Check if any block has failed
             elif echo "$BLOCK_STATUSES" | grep -q -E "failed|error"; then
               echo "Pipeline failed."
               echo "pipeline_status=FAILED" >> $GITHUB_ENV
               break
-            # Check if all blocks have completed
             elif echo "$BLOCK_STATUSES" | grep -vq "completed"; then
               echo "Pipeline completed successfully."
               echo "pipeline_status=COMPLETED" >> $GITHUB_ENV
@@ -96,3 +92,29 @@ jobs:
             echo "Pipeline status check timed out."
             echo "pipeline_status=TIMED_OUT" >> $GITHUB_ENV
           fi
+
+      - name: Post Comment on PR with Pipeline Status
+        if: steps.check_comment.outputs.run_pipeline == 'true'
+        id: post_pipeline_status_comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
+          case "$pipeline_status" in
+            COMPLETED)
+              COMMENT="✅ Pipeline completed successfully for CI:run_yellow_etl_dev."
+              ;;
+            FAILED)
+              COMMENT="❌ Pipeline failed for CI:run_yellow_etl_dev."
+              ;;
+            TIMED_OUT)
+              COMMENT="⚠️ Pipeline status check timed out for CI:run_yellow_etl_dev."
+              ;;
+            *)
+              COMMENT="❓ Pipeline status is unknown for CI:run_yellow_etl_dev."
+              ;;
+          esac
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\": \"$COMMENT\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
