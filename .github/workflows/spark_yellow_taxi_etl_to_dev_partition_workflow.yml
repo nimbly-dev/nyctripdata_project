@@ -25,7 +25,7 @@ jobs:
         if: steps.check_comment.outputs.run_pipeline == 'true'
         id: trigger_pipeline
         env:
-          API_URL: "http://localhost:6789/api/pipeline_schedules/27/pipeline_runs"
+          API_URL: "http://magic:6789/api/pipeline_schedules/27/pipeline_runs"
           BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
         run: |
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
@@ -60,7 +60,7 @@ jobs:
         id: check_pipeline_status
         env:
           BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
-          STATUS_API_URL: "http://localhost:6789/api/pipeline_runs/${{ steps.trigger_pipeline.outputs.pipeline_run_id }}"
+          STATUS_API_URL: "http://magic:6789/api/pipeline_runs/${{ steps.trigger_pipeline.outputs.pipeline_run_id }}"
         run: |
           MAX_ATTEMPTS=30
           ATTEMPT=0
