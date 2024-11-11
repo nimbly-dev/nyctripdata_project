@@ -57,7 +57,8 @@ jobs:
                 }")
 
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
-            echo "prerequisite_run_id=$(jq -r '.pipeline_run.id' response.json)" >> $GITHUB_ENV
+            PREREQUISITE_RUN_ID=$(jq -r '.pipeline_run.id' response.json)
+            echo "prerequisite_run_id=$PREREQUISITE_RUN_ID" >> $GITHUB_ENV
             echo "status=success" >> $GITHUB_ENV
           else
             cat response.json
@@ -128,7 +129,8 @@ jobs:
                 }")
 
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
-            echo "psql_run_id=$(jq -r '.pipeline_run.id' response.json)" >> $GITHUB_ENV
+            PSQL_RUN_ID=$(jq -r '.pipeline_run.id' response.json)
+            echo "psql_run_id=$PSQL_RUN_ID" >> $GITHUB_ENV
           else
             cat response.json
             exit 1
