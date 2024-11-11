@@ -67,23 +67,14 @@ jobs:
           MAX_ATTEMPTS=30
           ATTEMPT=0
           pipeline_status="RUNNING"
-          COMMENT_ID=""
 
+          # Function to post a new comment
           post_comment() {
             local message=$1
-            RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            curl -s -H "Authorization: token $GITHUB_TOKEN" \
               -H "Content-Type: application/json" \
               -d "{\"body\": \"$message\"}" \
-              "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments")
-            COMMENT_ID=$(echo "$RESPONSE" | jq -r '.id')
-          }
-
-          update_comment() {
-            local message=$1
-            curl -s -X PATCH -H "Authorization: token $GITHUB_TOKEN" \
-              -H "Content-Type: application/json" \
-              -d "{\"body\": \"$message\"}" \
-              "https://api.github.com/repos/${{ github.repository }}/issues/comments/$COMMENT_ID"
+              "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
           }
 
           # Initial comment that the pipeline is running
@@ -120,19 +111,19 @@ jobs:
             pipeline_status="TIMED_OUT"
           fi
 
-          # Final status update
+          # Final status update with a new comment
           case "$pipeline_status" in
             COMPLETED)
-              update_comment "✅ Pipeline completed successfully."
+              post_comment "✅ Pipeline completed successfully."
               ;;
             FAILED)
-              update_comment "❌ Pipeline failed during execution."
+              post_comment "❌ Pipeline failed during execution."
               ;;
             TIMED_OUT)
-              update_comment "⚠️ Pipeline status check timed out."
+              post_comment "⚠️ Pipeline status check timed out."
               ;;
             *)
-              update_comment "❓ Pipeline status is unknown."
+              post_comment "❓ Pipeline status is unknown."
               ;;
           esac
           echo "pipeline_status=$pipeline_status" >> $GITHUB_ENV
