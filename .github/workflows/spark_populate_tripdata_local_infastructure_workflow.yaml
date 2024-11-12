@@ -6,7 +6,7 @@ on:
 
 jobs:
   trigger_pipeline:
-    if: github.event.issue.pull_request != null && contains(github.event.comment.body, 'CI:run_green_etl_dev')
+    if: ${{ github.event.issue.pull_request != null && contains(github.event.comment.body, 'CI:run_green_etl_dev') }}
     runs-on: self-hosted
     outputs:
       pipeline_run_id: ${{ steps.trigger_pipeline.outputs.pipeline_run_id }}
@@ -78,11 +78,10 @@ jobs:
             -d "{\"body\": \"$COMMENT\"}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
 
-
   monitor_pipeline_status:
     runs-on: self-hosted
     needs: trigger_pipeline
-    if: needs.trigger_pipeline.outputs.status == 'success'
+    if: ${{ needs.trigger_pipeline.outputs.status == 'success' }}
     outputs:
       final_status: ${{ steps.check_status.outputs.pipeline_status }}
     steps:
