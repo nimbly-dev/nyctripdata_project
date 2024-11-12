@@ -1,4 +1,4 @@
-name: Test CI:run_green_etl_dev
+name: CI:run_green_etl_dev
 
 on:
   issue_comment:
