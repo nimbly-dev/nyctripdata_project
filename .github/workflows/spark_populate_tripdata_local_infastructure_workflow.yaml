@@ -64,7 +64,7 @@ jobs:
                     }
                   }
                 }")
-
+          
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
             echo "Pipeline triggered successfully."
             PIPELINE_RUN_ID=$(jq -r '.pipeline_run.id' response.json)
@@ -75,6 +75,7 @@ jobs:
             cat response.json
             echo "::set-output name=status::failure"
             exit 1
+          fi
 
       - name: Post Initial "Running" Comment
         if: steps.check_comment.outputs.run_pipeline == 'true' && steps.trigger_pipeline.outputs.status == 'success'
