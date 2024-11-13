@@ -118,14 +118,26 @@ jobs:
           ATTEMPT=0
           pipeline_status="RUNNING"
 
+          STATUS_API_URL="${STATUS_API_URL}${PIPELINE_RUN_ID}"  # Ensure URL includes the pipeline run ID
+
           while [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; do
             RESPONSE=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$STATUS_API_URL")
+            
+            # Debugging output to verify RESPONSE content
+            echo "RESPONSE: $RESPONSE"
+            
+            # Check if RESPONSE is empty
+            if [ -z "$RESPONSE" ]; then
+              echo "No response from the API. Exiting with failure."
+              exit 1
+            fi
+
             PIPELINE_STATUS=$(echo "$RESPONSE" | jq -r '.pipeline_run.status')
             BLOCK_STATUSES=$(echo "$RESPONSE" | jq -r '.pipeline_run.block_runs[].status')
-            
+
             echo "Pipeline status: $PIPELINE_STATUS"
             echo "Block statuses: $BLOCK_STATUSES"
-            
+
             if echo "$BLOCK_STATUSES" | grep -q "running"; then
               echo "Pipeline is still running..."
               pipeline_status="RUNNING"
@@ -138,7 +150,7 @@ jobs:
               pipeline_status="COMPLETED"
               break
             fi
-            
+
             ATTEMPT=$((ATTEMPT + 1))
             sleep 30
           done
@@ -148,6 +160,7 @@ jobs:
             pipeline_status="TIMED_OUT"
           fi
           echo "::set-output name=pipeline_status::$pipeline_status"
+
 
   post_comments:
     runs-on: self-hosted
