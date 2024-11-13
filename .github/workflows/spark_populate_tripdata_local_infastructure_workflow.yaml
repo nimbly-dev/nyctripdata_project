@@ -35,13 +35,15 @@ jobs:
           fi
 
       - name: Generate Dynamic Pipeline Run Name
+        if: steps.check_comment.outputs.run_pipeline == 'true'
         id: generate_run_name
         run: |
           TIMESTAMP=$(date +"%d%m%Y_%H%M")
-          RUN_NAME="workflow_run_spark_${{ env.cab_type }}_etl_to_dev_partition_${TIMESTAMP}"
+          RUN_NAME="workflow_run_spark_green_taxi_etl_to_dev_partition_${TIMESTAMP}"
           echo "pipeline_run_name=$RUN_NAME" >> $GITHUB_ENV
 
       - name: Trigger Pipeline via API Request
+        if: steps.check_comment.outputs.run_pipeline == 'true'
         id: trigger_pipeline
         env:
           API_URL: "http://magic:6789/api/pipeline_schedules/26/pipeline_runs"
