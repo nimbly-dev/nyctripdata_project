@@ -37,9 +37,6 @@ jobs:
             echo "run_pipeline=false" >> $GITHUB_OUTPUT
             exit 1
           fi
-        outputs:
-          run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }}
-          cab_type: ${{ steps.set_variables.outputs.cab_type }}
 
       - name: Generate Dynamic Pipeline Run Name
         if: steps.set_variables.outputs.run_pipeline == 'true'
