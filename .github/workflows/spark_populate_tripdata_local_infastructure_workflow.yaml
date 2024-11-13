@@ -10,7 +10,6 @@ jobs:
     runs-on: self-hosted
     outputs:
       populate_tripdata_run_id: ${{ steps.trigger_pipeline.outputs.pipeline_run_id }}
-      cab_type: ${{ steps.set_variables.outputs.cab_type }}
     steps:
       - name: Check Comment for Command and Set Variables
         id: set_variables
@@ -33,17 +32,19 @@ jobs:
             echo "run_pipeline=false" >> $GITHUB_OUTPUT
             exit 1
           fi
+        outputs:
+          run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }}
 
       - name: Generate Dynamic Pipeline Run Name
-        if: steps.check_comment.outputs.run_pipeline == 'true'
+        if: steps.set_variables.outputs.run_pipeline == 'true'
         id: generate_run_name
         run: |
           TIMESTAMP=$(date +"%d%m%Y_%H%M")
-          RUN_NAME="workflow_run_spark_green_taxi_etl_to_dev_partition_${TIMESTAMP}"
+          RUN_NAME="workflow_run_spark_${{ env.cab_type }}_etl_to_dev_partition_${TIMESTAMP}"
           echo "pipeline_run_name=$RUN_NAME" >> $GITHUB_ENV
 
       - name: Trigger Pipeline via API Request
-        if: steps.check_comment.outputs.run_pipeline == 'true'
+        if: steps.set_variables.outputs.run_pipeline == 'true'
         id: trigger_pipeline
         env:
           API_URL: "http://magic:6789/api/pipeline_schedules/26/pipeline_runs"
@@ -74,17 +75,16 @@ jobs:
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
             echo "Pipeline triggered successfully."
             PIPELINE_RUN_ID=$(jq -r '.pipeline_run.id' response.json)
-            echo "::set-output name=pipeline_run_id::$PIPELINE_RUN_ID"
-            echo "::set-output name=status::success"
+            echo "pipeline_run_id=$PIPELINE_RUN_ID" >> $GITHUB_OUTPUT
+            echo "status=success" >> $GITHUB_OUTPUT
           else
             echo "Error triggering pipeline. HTTP Status: $HTTP_RESPONSE"
             cat response.json
-            echo "::set-output name=status::failure"
+            echo "status=failure" >> $GITHUB_OUTPUT
             exit 1
-          fi
 
       - name: Post Initial "Running" Comment
-        if: steps.check_comment.outputs.run_pipeline == 'true' && steps.trigger_pipeline.outputs.status == 'success'
+        if: steps.set_variables.outputs.run_pipeline == 'true' && steps.trigger_pipeline.outputs.status == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
