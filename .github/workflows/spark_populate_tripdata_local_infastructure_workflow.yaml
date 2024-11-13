@@ -5,7 +5,7 @@ on:
     types: [created]
 
 jobs:
-  Trigger spark_populate_tripdata_local_infastructure Pipeline:
+  trigger_spark_populate_tripdata_local_infastructure_pipeline:
     if: github.event.issue.pull_request != null && contains(github.event.comment.body, 'CI:populate_tripdata:')
     runs-on: self-hosted
     outputs:
