@@ -80,7 +80,7 @@ jobs:
             echo "Pipeline triggered successfully."
             PIPELINE_RUN_ID=$(jq -r '.pipeline_run.id' response.json)
             echo "pipeline_run_id=$PIPELINE_RUN_ID" >> $GITHUB_OUTPUT
-            echo "status=success" >> $GITHUB_OUTPUT
+            echo "::set-output name=status::success"
           else
             echo "Error triggering pipeline. HTTP Status: $HTTP_RESPONSE"
             cat response.json
