@@ -45,6 +45,14 @@ jobs:
           PIPELINE_RUN_NAME: ${{ env.pipeline_run_name }}
           CAB_TYPE: ${{ env.cab_type }}
         run: |
+      - name: Trigger Pipeline via API Request
+        id: trigger_pipeline
+        env:
+          API_URL: "http://magic:6789/api/pipeline_schedules/26/pipeline_runs"
+          BEARER_TOKEN: "1c3c4947fb7b4f22b0b8693fb237f6e4"
+          PIPELINE_RUN_NAME: ${{ env.pipeline_run_name }}
+          CAB_TYPE: ${{ env.cab_type }}
+        run: |
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
             -H "Authorization: Bearer $BEARER_TOKEN" \
             -H "Content-Type: application/json" \
@@ -75,7 +83,7 @@ jobs:
             cat response.json
             echo "::set-output name=status::failure"
             exit 1
-
+            
       - name: Post Initial "Running" Comment
         if: steps.check_comment.outputs.run_pipeline == 'true' && steps.trigger_pipeline.outputs.status == 'success'
         env:
