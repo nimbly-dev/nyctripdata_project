@@ -5,39 +5,45 @@ on:
     types: [created]
 
 jobs:
-  trigger_pipeline:
-    if: ${{ github.event.issue.pull_request != null && contains(github.event.comment.body, 'CI:run_green_etl_dev') }}
+  Trigger spark_populate_tripdata_local_infastructure Pipeline:
+    if: github.event.issue.pull_request != null && contains(github.event.comment.body, 'CI:populate_tripdata:')
     runs-on: self-hosted
     outputs:
-      pipeline_run_id: ${{ steps.trigger_pipeline.outputs.pipeline_run_id }}
-      status: ${{ steps.trigger_pipeline.outputs.status }}
+      populate_tripdata_run_id: ${{ steps.trigger_pipeline.outputs.pipeline_run_id }}
+      cab_type: ${{ steps.set_variables.outputs.cab_type }}
     steps:
-      - name: Check Comment for Command
-        id: check_comment
+      - name: Check Comment for Command and Set Variables
+        id: set_variables
         run: |
-          if [[ "${{ github.event.comment.body }}" == "CI:run_green_etl_dev" ]]; then
-            echo "Triggered by CI:run_green_etl_dev comment."
-            echo "run_pipeline=true" >> $GITHUB_ENV
+          COMMENT_BODY="${{ github.event.comment.body }}"
+          if [[ "$COMMENT_BODY" == "CI:populate_tripdata:yellow" ]]; then
+            echo "cab_type=yellow_cab_tripdata" >> $GITHUB_ENV
+            echo "Tripdata Type: yellow_cab_tripdata"
+          elif [[ "$COMMENT_BODY" == "CI:populate_tripdata:green" ]]; then
+            echo "cab_type=green_cab_tripdata" >> $GITHUB_ENV
+            echo "Tripdata Type: green_cab_tripdata"
+          elif [[ "$COMMENT_BODY" == "CI:populate_tripdata:fhv" ]]; then
+            echo "cab_type=fhv_cab_tripdata" >> $GITHUB_ENV
+            echo "Tripdata Type: fhv_cab_tripdata"
           else
-            echo "No matching command found in comment."
-            echo "run_pipeline=false" >> $GITHUB_ENV
+            echo "No matching command found or unsupported cab type."
+            exit 1
           fi
-  
+
       - name: Generate Dynamic Pipeline Run Name
-        if: env.run_pipeline == 'true'
         id: generate_run_name
         run: |
           TIMESTAMP=$(date +"%d%m%Y_%H%M")
-          RUN_NAME="workflow_run_spark_green_taxi_etl_to_dev_partition_${TIMESTAMP}"
+          RUN_NAME="workflow_run_spark_${{ env.cab_type }}_etl_to_dev_partition_${TIMESTAMP}"
           echo "pipeline_run_name=$RUN_NAME" >> $GITHUB_ENV
-  
+
       - name: Trigger Pipeline via API Request
-        if: env.run_pipeline == 'true'
         id: trigger_pipeline
         env:
-          API_URL: "http://magic:6789/api/pipeline_schedules/28/pipeline_runs"
-          BEARER_TOKEN: "5809a974ec34498b817e08f7720e2324"
+          API_URL: "http://magic:6789/api/pipeline_schedules/26/pipeline_runs"
+          BEARER_TOKEN: "1c3c4947fb7b4f22b0b8693fb237f6e4"
           PIPELINE_RUN_NAME: ${{ env.pipeline_run_name }}
+          CAB_TYPE: ${{ env.cab_type }}
         run: |
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
             -H "Authorization: Bearer $BEARER_TOKEN" \
@@ -45,29 +51,33 @@ jobs:
             -d "{
                   \"pipeline_run\": {
                     \"variables\": {
-                      \"dev_limit_rows\": 1000,
-                      \"pipeline_run_name\": \"${PIPELINE_RUN_NAME}\",
+                      \"dev_limit_rows\": -1,
+                      \"end_month\": 11,
+                      \"end_year\": 2023,
+                      \"start_month\": 10,
+                      \"start_year\": 2023,
+                      \"pipeline_run_name\": \"$PIPELINE_RUN_NAME\",
                       \"spark_mode\": \"cluster\",
-                      \"tripdata_type\": \"green_cab_tripdata\",
-                      \"year_month\": \"2023_1\"
+                      \"tripdata_type\": \"$CAB_TYPE\",
+                      \"data_loss_threshold\": \"very_strict\",
+                      \"overwrite_enabled\": true
                     }
                   }
                 }")
-  
+
           if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
             echo "Pipeline triggered successfully."
             PIPELINE_RUN_ID=$(jq -r '.pipeline_run.id' response.json)
-            echo "pipeline_run_id=$PIPELINE_RUN_ID" >> $GITHUB_ENV
-            echo "status=success" >> $GITHUB_ENV
+            echo "::set-output name=pipeline_run_id::$PIPELINE_RUN_ID"
+            echo "::set-output name=status::success"
           else
             echo "Error triggering pipeline. HTTP Status: $HTTP_RESPONSE"
             cat response.json
-            echo "status=failure" >> $GITHUB_ENV
+            echo "::set-output name=status::failure"
             exit 1
-          fi
-  
+
       - name: Post Initial "Running" Comment
-        if: env.run_pipeline == 'true' && env.status == 'success'
+        if: steps.check_comment.outputs.run_pipeline == 'true' && steps.trigger_pipeline.outputs.status == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -81,7 +91,7 @@ jobs:
   monitor_pipeline_status:
     runs-on: self-hosted
     needs: trigger_pipeline
-    if: ${{ needs.trigger_pipeline.outputs.status == 'success' }}
+    if: needs.trigger_pipeline.outputs.status == 'success'
     outputs:
       final_status: ${{ steps.check_status.outputs.pipeline_status }}
     steps:
