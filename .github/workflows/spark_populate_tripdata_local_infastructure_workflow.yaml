@@ -17,20 +17,20 @@ jobs:
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
           if [[ "$COMMENT_BODY" == "CI:populate_tripdata:yellow" ]]; then
-            echo "cab_type=yellow_cab_tripdata" >> $GITHUB_ENV
-            echo "run_pipeline=true" >> $GITHUB_ENV
+            echo "cab_type=yellow_cab_tripdata" >> $GITHUB_ENV  
+            echo "run_pipeline=true" >> $GITHUB_OUTPUT  
             echo "Tripdata Type: yellow_cab_tripdata"
           elif [[ "$COMMENT_BODY" == "CI:populate_tripdata:green" ]]; then
-            echo "cab_type=green_cab_tripdata" >> $GITHUB_ENV
-            echo "run_pipeline=true" >> $GITHUB_ENV
+            echo "cab_type=green_cab_tripdata" >> $GITHUB_ENV  
+            echo "run_pipeline=true" >> $GITHUB_OUTPUT  
             echo "Tripdata Type: green_cab_tripdata"
           elif [[ "$COMMENT_BODY" == "CI:populate_tripdata:fhv" ]]; then
             echo "cab_type=fhv_cab_tripdata" >> $GITHUB_ENV
-            echo "run_pipeline=true" >> $GITHUB_ENV
+            echo "run_pipeline=true" >> $GITHUB_OUTPUT
             echo "Tripdata Type: fhv_cab_tripdata"
           else
             echo "No matching command found or unsupported cab type."
-            echo "run_pipeline=false" >> $GITHUB_ENV
+            echo "run_pipeline=false" >> $GITHUB_OUTPUT
             exit 1
           fi
 
