@@ -85,6 +85,7 @@ jobs:
             cat response.json
             echo "status=failure" >> $GITHUB_OUTPUT
             exit 1
+          fi
 
       - name: Post Initial "Running" Comment
         if: steps.set_variables.outputs.run_pipeline == 'true' && steps.trigger_pipeline.outputs.status == 'success'
