@@ -121,10 +121,8 @@ jobs:
           while [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; do
             RESPONSE=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$STATUS_API_URL")
             
-            # Debugging output to verify RESPONSE content
             echo "RESPONSE: $RESPONSE"
             
-            # Check if RESPONSE is empty
             if [ -z "$RESPONSE" ]; then
               echo "No response from the API. Exiting with failure."
               exit 1
@@ -158,6 +156,7 @@ jobs:
             pipeline_status="TIMED_OUT"
           fi
           echo "pipeline_status=$pipeline_status" >> $GITHUB_OUTPUT
+
 
   post_comments:
     runs-on: self-hosted
