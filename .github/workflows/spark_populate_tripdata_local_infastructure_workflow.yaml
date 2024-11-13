@@ -8,10 +8,10 @@ jobs:
   trigger_pipeline:
     if: github.event.issue.pull_request != null && contains(github.event.comment.body, 'CI:populate_tripdata:')
     runs-on: self-hosted
-    outputs:
+    outputs:  # Outputs should be defined here, at the job level
       populate_tripdata_run_id: ${{ steps.trigger_pipeline.outputs.pipeline_run_id }}
-      cab_type: ${{ steps.set_variables.outputs.cab_type }}
-      run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }}
+      cab_type: ${{ steps.set_variables.outputs.cab_type }}  # Defined as an output here
+      run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }}  # Added run_pipeline as a job output
     steps:
       - name: Check Comment for Command and Set Variables
         id: set_variables
@@ -36,13 +36,17 @@ jobs:
             echo "No matching command found or unsupported cab type."
             echo "run_pipeline=false" >> $GITHUB_OUTPUT
             exit 1
+          fi
+        outputs:
+          run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }}
+          cab_type: ${{ steps.set_variables.outputs.cab_type }}
 
       - name: Generate Dynamic Pipeline Run Name
         if: steps.set_variables.outputs.run_pipeline == 'true'
         id: generate_run_name
         run: |
           TIMESTAMP=$(date +"%d%m%Y_%H%M")
-          RUN_NAME="workflow_run_spark_${{ steps.set_variables.outputs.cab_type }}_etl_to_dev_partition_${TIMESTAMP}"
+          RUN_NAME="workflow_run_spark_${{ env.cab_type }}_etl_to_dev_partition_${TIMESTAMP}"
           echo "pipeline_run_name=$RUN_NAME" >> $GITHUB_ENV
 
       - name: Trigger Pipeline via API Request
@@ -52,7 +56,7 @@ jobs:
           API_URL: "http://magic:6789/api/pipeline_schedules/26/pipeline_runs"
           BEARER_TOKEN: "1c3c4947fb7b4f22b0b8693fb237f6e4"
           PIPELINE_RUN_NAME: ${{ env.pipeline_run_name }}
-          CAB_TYPE: ${{ steps.set_variables.outputs.cab_type }}
+          CAB_TYPE: ${{ env.cab_type }}
         run: |
           HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
             -H "Authorization: Bearer $BEARER_TOKEN" \
@@ -97,6 +101,7 @@ jobs:
             -d "{\"body\": \"$COMMENT\"}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
 
+
   monitor_pipeline_status:
     runs-on: self-hosted
     needs: trigger_pipeline
@@ -108,7 +113,7 @@ jobs:
         id: check_status
         env:
           BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
-          STATUS_API_URL: "http://magic:6789/api/pipeline_runs/${{ needs.trigger_pipeline.outputs.populate_tripdata_run_id }}"
+          STATUS_API_URL: "http://magic:6789/api/pipeline_runs/${{ needs.trigger_pipeline.outputs.pipeline_run_id }}"
         run: |
           MAX_ATTEMPTS=30
           ATTEMPT=0
@@ -143,7 +148,7 @@ jobs:
             echo "Pipeline status check timed out."
             pipeline_status="TIMED_OUT"
           fi
-          echo "pipeline_status=$pipeline_status" >> $GITHUB_OUTPUT
+          echo "::set-output name=pipeline_status::$pipeline_status"
 
   post_comments:
     runs-on: self-hosted
