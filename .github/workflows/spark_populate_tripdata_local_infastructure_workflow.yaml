@@ -12,7 +12,7 @@ jobs:
       populate_tripdata_run_id: ${{ steps.trigger_pipeline.outputs.pipeline_run_id }}
       cab_type: ${{ steps.set_variables.outputs.cab_type }}  
       run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }} 
-      status: ${{ steps.set_variables.outputs.status }} 
+      status: ${{ steps.trigger_pipeline.outputs.status }}
     steps:
       - name: Check Comment for Command and Set Variables
         id: set_variables
