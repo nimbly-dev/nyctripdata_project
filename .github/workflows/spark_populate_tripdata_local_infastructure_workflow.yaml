@@ -8,10 +8,10 @@ jobs:
   trigger_pipeline:
     if: github.event.issue.pull_request != null && contains(github.event.comment.body, 'CI:populate_tripdata:')
     runs-on: self-hosted
-    outputs:  # Outputs should be defined here, at the job level
+    outputs:
       populate_tripdata_run_id: ${{ steps.trigger_pipeline.outputs.pipeline_run_id }}
-      cab_type: ${{ steps.set_variables.outputs.cab_type }}  # Defined as an output here
-      run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }}  # Added run_pipeline as a job output
+      cab_type: ${{ steps.set_variables.outputs.cab_type }}
+      run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }}
     steps:
       - name: Check Comment for Command and Set Variables
         id: set_variables
@@ -34,8 +34,8 @@ jobs:
             echo "run_pipeline=false" >> $GITHUB_OUTPUT
             exit 1
         outputs:
-          run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }}
           cab_type: ${{ steps.set_variables.outputs.cab_type }}
+          run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }}
 
       - name: Generate Dynamic Pipeline Run Name
         if: steps.set_variables.outputs.run_pipeline == 'true'
@@ -96,7 +96,6 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"body\": \"$COMMENT\"}" \
             "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
-
 
   monitor_pipeline_status:
     runs-on: self-hosted
