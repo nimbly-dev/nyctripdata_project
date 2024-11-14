@@ -114,7 +114,7 @@ jobs:
           BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
           STATUS_API_URL: "http://magic:6789/api/pipeline_runs/${{ needs.trigger_pipeline.outputs.populate_tripdata_run_id }}"
         run: |
-          MAX_ATTEMPTS=30
+          MAX_ATTEMPTS=50
           ATTEMPT=0
           pipeline_status="RUNNING"
 
@@ -141,7 +141,7 @@ jobs:
             fi
             
             ATTEMPT=$((ATTEMPT + 1))
-            sleep 30
+            sleep 100
           done
 
           if [[ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]]; then
