@@ -156,6 +156,7 @@ jobs:
           fi
           echo "pipeline_status=$pipeline_status" >> $GITHUB_OUTPUT
 
+
   post_comments:
     runs-on: self-hosted
     needs: [trigger_pipeline, monitor_pipeline_status]
