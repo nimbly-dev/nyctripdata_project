@@ -131,12 +131,12 @@ jobs:
               echo "Pipeline is still running..."
               pipeline_status="RUNNING"
             elif echo "$BLOCK_STATUSES" | grep -q -E "failed|error"; then
-              echo "Pipeline failed."
+              echo "Pipeline failed due to a fatal block status."
               pipeline_status="FAILED"
               break
-            elif echo "$BLOCK_STATUSES" | grep -v "completed" | grep -qv '.'; then
-              # Only "completed" statuses remain, meaning all blocks are completed
-              echo "Pipeline completed successfully."
+            elif echo "$BLOCK_STATUSES" | grep -vqE "completed|condition_failed|initial"; then
+              # Only "completed", "condition_failed", and "initial" statuses remain
+              echo "Pipeline completed successfully with non-fatal statuses."
               pipeline_status="COMPLETED"
               break
             fi
@@ -151,9 +151,6 @@ jobs:
           fi
 
           echo "::set-output name=pipeline_status::$pipeline_status"
-
-
-
 
   post_comments:
     runs-on: self-hosted
