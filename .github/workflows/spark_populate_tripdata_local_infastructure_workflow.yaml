@@ -134,7 +134,8 @@ jobs:
               echo "Pipeline failed."
               pipeline_status="FAILED"
               break
-            elif ! echo "$BLOCK_STATUSES" | grep -vq "completed"; then
+            elif echo "$BLOCK_STATUSES" | grep -v "completed" | grep -qv '.'; then
+              # Only "completed" statuses remain, meaning all blocks are completed
               echo "Pipeline completed successfully."
               pipeline_status="COMPLETED"
               break
@@ -150,6 +151,7 @@ jobs:
           fi
 
           echo "::set-output name=pipeline_status::$pipeline_status"
+
 
 
 
