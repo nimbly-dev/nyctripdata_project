@@ -119,7 +119,10 @@ jobs:
           pipeline_status="RUNNING"
 
           while [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; do
-            RESPONSE=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$STATUS_API_URL")
+            RESPONSE=$(curl -s -o response.json -w "%{http_code}" -H "Authorization: Bearer $BEARER_TOKEN" "$STATUS_API_URL")
+            HTTP_STATUS=$(tail -n 1 response.json)
+            cat response.json # For debugging the raw response
+
             
             echo "RESPONSE: $RESPONSE"
             
