@@ -136,24 +136,24 @@ jobs:
             echo "Block statuses: $BLOCK_STATUSES"
             
             # Determine the overall pipeline status based on block statuses
-            if echo "$BLOCK_STATUSES" | grep -qE "running"; then
-              echo "Pipeline is still running..."
-              pipeline_status="RUNNING"
-            elif echo "$BLOCK_STATUSES" | grep -qE "failed|error"; then
-              echo "Pipeline failed due to a fatal block status."
-              pipeline_status="FAILED"
-              break
-            elif echo "$BLOCK_STATUSES" | grep -vqE "completed|condition_failed|initial"; then
-              echo "Unknown statuses detected. Marking pipeline as failed."
-              pipeline_status="FAILED"
-              break
-            elif echo "$BLOCK_STATUSES" | grep -vq "running"; then
-              # If all blocks are either completed or condition_failed
-              if echo "$BLOCK_STATUSES" | grep -q "completed"; then
-                echo "Pipeline completed successfully with no fatal errors."
+            if [[ "$PIPELINE_STATUS" == "completed" ]]; then
+              # Check if all non-fatal blocks are either completed or condition_failed
+              if echo "$BLOCK_STATUSES" | grep -vqE "failed|error"; then
+                echo "Pipeline completed successfully with no fatal block statuses."
                 pipeline_status="COMPLETED"
                 break
+              else
+                echo "Pipeline failed due to fatal block statuses."
+                pipeline_status="FAILED"
+                break
               fi
+            elif echo "$BLOCK_STATUSES" | grep -qE "running"; then
+              echo "Pipeline is still running..."
+              pipeline_status="RUNNING"
+            else
+              echo "Unknown pipeline status or unexpected block statuses."
+              pipeline_status="FAILED"
+              break
             fi
             
             ATTEMPT=$((ATTEMPT + 1))
@@ -167,13 +167,8 @@ jobs:
             pipeline_status="TIMED_OUT"
           fi
 
-          # Set final status if pipeline_status is still ambiguous
-          if [[ "$pipeline_status" != "RUNNING" && "$pipeline_status" != "COMPLETED" ]]; then
-            pipeline_status="FAILED"
-          fi
-
           echo "::set-output name=pipeline_status::$pipeline_status"
-          
+
   post_comments:
     runs-on: self-hosted
     needs: [trigger_pipeline, monitor_pipeline_status]
