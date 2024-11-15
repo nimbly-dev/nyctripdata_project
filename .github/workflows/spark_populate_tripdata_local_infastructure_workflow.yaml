@@ -101,6 +101,13 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
 
 
+  monitor_pipeline_status:
+    runs-on: self-hosted
+    needs: trigger_pipeline
+    if: needs.trigger_pipeline.outputs.status == 'success'
+    outputs:
+      final_status: ${{ steps.check_status.outputs.pipeline_status }}
+    steps:
       - name: Monitor Pipeline Status
         id: check_status
         env:
@@ -166,8 +173,7 @@ jobs:
           fi
 
           echo "::set-output name=pipeline_status::$pipeline_status"
-
-
+          
   post_comments:
     runs-on: self-hosted
     needs: [trigger_pipeline, monitor_pipeline_status]
