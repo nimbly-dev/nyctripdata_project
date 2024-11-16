@@ -7,7 +7,7 @@
 ![Docker](https://img.shields.io/badge/Docker-Available-blue)
 ![Mage](https://img.shields.io/badge/Mage-Orchestration-orange)
 ![GitHub Workflow CI](https://img.shields.io/badge/GitHub%20Workflow-CI-blue)
-[![Sample Dashboard](https://img.shields.io/badge/Mage-Orchestration-orange)](https://lookerstudio.google.com/u/0/reporting/2b0189c7-098b-4a3d-b463-daa1abcf5b40/page/CWDFE)
+[![Sample Dashboard](https://img.shields.io/badge/Sample-Dashboard-orange)](https://lookerstudio.google.com/u/0/reporting/2b0189c7-098b-4a3d-b463-daa1abcf5b40/page/CWDFE)
 
 ## Table of Contents
 - [About](#-about)
