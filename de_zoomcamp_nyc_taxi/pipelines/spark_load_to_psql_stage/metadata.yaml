@@ -56,7 +56,7 @@ blocks:
   language: python
   name: spark_clean_yellow_taxi_data
   retry_config: {}
-  status: executed
+  status: updated
   timeout: null
   type: transformer
   upstream_blocks:
@@ -75,7 +75,7 @@ blocks:
   language: python
   name: spark_clean_green_taxi_data
   retry_config: {}
-  status: updated
+  status: failed
   timeout: null
   type: transformer
   upstream_blocks:
@@ -240,7 +240,7 @@ conditionals:
   upstream_blocks:
   - spark_clean_green_taxi_data
   uuid: run_clean_green_taxi_data
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks: []

@@ -59,6 +59,10 @@ def transform(data, *args, **kwargs):
         .withColumn('store_and_fwd_flag', col('store_and_fwd_flag').substr(0, 1))
     )
 
+    if 'year' in df.columns or 'month' in df.columns:
+        df = df.drop('year', 'month')
+
+
     df.write.mode("overwrite").parquet(partition_path)
     LOG.info(f"Writing cleaned data to Parquet files at: {partition_path}")
 
