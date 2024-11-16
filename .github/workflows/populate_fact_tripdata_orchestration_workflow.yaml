@@ -57,8 +57,8 @@ jobs:
                       \"end_year\": 2023,
                       \"start_month\": 10,
                       \"start_year\": 2023,
-                      \"pipeline_run_name\": \"$ENVIRONMENT_TYPE\",
-                      \"env_to_populate\": \"$\",
+                      \"pipeline_run_name\": \"$PIPELINE_RUN_NAME\",
+                      \"env_to_populate\": \"$ENVIRONMENT_TYPE\",
                       \"['green']\": \"green\"
                     }
                   }
