@@ -75,7 +75,7 @@ blocks:
   language: python
   name: spark_clean_green_taxi_data
   retry_config: {}
-  status: failed
+  status: updated
   timeout: null
   type: transformer
   upstream_blocks:
