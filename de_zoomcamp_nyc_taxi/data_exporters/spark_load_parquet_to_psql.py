@@ -68,8 +68,6 @@ def export_data(data, *args, **kwargs):
     partition_path = os.path.join(base_read_path, f'year={year}', f'month={month}')
     df = spark.read.parquet(partition_path)
 
-    df = df.drop('year', 'month')
-
     temp_csv_dir = os.path.join(base_csv_temp_path, f'year={year}', f'month={month}')
     df.write.csv(temp_csv_dir, header=True, mode="overwrite")
 
