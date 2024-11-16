@@ -1,0 +1,188 @@
+name: CI:populate_fact_tripdata:{environment}
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  trigger_pipeline:
+    if: github.event.issue.pull_request != null && contains(github.event.comment.body, 'CI:populate_fact_tripdata:')
+    runs-on: self-hosted
+    outputs:  
+      populate_tripdata_run_id: ${{ steps.trigger_pipeline.outputs.pipeline_run_id }}
+      environment_type: ${{ steps.set_variables.outputs.environment_type }}  
+      run_pipeline: ${{ steps.set_variables.outputs.run_pipeline }} 
+      status: ${{ steps.trigger_pipeline.outputs.status }}
+    steps:
+      - name: Check Comment for Command and Set Variables
+        id: set_variables
+        run: |
+          COMMENT_BODY="${{ github.event.comment.body }}"
+          if [[ "$COMMENT_BODY" == "CI:populate_fact_tripdata:staging" ]]; then
+            echo "environment_type=staging" >> $GITHUB_ENV  
+            echo "run_pipeline=true" >> $GITHUB_OUTPUT  
+          elif [[ "$COMMENT_BODY" == "CI:populate_fact_tripdata:production" ]]; then
+            echo "environment_type=production" >> $GITHUB_ENV  
+            echo "run_pipeline=true" >> $GITHUB_OUTPUT  
+          else
+            echo "No matching command found or unsupported environment type."
+            echo "run_pipeline=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Generate Dynamic Pipeline Run Name
+        if: steps.set_variables.outputs.run_pipeline == 'true'
+        id: generate_run_name
+        run: |
+          TIMESTAMP=$(date +"%d%m%Y_%H%M")
+          RUN_NAME="workflow_run_populate_fact_tripdata_${{ env.environment_type }}_${TIMESTAMP}"
+          echo "pipeline_run_name=$RUN_NAME" >> $GITHUB_ENV
+
+      - name: Trigger Pipeline via API Request
+        if: steps.set_variables.outputs.run_pipeline == 'true'
+        id: trigger_pipeline
+        env:
+          API_URL: "http://magic:6789/api/pipeline_schedules/19/pipeline_runs"
+          BEARER_TOKEN: "31d550d388574e67aae65ef4b657706d"
+          PIPELINE_RUN_NAME: ${{ env.pipeline_run_name }}
+          ENVIRONMENT_TYPE: ${{ env.environment_type }}
+        run: |
+          HTTP_RESPONSE=$(curl -s -o response.json -w "%{http_code}" -X POST "$API_URL" \
+            -H "Authorization: Bearer $BEARER_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{
+                  \"pipeline_run\": {
+                    \"variables\": {
+                      \"end_month\": 11,
+                      \"end_year\": 2023,
+                      \"start_month\": 10,
+                      \"start_year\": 2023,
+                      \"pipeline_run_name\": \"$PIPELINE_RUN_NAME\",
+                      \"['green']\": \"green\"
+                    }
+                  }
+                }")
+
+          if [ "$HTTP_RESPONSE" -ge 200 ] && [ "$HTTP_RESPONSE" -lt 300 ]; then
+            echo "Pipeline triggered successfully."
+            PIPELINE_RUN_ID=$(jq -r '.pipeline_run.id' response.json)
+            echo "pipeline_run_id=$PIPELINE_RUN_ID" >> $GITHUB_OUTPUT
+            echo "::set-output name=status::success"
+          else
+            echo "Error triggering pipeline. HTTP Status: $HTTP_RESPONSE"
+            cat response.json
+            echo "status=failure" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Post Initial "Running" Comment
+        if: steps.set_variables.outputs.run_pipeline == 'true' && steps.trigger_pipeline.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
+          COMMENT="⏳ Pipeline is currently running...\n\n[View workflow run details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\": \"$COMMENT\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
+
+
+  monitor_pipeline_status:
+    runs-on: self-hosted
+    needs: trigger_pipeline
+    if: needs.trigger_pipeline.outputs.status == 'success'
+    outputs:
+      final_status: ${{ steps.check_status.outputs.pipeline_status }}
+    steps:
+      - name: Monitor Pipeline Status
+        id: check_status
+        env:
+          BEARER_TOKEN: "098b10876caf4d589d61c41752515731"
+          STATUS_API_URL: "http://magic:6789/api/pipeline_runs/${{ needs.trigger_pipeline.outputs.populate_tripdata_run_id }}"
+        run: |
+          MAX_ATTEMPTS=50
+          ATTEMPT=0
+          pipeline_status="RUNNING"
+
+          while [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; do
+            # Fetch the pipeline status
+            RESPONSE=$(curl -s -H "Authorization: Bearer $BEARER_TOKEN" "$STATUS_API_URL")
+            
+            if [[ -z "$RESPONSE" || "$RESPONSE" == "null" ]]; then
+              echo "Error: Received null or empty response from pipeline API."
+              pipeline_status="FAILED"
+              break
+            fi
+
+            PIPELINE_STATUS=$(echo "$RESPONSE" | jq -r '.pipeline_run.status')
+            BLOCK_STATUSES=$(echo "$RESPONSE" | jq -r '.pipeline_run.block_runs[].status')
+            
+            echo "Raw API Response: $RESPONSE"
+            echo "Pipeline status: $PIPELINE_STATUS"
+            echo "Block statuses: $BLOCK_STATUSES"
+            
+            # Determine the overall pipeline status based on block statuses
+            if [[ "$PIPELINE_STATUS" == "completed" ]]; then
+              # Check if all non-fatal blocks are either completed or condition_failed
+              if echo "$BLOCK_STATUSES" | grep -vqE "failed|error"; then
+                echo "Pipeline completed successfully with no fatal block statuses."
+                pipeline_status="COMPLETED"
+                break
+              else
+                echo "Pipeline failed due to fatal block statuses."
+                pipeline_status="FAILED"
+                break
+              fi
+            elif echo "$BLOCK_STATUSES" | grep -qE "running"; then
+              echo "Pipeline is still running..."
+              pipeline_status="RUNNING"
+            else
+              echo "Unknown pipeline status or unexpected block statuses."
+              pipeline_status="FAILED"
+              break
+            fi
+            
+            ATTEMPT=$((ATTEMPT + 1))
+            echo "Attempt $ATTEMPT/$MAX_ATTEMPTS completed. Retrying in 100 seconds..."
+            sleep 100
+          done
+
+          # Check if max attempts were reached
+          if [[ "$ATTEMPT" -ge "$MAX_ATTEMPTS" && "$pipeline_status" == "RUNNING" ]]; then
+            echo "Pipeline status check timed out."
+            pipeline_status="TIMED_OUT"
+          fi
+
+          echo "::set-output name=pipeline_status::$pipeline_status"
+
+  post_comments:
+    runs-on: self-hosted
+    needs: [trigger_pipeline, monitor_pipeline_status]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Post Final Status Comment
+        run: |
+          PR_NUMBER=$(jq .issue.number "$GITHUB_EVENT_PATH")
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          FINAL_STATUS="${{ needs.monitor_pipeline_status.outputs.final_status }}"
+          
+          case "$FINAL_STATUS" in
+            COMPLETED)
+              COMMENT="✅ Pipeline completed successfully.\n\nStatus: **$FINAL_STATUS**\n\n[View workflow run details]($WORKFLOW_URL)"
+              ;;
+            FAILED)
+              COMMENT="❌ Pipeline failed during execution.\n\nStatus: **$FINAL_STATUS**\n\n[View workflow run details]($WORKFLOW_URL)"
+              ;;
+            TIMED_OUT)
+              COMMENT="⚠️ Pipeline status check timed out.\n\nStatus: **$FINAL_STATUS**\n\n[View workflow run details]($WORKFLOW_URL)"
+              ;;
+            *)
+              COMMENT="❓ Pipeline status is unknown.\n\nStatus: **$FINAL_STATUS**\n\n[View workflow run details]($WORKFLOW_URL)"
+              ;;
+          esac
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\": \"$COMMENT\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/$PR_NUMBER/comments"
