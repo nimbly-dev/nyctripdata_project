@@ -54,6 +54,10 @@ def transform(data, *args, **kwargs):
         .filter(F.col("sr_flag").isin(0, 1))
     )
 
+    if 'year' in df.columns or 'month' in df.columns:
+        df = df.drop('year', 'month')
+
+
     LOG.info(f"Number of records after deduplication: {df.count()}")
     df.write.mode("overwrite").parquet(partition_path)
     LOG.info(f"Writing cleaned data for {year}-{month} to Parquet files at: {partition_path}")

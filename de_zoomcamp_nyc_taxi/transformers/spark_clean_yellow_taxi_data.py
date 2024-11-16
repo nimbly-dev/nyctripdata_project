@@ -55,6 +55,8 @@ def transform(data, *args, **kwargs):
         .filter(F.col('pickup_datetime') != F.col('dropoff_datetime'))
         .withColumn('store_and_fwd_flag', F.col('store_and_fwd_flag').substr(0, 1))
     )
+    if 'year' in df.columns or 'month' in df.columns:
+        df = df.drop('year', 'month')
 
     df.write.mode("overwrite").parquet(partition_path)
     LOG.info(f"Writing cleaned data for {year}-{month} to Parquet files at: {partition_path}")
