@@ -18,8 +18,8 @@ jobs:
         id: set_variables
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
-          if [[ "$COMMENT_BODY" == "CI:populate_fact_tripdata:staging" ]]; then
-            echo "environment_type=staging" >> $GITHUB_ENV  
+          if [[ "$COMMENT_BODY" == "CI:populate_fact_tripdata:stage" ]]; then
+            echo "environment_type=stage" >> $GITHUB_ENV  
             echo "run_pipeline=true" >> $GITHUB_OUTPUT  
           elif [[ "$COMMENT_BODY" == "CI:populate_fact_tripdata:production" ]]; then
             echo "environment_type=production" >> $GITHUB_ENV  
@@ -57,7 +57,8 @@ jobs:
                       \"end_year\": 2023,
                       \"start_month\": 10,
                       \"start_year\": 2023,
-                      \"pipeline_run_name\": \"$PIPELINE_RUN_NAME\",
+                      \"pipeline_run_name\": \"$ENVIRONMENT_TYPE\",
+                      \"env_to_populate\": \"$\",
                       \"['green']\": \"green\"
                     }
                   }
