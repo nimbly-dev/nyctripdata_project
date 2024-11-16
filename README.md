@@ -13,6 +13,7 @@
 - [Dataset](#-dataset)
 - [Setup](#-setup)
 - [Documentation](#documentation)
+- [FAQ](#FAQ)
 
 ## 🚀 About
 
@@ -390,4 +391,40 @@ To view real-time logs or troubleshoot errors, click the logs icon, which provid
 
 ![Pipeline Run Log Tail](images/documentation/pipeline_log_tail.JPG)
 
+Here’s an improved version of your **FAQ** section with clearer formatting, grammar, and readability, while maintaining the same core message:
 
+
+
+## ❓ FAQ
+
+### 1. What is the purpose/goal of this project?
+
+The primary goal of this project is to automate the process of retrieving TLC Trip Data from the API, cleaning and transforming it, and ingesting it for reporting and analysis. Over time, the scope was expanded to include technologies like `Apache Spark` to efficiently handle and process large datasets.
+
+The concept of pipeline stages in this project was inspired by my experience as a Software Engineer, where applications are deployed across multiple environments, such as Development for early-stage features and Production for stable, end-user-ready products.
+
+Additionally, I enhanced the project by:
+- Creating a Fact pipeline and dashboards to derive insights.
+- Adding GitHub Workflows to ensure pipeline stability by testing changes before they are applied.
+
+While these extensions helped me explore and learn new technologies and tools, the core purpose was successfully achieved: building an ETL pipeline to automate data gathering, cleaning, transformation, and delivery of ready-to-use NYC TLC Trip datasets.
+
+### 2. Why use this dataset and not others?
+
+This dataset was introduced to me through the [DataTalksClub Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp), which I followed up to the Apache Spark section before branching off to build my own ETL pipelines and add new features.
+
+The dataset is large, with the `yellow_tripdata` as one year having 32 million records, making it ideal for leveraging Spark to distribute workloads effectively. This presented a valuable challenge, as an inefficient ETL process could easily overwhelm the system, requiring careful optimization.
+
+While the dataset focuses on NYC taxi trips—less relevant outside the transportation industry—it offers meaningful insights for anyone researching or analyzing taxi patterns in New York City.
+
+### 3. I have this 'X' issue?
+
+Known issues are documented in the Issues tab, and some include workarounds that can be used until they are resolved. After STABLE_RELEASE_1, I may not actively track or maintain issues unless they are critical.
+
+Moving forward, my focus will shift to the next phase of the project, which is a potential cloud migration.
+
+### 4. Can you migrate this to the cloud? 
+
+I plan to start with a Proof of Concept (PoC) that outlines the necessary services for migration, replacements (e.g., Self-Hosted Apache Spark with AWS EMR), and the overall architecture.
+
+The PoC will utilize Free Tier AWS Services wherever possible and will be documented in this repository, likely as a README.md file with an accompanying architecture diagram. The actual cloud migration project will be hosted in a separate repository and will primarily include Terraform code, detailed steps, and supporting documentation.
