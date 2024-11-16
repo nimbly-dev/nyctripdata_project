@@ -6,7 +6,7 @@ This guide covers setting up a CI/CD pipeline on GitHub using a self-hosted runn
 
 Using a self-hosted runner, we can utilize local resources to run Mage orchestration workflows as part of our GitHub Actions CI/CD. This allows for on-prem or local environment testing during pull requests, giving early warnings for potential issues.
 
-## Action Plan
+## Action Plans
 
 ### 1. Set Up a Self-Hosted GitHub Runner
 
