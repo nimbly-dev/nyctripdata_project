@@ -15,7 +15,10 @@
 - [Documentation](#documentation)
 
 ## 🚀 About
-This project simulates a **production-grade Data Infrastructure** designed to process NYC trip data through multiple stages: **dev**, **stage**, and **production**. The pipeline handles **millions of trip data records**, ensuring reliability and scalability through techniques like **batch writing**, **disk spill management** and **Parallelization**. The project heavily used Apache Spark's Distributed Computing capabilities to process large datasets effectively.  
+
+The NYC Tripdata Project automates the process of gathering data from the NYC TLC API. The collected data is cleaned, transformed, and prepared through pipelines, producing datasets that are ready for analytics and reporting. 
+
+Additionally, the project includes on-demand CI workflows to test and verify pipeline stability whenever there are code changes, ensuring reliable and efficient data processing.
 
 ## 🗂️ Project Infrastructure
 ![Environment Diagram](images/environment_diagram.png)
@@ -33,11 +36,9 @@ The data processing in this project follows a **vertical pipeline** architecture
    - The final stage where data is fully prepared for **feature extraction**, **reporting**, and **analysis**.
    - The data at this point is ready for consumption in analytical and reporting workflows.
 
-The project leverages both **Data Lakehouse** and **Data Warehouse** architectures for effective data management:
+The project leverages both **Data Lakehouse** and **Data Warehouse** concepts for effective data management:
 - **Data Lakehouse**: This is where raw and intermediate data is stored. The local storage is organized under the `spark-lakehouse` directory, where temporary files, downloads, and processed trip data are housed.
 - **Data Warehouse**: The processed data moves through a series of PostgreSQL databases: **dev**, **stage**, and **production**, ensuring a smooth transition across the lifecycle and enhancing governance and data management.
-
-This architecture demonstrates the system’s ability to handle **large datasets** with high **reliability** and **efficiency**, mimicking a production-like environment.
 
 ## 📊 Dataset
 The data is sourced from the [NYC Taxi & Limousine Commission Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). Many data engineering principles used in this project are inspired by the [DataTalksClub Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp).
@@ -99,13 +100,18 @@ The Docker Compose configuration sets up the following services, all connected t
 ├── spark_master          # Master node managing the Spark cluster
 │   ├── spark-worker-1    # Spark worker node 1
 │   ├── spark-worker-2    # Spark worker node 2
-│   └── spark-worker-3    # Spark worker node 3
+│   ├── spark-worker-3    # Spark worker node 3
+│   └── spark-history     # Spark History Server for monitoring completed jobs
 ├── pg_admin              # PgAdmin web UI for PostgreSQL management
 ├── postgres-dev          # PostgreSQL for the development environment
 ├── postgres-staging      # PostgreSQL for the staging environment
-└── postgres-production   # PostgreSQL for the production environment
+├── postgres-production   # PostgreSQL for the production environment
+└── github-runner         # Self-hosted GitHub runner for executing workflows
 ```
 
+#### Github Runner
+
+The github runner is self-hosted. This will be run upon starting of the container using `docker-compose up -d`. For more information refer to .github/DCOUMENTATION.md. 
 
 #### Spark Configuration
 
@@ -115,6 +121,7 @@ The default Spark service configuration includes the following ports:
 - **Worker UI**: 7000
 - **Web UI**: 9090
 - **Worker Web UI**: 9091, 9092, 909* (for workers)
+- **History UI**: 18080
 
 
 #### Adding a New Spark Worker
