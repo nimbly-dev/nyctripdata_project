@@ -62,7 +62,7 @@ blocks:
   language: python
   name: clean_yellow_tripdata
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: transformer
   upstream_blocks:
@@ -96,13 +96,13 @@ blocks:
   language: python
   name: clean_fhv_tripdata
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: transformer
   upstream_blocks:
   - get_fhv_cab_tripdata_from_production
   uuid: clean_fhv_tripdata
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks:
@@ -113,7 +113,7 @@ blocks:
   language: python
   name: unionize_all_tripdata
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: transformer
   upstream_blocks:
@@ -121,7 +121,7 @@ blocks:
   - clean_green_tripdata
   - clean_fhv_tripdata
   uuid: unionize_all_tripdata
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks: []
@@ -131,7 +131,7 @@ blocks:
   language: python
   name: load_tripdata_to_fact_tripdata
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: data_exporter
   upstream_blocks:

@@ -1,6 +1,7 @@
 from pyspark.sql.functions import col, lit
 import os
 from datetime import datetime
+from calendar import monthrange
 from de_zoomcamp_nyc_taxi.utils.spark.spark_util import get_spark_session, get_dataframe_schema
 from de_zoomcamp_nyc_taxi.utils.common.common_util import validate_parquet_files
 
@@ -12,7 +13,7 @@ SPARK_LAKEHOUSE_FILES_DIR = os.getenv(
 @data_exporter
 def export_data(data, *args, **kwargs):
     LOG = kwargs.get('logger')
-    year_month = kwargs['year_month']  # Expected format: '2023_10'
+    year_month = kwargs['year_month']  # Expected format: 'YYYY_MM'
     pipeline_run_name = kwargs['pipeline_run_name']
     spark_mode = kwargs['spark_mode']
     tripdata_type = kwargs['tripdata_type']
@@ -54,7 +55,8 @@ def export_data(data, *args, **kwargs):
         df.cache()
         LOG.info(f"Dataframe for {year}-{month:02d} loaded.")
 
-        num_days = (datetime(year, month, 1).replace(month=month % 12 + 1) - datetime(year, month, 1)).days
+        # Use calendar.monthrange to get the number of days in the month
+        num_days = monthrange(year, month)[1]
         for day in range(1, num_days + 1):
             date_str = f'{year}-{month:02d}-{day:02d}'
             LOG.info(f"Processing data for {date_str}...")

@@ -30,6 +30,7 @@ def export_data_to_postgres(df: DataFrame, **kwargs) -> None:
     config_path = path.join(get_repo_path(), 'io_config.yaml')
     config_profile = 'stage_db'
 
+
     with Postgres.with_config(ConfigFileLoader(config_path, config_profile)) as loader:
         create_partition(loader,year_month)
 

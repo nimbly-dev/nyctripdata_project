@@ -247,6 +247,7 @@ variables:
   end_month: 11
   end_year: 2023
   overwrite_enabled: true
+  parrelel_exc_count: 2
   pipeline_run_name: dataeng_22_enchancement_2
   spark_mode: cluster
   start_month: 10

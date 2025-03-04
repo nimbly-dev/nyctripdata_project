@@ -30,7 +30,7 @@ blocks:
   language: python
   name: spark_load_data_to_lakehouse
   retry_config: {}
-  status: executed
+  status: updated
   timeout: null
   type: data_exporter
   upstream_blocks:

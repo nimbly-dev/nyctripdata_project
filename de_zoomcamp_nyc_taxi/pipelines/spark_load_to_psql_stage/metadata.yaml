@@ -161,7 +161,7 @@ blocks:
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config:
-  pipeline_run_limit_all_triggers: 1
+  pipeline_run_limit_all_triggers: 10
 conditionals:
 - all_upstream_blocks_executed: true
   color: null
