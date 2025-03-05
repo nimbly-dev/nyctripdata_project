@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: public
+    schema: public
+    tables:
+      - name: yellow_tripdata
+      - name: green_tripdata
+      - name: fhv_tripdata

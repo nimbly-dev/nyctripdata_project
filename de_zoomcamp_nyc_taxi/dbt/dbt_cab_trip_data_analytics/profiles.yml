@@ -1,0 +1,24 @@
+dbt_cab_trip_data_analytics:
+  target: stage  # Default environment (can be overridden)
+  outputs:
+    stage:
+      type: postgres
+      host: localhost
+      port: 5433
+      user: postgres
+      password: postgres
+      dbname: nyc_taxi_staging_postgres
+      schema: staging
+      threads: 4  # Number of parallel models dbt can run
+      keepalives_idle: 0  # Keep connection alive
+
+    production:
+      type: postgres
+      host: localhost
+      port: 5434
+      user: postgres
+      password: postgres
+      dbname: nyc_taxi_production_postgres
+      schema: production
+      threads: 8  # More parallel processing for Prod
+      keepalives_idle: 0
