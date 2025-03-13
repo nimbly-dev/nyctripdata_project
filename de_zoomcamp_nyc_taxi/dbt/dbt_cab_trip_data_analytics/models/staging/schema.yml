@@ -1,0 +1,170 @@
+version: 2
+
+models:
+  - name: stg_yellow_cab_tripdata
+    description: "Staging model for yellow cab trip data."
+    columns:
+      - name: dwid
+        description: "Unique identifier for each trip."
+        tests:
+          - not_null:
+              where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month') }}-01','YYYY-MM-DD')"
+          - unique:
+              where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month') }}-01','YYYY-MM-DD')"
+      - name: cab_type
+        description: "Should be 'yellow'."
+        tests:
+          - not_null
+      - name: fare_amount
+        description: "Fare amount of the trip."
+        tests:
+          - not_null
+      - name: total_amount
+        description: "Total amount of the trip."
+      - name: trip_distance
+        description: "Distance traveled during the trip."
+      - name: ratecode_id
+        description: "Rate code for the trip."
+      - name: vendor_id
+        description: "Vendor identifier."
+      - name: pu_location_id
+        description: "Pickup location identifier."
+        tests:
+          - not_null
+      - name: do_location_id
+        description: "Dropoff location identifier."
+        tests:
+          - not_null
+      - name: pickup_datetime
+        description: "Timestamp when the trip started."
+        tests:
+          - not_null
+      - name: dropoff_datetime
+        description: "Timestamp when the trip ended."
+        tests:
+          - not_null
+      - name: payment_type
+        description: "Payment method used."
+      - name: dispatching_base_num
+        description: "Dispatching base number."
+      - name: affiliated_base_number
+        description: "Affiliated base number."
+
+  - name: stg_green_cab_tripdata
+    description: "Staging model for green cab trip data."
+    columns:
+      - name: dwid
+        description: "Unique identifier for each trip."
+        tests:
+          - not_null:
+              where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month') }}-01','YYYY-MM-DD')"
+          - unique:
+              where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month') }}-01','YYYY-MM-DD')"
+      - name: cab_type
+        description: "Should be 'green'."
+        tests:
+          - not_null
+      - name: fare_amount
+        description: "Fare amount of the trip."
+        tests:
+          - not_null
+      - name: total_amount
+        description: "Total amount of the trip."
+      - name: trip_distance
+        description: "Distance traveled during the trip."
+      - name: ratecode_id
+        description: "Rate code for the trip."
+      - name: vendor_id
+        description: "Vendor identifier."
+      - name: pu_location_id
+        description: "Pickup location identifier."
+        tests:
+          - not_null
+      - name: do_location_id
+        description: "Dropoff location identifier."
+        tests:
+          - not_null
+      - name: pickup_datetime
+        description: "Timestamp when the trip started."
+        tests:
+          - not_null
+      - name: dropoff_datetime
+        description: "Timestamp when the trip ended."
+        tests:
+          - not_null
+      - name: payment_type
+        description: "Payment method used."
+        tests:
+          - not_null
+      - name: dispatching_base_num
+        description: "Dispatching base number."
+      - name: affiliated_base_number
+        description: "Affiliated base number."
+
+  - name: stg_fhv_cab_tripdata
+    description: "Staging model for FHV trip data. FHV does not include fare_amount, total_amount, or trip_distance."
+    columns:
+      - name: dwid
+        description: "Unique identifier for each trip."
+        tests:
+          - not_null:
+              where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month') }}-01','YYYY-MM-DD')"
+          - unique:
+              where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month') }}-01','YYYY-MM-DD')"
+      - name: cab_type
+        description: "Should be 'fhv'."
+        tests:
+          - not_null
+      - name: pu_location_id
+        description: "Pickup location identifier."
+        tests:
+          - not_null
+      - name: do_location_id
+        description: "Dropoff location identifier."
+        tests:
+          - not_null
+      - name: pickup_datetime
+        description: "Timestamp when the trip started."
+        tests:
+          - not_null
+      - name: dropoff_datetime
+        description: "Timestamp when the trip ended."
+        tests:
+          - not_null
+      - name: payment_type
+        description: "Payment method used."
+      - name: dispatching_base_num
+        description: "Dispatching base number."
+      - name: affiliated_base_number
+        description: "Affiliated base number."
+  - name: combine_clean_cab_tripdata
+    description: "Combined staging model that unions yellow, green, and FHV cab trip data."
+    columns:
+      - name: dwid
+        tests:
+          - not_null
+          - unique
+      - name: cab_type
+        tests:
+          - not_null
+      - name: fare_amount
+        description: "Null for FHV, not_null for Yellow/Green."
+      - name: total_amount
+      - name: trip_distance
+      - name: ratecode_id
+      - name: vendor_id
+      - name: pu_location_id
+        tests:
+          - not_null
+      - name: do_location_id
+        tests:
+          - not_null
+      - name: pickup_datetime
+        tests:
+          - not_null
+      - name: dropoff_datetime
+        tests:
+          - not_null
+      - name: payment_type
+      - name: dispatching_base_num
+      - name: affiliated_base_number

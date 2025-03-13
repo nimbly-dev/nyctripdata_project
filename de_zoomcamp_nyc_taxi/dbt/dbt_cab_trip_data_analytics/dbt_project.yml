@@ -1,16 +1,7 @@
-
-# Name your project! Project names should contain only lowercase characters
-# and underscores. A good package name should reflect your organization's
-# name or the intended use of these models
 name: 'dbt_cab_trip_data_analytics'
-version: '1.0.0'
-
-# This setting configures which "profile" dbt uses for this project.
+version: '1.9.0'
 profile: 'dbt_cab_trip_data_analytics'
 
-# These configurations specify where dbt should look for different types of files.
-# The `model-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You probably won't need to change these!
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
@@ -18,30 +9,20 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-clean-targets:         # directories to be removed by `dbt clean`
+clean-targets:
   - "target"
   - "dbt_packages"
 
+vars:
+  year_month: "2021_12"
 
-models:
-  dbt_cab_trip_data_analytics:
-    staging:
-      +schema: staging
-      +materialized: table
-      fact:
-        +enabled: true  
-      dim:
-        +enabled: false 
-      materialized_views:
-        +enabled: false  
+dispatch:
+  - macro_namespace: dbt
+    search_order: ['dbt_cab_trip_data_analytics', 'dbt']
 
-    production:
-      +schema: production
-      +materialized: table
-      fact:
-        +enabled: true  
-      dim:
-        +enabled: true  
-      materialized_views:
-        +enabled: true  
-
+# models:
+#   dbt_cab_trip_data_analytics:
+#     staging:
+#       +schema: "{{ target.schema }}"
+#     fact:
+#       +schema: "{{ target.schema }}_fact"

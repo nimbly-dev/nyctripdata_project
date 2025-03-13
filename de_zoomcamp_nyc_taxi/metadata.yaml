@@ -32,5 +32,6 @@ features:
   automatic_kernel_cleanup: true
   compute_management: true
   interactions: true
+  data_integration_in_batch_pipeline: true
 pipelines:
 remote_variables_dir:

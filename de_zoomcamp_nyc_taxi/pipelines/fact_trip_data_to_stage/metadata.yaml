@@ -2,141 +2,185 @@ blocks:
 - all_upstream_blocks_executed: true
   color: null
   configuration:
-    data_provider: postgres
-    data_provider_profile: stage_db
-    data_provider_schema: fact
-    export_write_policy: append
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
+    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/stg_yellow_cab_tripdata.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/staging/stg_yellow_cab_tripdata.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
+    limit: 1000
   downstream_blocks:
-  - clean_yellow_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_yellow_cab_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
-  language: python
-  name: get_yellow_cab_tripdata_from_production
+  language: sql
+  name: dbt/dbt_cab_trip_data_analytics/models/staging/stg_yellow_cab_tripdata
   retry_config: null
   status: executed
   timeout: null
-  type: data_loader
+  type: dbt
   upstream_blocks: []
-  uuid: get_yellow_cab_tripdata_from_production
+  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/stg_yellow_cab_tripdata
 - all_upstream_blocks_executed: true
   color: null
-  configuration: {}
+  configuration:
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
+    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/stg_green_cab_tripdata.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/staging/stg_green_cab_tripdata.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
+    limit: 1000
   downstream_blocks:
-  - clean_green_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_green_cab_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
-  language: python
-  name: get_green_cab_tripdata_from_production
+  language: sql
+  name: dbt/dbt_cab_trip_data_analytics/models/staging/stg_green_cab_tripdata
   retry_config: null
   status: executed
   timeout: null
-  type: data_loader
+  type: dbt
   upstream_blocks: []
-  uuid: get_green_cab_tripdata_from_production
+  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/stg_green_cab_tripdata
 - all_upstream_blocks_executed: true
   color: null
-  configuration: {}
+  configuration:
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
+    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/stg_fhv_cab_tripdata.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/staging/stg_fhv_cab_tripdata.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
+    limit: 1000
   downstream_blocks:
-  - clean_fhv_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_fhv_cab_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
-  language: python
-  name: get_fhv_cab_tripdata_from_production
+  language: sql
+  name: dbt/dbt_cab_trip_data_analytics/models/staging/stg_fhv_cab_tripdata
   retry_config: null
   status: executed
   timeout: null
-  type: data_loader
+  type: dbt
   upstream_blocks: []
-  uuid: get_fhv_cab_tripdata_from_production
+  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/stg_fhv_cab_tripdata
 - all_upstream_blocks_executed: true
   color: null
-  configuration: {}
+  configuration:
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
+    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_fhv_cab_tripdata.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_fhv_cab_tripdata.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
+    limit: 1000
   downstream_blocks:
-  - unionize_all_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
-  language: python
-  name: clean_yellow_tripdata
-  retry_config: null
-  status: updated
-  timeout: null
-  type: transformer
-  upstream_blocks:
-  - get_yellow_cab_tripdata_from_production
-  uuid: clean_yellow_tripdata
-- all_upstream_blocks_executed: true
-  color: null
-  configuration: {}
-  downstream_blocks:
-  - unionize_all_tripdata
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: python
-  name: clean_green_tripdata
+  language: sql
+  name: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_fhv_cab_tripdata
   retry_config: null
   status: executed
   timeout: null
-  type: transformer
+  type: dbt
   upstream_blocks:
-  - get_green_cab_tripdata_from_production
-  uuid: clean_green_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/stg_fhv_cab_tripdata
+  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_fhv_cab_tripdata
 - all_upstream_blocks_executed: true
   color: null
-  configuration: {}
+  configuration:
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
+    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_yellow_cab_tripdata.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_yellow_cab_tripdata.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
+    limit: 1000
   downstream_blocks:
-  - unionize_all_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
-  language: python
-  name: clean_fhv_tripdata
+  language: sql
+  name: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_yellow_cab_tripdata
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
-  type: transformer
+  type: dbt
   upstream_blocks:
-  - get_fhv_cab_tripdata_from_production
-  uuid: clean_fhv_tripdata
-- all_upstream_blocks_executed: false
+  - dbt/dbt_cab_trip_data_analytics/models/staging/stg_yellow_cab_tripdata
+  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_yellow_cab_tripdata
+- all_upstream_blocks_executed: true
   color: null
-  configuration: {}
+  configuration:
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
+    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_green_cab_tripdata.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_green_cab_tripdata.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
+    limit: 1000
   downstream_blocks:
-  - load_tripdata_to_fact_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
-  language: python
-  name: unionize_all_tripdata
+  language: sql
+  name: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_green_cab_tripdata
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
-  type: transformer
+  type: dbt
   upstream_blocks:
-  - clean_yellow_tripdata
-  - clean_green_tripdata
-  - clean_fhv_tripdata
-  uuid: unionize_all_tripdata
-- all_upstream_blocks_executed: false
+  - dbt/dbt_cab_trip_data_analytics/models/staging/stg_green_cab_tripdata
+  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_green_cab_tripdata
+- all_upstream_blocks_executed: true
   color: null
-  configuration: {}
+  configuration:
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
+    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
+    limit: 1000
+  downstream_blocks:
+  - dbt/dbt_cab_trip_data_analytics/models/staging/fact/fact_tripdata
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata
+  retry_config: null
+  status: executed
+  timeout: null
+  type: dbt
+  upstream_blocks:
+  - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_fhv_cab_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_yellow_cab_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_green_cab_tripdata
+  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
+    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/fact/fact_tripdata.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/staging/fact/fact_tripdata.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
+    limit: 1000
   downstream_blocks: []
   executor_config: null
   executor_type: local_python
   has_callback: false
-  language: python
-  name: load_tripdata_to_fact_tripdata
+  language: sql
+  name: dbt/dbt_cab_trip_data_analytics/models/staging/fact/fact_tripdata
   retry_config: null
   status: updated
   timeout: null
-  type: data_exporter
+  type: dbt
   upstream_blocks:
-  - unionize_all_tripdata
-  uuid: load_tripdata_to_fact_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata
+  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/fact/fact_tripdata
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config:
@@ -165,6 +209,6 @@ uuid: fact_trip_data_to_stage
 variables:
   environment: production
   get_data_from: '[''green'']'
-  year_month: '2023_11'
+  year_month: '2021_12'
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

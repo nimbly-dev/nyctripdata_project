@@ -56,22 +56,42 @@ BEGIN
     END LOOP;
 END $$;
 
--- Future-proofing for new schemas: Grant the necessary privileges automatically
-CREATE OR REPLACE FUNCTION grant_new_schema_privileges()
-RETURNS event_trigger
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    -- Grant the necessary privileges to the service account user when a new schema is created
-    EXECUTE format('GRANT USAGE, CREATE ON SCHEMA %I TO "{{SERVICE_ACCOUNT_USER}}";', tg_argv[0]);
-    EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO "{{SERVICE_ACCOUNT_USER}}";', tg_argv[0]);
-    EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT USAGE, SELECT ON SEQUENCES TO "{{SERVICE_ACCOUNT_USER}}";', tg_argv[0]);
-END;
-$$;
+-- -- Future-proofing for new schemas: Grant the necessary privileges automatically
+-- CREATE OR REPLACE FUNCTION grant_new_schema_privileges()
+-- RETURNS event_trigger
+-- LANGUAGE plpgsql
+-- AS $$
+-- BEGIN
+--     -- Grant the necessary privileges to the service account user when a new schema is created
+--     EXECUTE format('GRANT USAGE, CREATE ON SCHEMA %I TO "{{SERVICE_ACCOUNT_USER}}";', tg_argv[0]);
+--     EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO "{{SERVICE_ACCOUNT_USER}}";', tg_argv[0]);
+--     EXECUTE format('ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT USAGE, SELECT ON SEQUENCES TO "{{SERVICE_ACCOUNT_USER}}";', tg_argv[0]);
+-- END;
+-- $$;
 
--- Create an event trigger that fires when a new schema is created
-DROP EVENT TRIGGER IF EXISTS grant_new_schema_privileges_trigger;
-CREATE EVENT TRIGGER grant_new_schema_privileges_trigger
+CREATE OR REPLACE FUNCTION grant_new_schema_privileges()
+RETURNS event_trigger AS $$
+DECLARE
+    schema_name TEXT;
+BEGIN
+    -- Retrieve the new schema name from the DDL commands
+    SELECT object_name
+      INTO schema_name
+      FROM pg_event_trigger_ddl_commands()
+      WHERE command_tag = 'CREATE SCHEMA'
+      LIMIT 1;
+
+    IF schema_name IS NOT NULL THEN
+        EXECUTE format(
+            'GRANT USAGE, CREATE ON SCHEMA %I TO "staging-service-account@de-nyctripdata-project.iam.com";',
+            schema_name
+        );
+    END IF;
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER grant_privileges_on_schema
     ON ddl_command_end
     WHEN TAG IN ('CREATE SCHEMA')
-    EXECUTE PROCEDURE grant_new_schema_privileges();
+    EXECUTE FUNCTION grant_new_schema_privileges();

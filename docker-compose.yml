@@ -55,6 +55,7 @@ services:
       - .:/home/src/
       - ./.data:/home/src/mage_data
       - spark-home:/opt/spark
+      - ./temp_copy:/home/src/temp_copy  
     networks:
       - mage-network
 
@@ -259,6 +260,7 @@ services:
       - "./.data/db_data/nyc_taxi_dev_data:/var/lib/postgresql/data:rw"
       - "./deployment/db-entrypoint/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh"
       - "./deployment/deployment-sql:/deployment-sql"  # Mount the SQL directory
+      - "./temp_copy:/tmp/temp_copy"         # Mount temp folder for CSV exports
     networks:
       - mage-network
 
@@ -283,6 +285,7 @@ services:
       - "./.data/db_data/nyc_taxi_stage_data:/var/lib/postgresql/data:rw"
       - "./deployment/db-entrypoint/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh"
       - "./deployment/deployment-sql:/deployment-sql"  # Mount the SQL directory
+      - "./temp_copy:/tmp/temp_copy"         # Mount temp folder for CSV exports
     networks:
       - mage-network
 
@@ -307,6 +310,7 @@ services:
       - "./.data/db_data/nyc_taxi_production_data:/var/lib/postgresql/data:rw"
       - "./deployment/db-entrypoint/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh"
       - "./deployment/deployment-sql:/deployment-sql"  # Mount the SQL directory
+      - "./temp_copy:/tmp/temp_copy"         # Mount temp folder for CSV exports
     networks:
       - mage-network
 
