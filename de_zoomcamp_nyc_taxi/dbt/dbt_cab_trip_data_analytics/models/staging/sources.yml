@@ -3,7 +3,136 @@ version: 2
 sources:
   - name: public
     schema: public
+    description: "Raw trip data from Yellow, Green, and FHV cabs stored in the production database."
     tables:
-      - name: yellow_tripdata
-      - name: green_tripdata
-      - name: fhv_tripdata
+      - name: yellow_cab_tripdata_production
+        description: "Partitioned table containing yellow cab tripdata production data."
+        columns:
+          - name: dwid
+            description: "Column representing dwid."
+          - name: vendor_id
+            description: "Column representing vendor id."
+          - name: pickup_datetime
+            description: "Column representing pickup datetime."
+          - name: dropoff_datetime
+            description: "Column representing dropoff datetime."
+          - name: passenger_count
+            description: "Column representing passenger count."
+          - name: trip_distance
+            description: "Column representing trip distance."
+          - name: ratecode_id
+            description: "Column representing ratecode id."
+          - name: store_and_fwd_flag
+            description: "Column representing store and fwd flag."
+          - name: pu_location_id
+            description: "Column representing pickup location id."
+          - name: do_location_id
+            description: "Column representing dropoff location id."
+          - name: payment_type
+            description: "Column representing payment type."
+          - name: fare_amount
+            description: "Column representing fare amount."
+          - name: extra
+            description: "Column representing extra."
+          - name: mta_tax
+            description: "Column representing mta tax."
+          - name: tip_amount
+            description: "Column representing tip amount."
+          - name: tolls_amount
+            description: "Column representing tolls amount."
+          - name: improvement_surcharge
+            description: "Column representing improvement surcharge."
+          - name: total_amount
+            description: "Column representing total amount."
+          - name: congestion_surcharge
+            description: "Column representing congestion surcharge."
+          - name: airport_fee
+            description: "Column representing airport fee."
+
+      - name: green_cab_tripdata_production
+        description: "Partitioned table containing green cab tripdata production data."
+        columns:
+          - name: dwid
+            description: "Column representing dwid."
+          - name: vendor_id
+            description: "Column representing vendor id."
+          - name: pickup_datetime
+            description: "Column representing pickup datetime."
+          - name: dropoff_datetime
+            description: "Column representing dropoff datetime."
+          - name: store_and_fwd_flag
+            description: "Column representing store and fwd flag."
+          - name: ratecode_id
+            description: "Column representing ratecode id."
+          - name: pu_location_id
+            description: "Column representing pickup location id."
+          - name: do_location_id
+            description: "Column representing dropoff location id."
+          - name: passenger_count
+            description: "Column representing passenger count."
+          - name: trip_distance
+            description: "Column representing trip distance."
+          - name: fare_amount
+            description: "Column representing fare amount."
+          - name: extra
+            description: "Column representing extra."
+          - name: mta_tax
+            description: "Column representing mta tax."
+          - name: tip_amount
+            description: "Column representing tip amount."
+          - name: tolls_amount
+            description: "Column representing tolls amount."
+          - name: improvement_surcharge
+            description: "Column representing improvement surcharge."
+          - name: total_amount
+            description: "Column representing total amount."
+          - name: payment_type
+            description: "Column representing payment type."
+          - name: trip_type
+            description: "Column representing trip type."
+          - name: congestion_surcharge
+            description: "Column representing congestion surcharge."
+
+      - name: fhv_cab_tripdata_production
+        description: "Partitioned table containing FHV cab tripdata production data."
+        columns:
+          - name: dwid
+            description: "Column representing dwid."
+          - name: vendor_id
+            description: "Column representing vendor id."
+          - name: pickup_datetime
+            description: "Column representing pickup datetime."
+          - name: dropoff_datetime
+            description: "Column representing dropoff datetime."
+          - name: store_and_fwd_flag
+            description: "Column representing store and fwd flag."
+          - name: ratecode_id
+            description: "Column representing ratecode id."
+          - name: pu_location_id
+            description: "Column representing pickup location id."
+          - name: do_location_id
+            description: "Column representing dropoff location id."
+          - name: passenger_count
+            description: "Column representing passenger count."
+          - name: trip_distance
+            description: "Column representing trip distance."
+          - name: fare_amount
+            description: "Column representing fare amount."
+          - name: extra
+            description: "Column representing extra."
+          - name: mta_tax
+            description: "Column representing mta tax."
+          - name: tip_amount
+            description: "Column representing tip amount."
+          - name: tolls_amount
+            description: "Column representing tolls amount."
+          - name: improvement_surcharge
+            description: "Column representing improvement surcharge."
+          - name: total_amount
+            description: "Column representing total amount."
+          - name: payment_type
+            description: "Column representing payment type."
+          - name: trip_type
+            description: "Column representing trip type."
+          - name: congestion_surcharge
+            description: "Column representing congestion surcharge."

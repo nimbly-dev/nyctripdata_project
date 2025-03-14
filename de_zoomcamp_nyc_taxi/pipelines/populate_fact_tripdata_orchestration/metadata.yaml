@@ -31,7 +31,7 @@ blocks:
   upstream_blocks:
   - conditional_run_trigger_fact_trip_data_to_env
   uuid: trigger_fact_trip_data_to_prod
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: teal
   configuration: {}
   downstream_blocks:
@@ -46,8 +46,53 @@ blocks:
   status: updated
   timeout: null
   type: custom
-  upstream_blocks: []
+  upstream_blocks:
+  - create_stg_tables_if_not_exist
+  - create_temp_staging_folders_if_not_exist
   uuid: conditional_run_trigger_fact_trip_data_to_env
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    data_provider: postgres
+    data_provider_profile: stage_db
+    dbt: {}
+    disable_query_preprocessing: false
+    export_write_policy: append
+    file_source:
+      path: data_exporters/create_stg_tables_if_not_exist.sql
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - conditional_run_trigger_fact_trip_data_to_env
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: create_stg_tables_if_not_exist
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks: []
+  uuid: create_stg_tables_if_not_exist
+- all_upstream_blocks_executed: true
+  color: teal
+  configuration:
+    file_source:
+      path: custom/create_temp_staging_folders_if_not_exist.py
+  downstream_blocks:
+  - conditional_run_trigger_fact_trip_data_to_env
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: create_temp_staging_folders_if_not_exist
+  retry_config: null
+  status: updated
+  timeout: null
+  type: custom
+  upstream_blocks: []
+  uuid: create_temp_staging_folders_if_not_exist
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}
@@ -106,14 +151,14 @@ tags:
 type: python
 uuid: populate_fact_tripdata_orchestration
 variables:
-  end_month: 12
+  end_month: 2
   end_year: 2022
   env_to_populate: stage
   get_data_from:
   - yellow
   - fhv
   - green
-  start_month: 1
+  start_month: 11
   start_year: 2021
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

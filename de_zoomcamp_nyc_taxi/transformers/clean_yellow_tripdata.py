@@ -37,7 +37,7 @@ def execute_transformer_action(df: DataFrame, *args, **kwargs) -> DataFrame:
             df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0).astype(int)
 
     return df
-
+z
 
 @test
 def test_output(output, *args) -> None:
