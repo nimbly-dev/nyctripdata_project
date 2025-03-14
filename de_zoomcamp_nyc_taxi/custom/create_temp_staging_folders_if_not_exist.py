@@ -23,7 +23,7 @@ def transform_custom(*args, **kwargs):
             base_dir = "./temp_copy"  # This corresponds to /tmp/temp_copy in the container
             
             # List of cab types for which to create folders.
-            folders = ["yellow", "green", "fhv", "combined"]
+            folders = ["yellow", "green", "fhv", "combined", "stg_fact"]
             
             for folder in folders:
                 # Build the full directory path for each cab type and year_month.

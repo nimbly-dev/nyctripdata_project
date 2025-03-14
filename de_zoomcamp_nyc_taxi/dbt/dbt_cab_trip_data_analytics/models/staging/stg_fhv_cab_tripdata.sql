@@ -1,6 +1,5 @@
 {% set year_month = var("year_month", "2023_10") %}
 
-{# Define the remote query for fhv data with proper escaping #}
 {% set remote_query = (
   "SELECT dwid, ''fhv'' AS cab_type, " ~
   "NULL::REAL AS fare_amount, " ~
@@ -16,21 +15,18 @@
   "affiliated_base_number::VARCHAR " ~
   "FROM public.fhv_cab_tripdata_production_" ~ year_month
 ) %}
-
-{# Define column definitions for the dblink alias (same as for yellow/green) #}
 {% set column_definitions = "dwid TEXT, cab_type TEXT, fare_amount REAL, total_amount REAL, trip_distance REAL, ratecode_id INT, vendor_id INT, pu_location_id INT, do_location_id INT, pickup_datetime TIMESTAMP, dropoff_datetime TIMESTAMP, payment_type INT, dispatching_base_num VARCHAR, affiliated_base_number VARCHAR" %}
 
-{# Define CSV export path for fhv #}
 {% set csv_path = "/tmp/temp_copy/fhv/" ~ year_month ~ "/fhv_" ~ year_month ~ ".csv" %}
 {% set copy_command = "COPY " ~ this ~ " FROM '" ~ csv_path ~ "' WITH CSV HEADER;" %}
 
-{# Pre-hook to delete existing data for the month #}
 {% set delete_existing = "DELETE FROM " ~ this ~ " WHERE to_char(pickup_datetime, 'YYYY_MM') = '" ~ year_month ~ "';" %}
 
 {{ 
     config(
         materialized='incremental',
         unique_key='dwid',
+        on_schema_change='sync_all_columns',
         pre_hook=[
             delete_existing,
             create_partition('staging', 'stg_fhv_cab_tripdata', year_month),
@@ -46,7 +42,7 @@
   {% set incremental_filter = "" %}
 {% endif %}
 
-SELECT 
+SELECT DISTINCT ON (dwid, pickup_datetime, dropoff_datetime)
     CAST(dwid AS TEXT) AS dwid,
     'fhv' AS cab_type,
     fare_amount::REAL,

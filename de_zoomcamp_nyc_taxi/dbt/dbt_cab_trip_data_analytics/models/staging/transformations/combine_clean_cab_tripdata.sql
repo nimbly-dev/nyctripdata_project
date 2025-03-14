@@ -1,4 +1,16 @@
-{% set year_month = var("year_month", "2021_12") %}
+{% set year_month = var("year_month", "2023_10") %}
+{% set parts = year_month.split('_') %}
+{% set year = parts[0] %}
+{% set month = parts[1] %}
+{% set start_date = year ~ '-' ~ month ~ '-01' %}
+{% set next_month = (month | int) + 1 %}
+{% set next_year = year | int %}
+{% if next_month > 12 %}
+  {% set next_year = next_year + 1 %}
+  {% set next_month = 1 %}
+{% endif %}
+{% set next_month = "%02d"|format(next_month) %}
+{% set end_date = next_year|string ~ '-' ~ next_month ~ '-01' %}
 {% set target_schema = target.schema %}
 {% set table_name = this.identifier %}
 
@@ -19,6 +31,8 @@
     )
 }}
 
+
+
 WITH yellow AS (
     SELECT 
         dwid,
@@ -36,6 +50,8 @@ WITH yellow AS (
         dispatching_base_num,
         affiliated_base_number
     FROM {{ ref('stg_yellow_cab_tripdata') }}
+    WHERE pickup_datetime >= '{{ start_date }}'
+      AND pickup_datetime < '{{ end_date }}'
 ),
 green AS (
     SELECT 
@@ -54,6 +70,8 @@ green AS (
         dispatching_base_num,
         affiliated_base_number
     FROM {{ ref('stg_green_cab_tripdata') }}
+    WHERE pickup_datetime >= '{{ start_date }}'
+      AND pickup_datetime < '{{ end_date }}'
 ),
 fhv AS (
     SELECT 
@@ -72,6 +90,8 @@ fhv AS (
         COALESCE(dispatching_base_num, 'UNKNOWN') AS dispatching_base_num,
         COALESCE(affiliated_base_number, 'UNKNOWN') AS affiliated_base_number
     FROM {{ ref('stg_fhv_cab_tripdata') }}
+    WHERE pickup_datetime >= '{{ start_date }}'
+      AND pickup_datetime < '{{ end_date }}'
 )
 
 SELECT *
@@ -82,6 +102,3 @@ FROM green
 UNION ALL
 SELECT *
 FROM fhv
-{% if is_incremental() %}
-  WHERE pickup_datetime > (SELECT MAX(pickup_datetime) FROM {{ this }})
-{% endif %}

@@ -2,69 +2,52 @@ blocks:
 - all_upstream_blocks_executed: true
   color: null
   configuration:
-    data_provider: postgres
-    data_provider_profile: production_db
-    dbt: {}
-    disable_query_preprocessing: true
-    export_write_policy: append
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
+    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/fact/export_stg_fact_tripdata_to_csv.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/staging/fact/export_stg_fact_tripdata_to_csv.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
     limit: 1000
-    use_raw_sql: true
   downstream_blocks:
-  - load_stage_fact_tripdata_to_prod_fact_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/production/fact/fact_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
   language: sql
-  name: clean_fact_staging_tripdata
+  name: dbt/dbt_cab_trip_data_analytics/models/staging/fact/export_stg_fact_tripdata_to_csv
   retry_config: null
   status: executed
   timeout: null
-  type: transformer
-  upstream_blocks:
-  - get_fact_tripdata_from_stage
-  uuid: clean_fact_staging_tripdata
+  type: dbt
+  upstream_blocks: []
+  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/fact/export_stg_fact_tripdata_to_csv
 - all_upstream_blocks_executed: true
   color: null
   configuration:
-    data_provider: postgres
-    data_provider_profile: production_db
     dbt: {}
-    disable_query_preprocessing: true
+    dbt_profile_target: production
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
+    disable_query_preprocessing: false
     export_write_policy: append
+    file_path: dbt/dbt_cab_trip_data_analytics/models/production/fact/fact_tripdata.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/production/fact/fact_tripdata.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
     limit: 1000
-    use_raw_sql: true
+    use_raw_sql: false
   downstream_blocks: []
   executor_config: null
   executor_type: local_python
   has_callback: false
   language: sql
-  name: load_stage_fact_tripdata_to_prod_fact_tripdata
+  name: dbt/dbt_cab_trip_data_analytics/models/production/fact/fact_tripdata
   retry_config: null
   status: executed
   timeout: null
-  type: data_exporter
+  type: dbt
   upstream_blocks:
-  - clean_fact_staging_tripdata
-  uuid: load_stage_fact_tripdata_to_prod_fact_tripdata
-- all_upstream_blocks_executed: true
-  color: null
-  configuration:
-    data_provider: postgres
-    data_provider_profile: production_db
-    export_write_policy: append
-  downstream_blocks:
-  - clean_fact_staging_tripdata
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: python
-  name: get_fact_tripdata_from_stage
-  retry_config: null
-  status: executed
-  timeout: null
-  type: data_loader
-  upstream_blocks: []
-  uuid: get_fact_tripdata_from_stage
+  - dbt/dbt_cab_trip_data_analytics/models/staging/fact/export_stg_fact_tripdata_to_csv
+  uuid: dbt/dbt_cab_trip_data_analytics/models/production/fact/fact_tripdata
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}
@@ -90,6 +73,6 @@ tags:
 type: python
 uuid: fact_tripdata_to_production
 variables:
-  year_month: '2023_12'
+  year_month: '2022_01'
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

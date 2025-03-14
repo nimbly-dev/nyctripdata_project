@@ -16,8 +16,7 @@ fi
 if [ "$ENVIRONMENT" = "stage" ]; then
     FACT_SCHEMA="staging_fact"
 elif [ "$ENVIRONMENT" = "production" ]; then
-    # You can either use "production" or define a separate production fact schema
-    FACT_SCHEMA="production"
+    FACT_SCHEMA="production_fact"
 else
     echo "Error: Unknown ENVIRONMENT value. Must be 'stage' or 'production'."
     exit 1
@@ -29,50 +28,6 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EO
 EOSQL
 echo "'$FACT_SCHEMA' schema created successfully in $POSTGRES_DB."
 
-echo "Creating partitioned fact_tripdata table in schema $FACT_SCHEMA..."
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EOSQL
-    DROP TABLE IF EXISTS $FACT_SCHEMA.fact_tripdata;
-    CREATE TABLE $FACT_SCHEMA.fact_tripdata (
-        dwid TEXT,
-        cab_type TEXT,
-        fare_amount REAL,
-        total_amount REAL,
-        trip_distance REAL,
-        ratecode_id INT,
-        vendor_id INT,
-        pu_location_id INT,
-        do_location_id INT,
-        pickup_datetime TIMESTAMP WITHOUT TIME ZONE,
-        dropoff_datetime TIMESTAMP WITHOUT TIME ZONE,
-        payment_type INT,
-        dispatching_base_num VARCHAR,
-        affiliated_base_number VARCHAR,
-        PRIMARY KEY (dwid, pickup_datetime, dropoff_datetime)
-    ) PARTITION BY RANGE (pickup_datetime);
-EOSQL
-echo "Partitioned fact_tripdata table created successfully in schema $FACT_SCHEMA in $POSTGRES_DB."
-
-
-# # Create 'temp' schema for all environments
-# echo "Creating 'temp' schema in $POSTGRES_DB..."
-# psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EOSQL
-#     CREATE SCHEMA IF NOT EXISTS temp;
-# EOSQL
-# echo "'temp' schema created successfully in $POSTGRES_DB."
-
-# # Create 'dim' schema for all environments
-# echo "Creating 'dim' schema in $POSTGRES_DB..."
-# psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EOSQL
-#     CREATE SCHEMA IF NOT EXISTS dim;
-# EOSQL
-# echo "'dim' schema created successfully in $POSTGRES_DB."
-
-# # Create 'fact' schema for all environments
-# echo "Creating 'fact' schema in $POSTGRES_DB..."
-# psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EOSQL
-#     CREATE SCHEMA IF NOT EXISTS fact;
-# EOSQL
-# echo "'fact' schema created successfully in $POSTGRES_DB."
 
 # Create 'utility' schema for all environments
 echo "Creating 'utility' schema in $POSTGRES_DB..."

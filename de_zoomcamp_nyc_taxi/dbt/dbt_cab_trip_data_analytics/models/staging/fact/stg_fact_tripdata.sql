@@ -11,7 +11,7 @@
 {% set partition_start = ("%04d-%02d-01" % (year, month)) %}
 {% set partition_end = ("%04d-%02d-01" % (next_year, next_month)) %}
 
-{# Dynamically resolve schema and table names #}
+{# Set target schema and table name explicitly #}
 {% set target_schema = target.schema ~ '_fact' %}
 {% set table_name = this.identifier %}
 
@@ -22,10 +22,9 @@
 {% set csv_path = "/tmp/temp_copy/combined/" ~ year_month ~ "/combined_" ~ year_month ~ ".csv" %}
 {% set copy_command = "COPY " ~ target_schema ~ '.' ~ table_name ~ " FROM '" ~ csv_path ~ "' WITH CSV HEADER;" %}
 
-{# Reference the combined_clean_cab_tripdata table correctly (FROM staging) #}
+{# Reference the combined_clean_cab_tripdata table from staging #}
 {% set combined_relation = target.schema ~ '."combine_clean_cab_tripdata"' %}
 
-{# Define the query for remote data extraction with deduplication #}
 {% if is_incremental() %}
   {% set incremental_filter = "WHERE pickup_datetime > (SELECT COALESCE(MAX(pickup_datetime), '1900-01-01') FROM " ~ this ~ ")" %}
 {% else %}
