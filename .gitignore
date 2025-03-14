@@ -187,3 +187,4 @@ dim_*.csv
 .recovery_code
 .profiles_interpolated_temp
 *.csv
+temp_copy

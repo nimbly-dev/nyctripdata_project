@@ -31,7 +31,7 @@ blocks:
   upstream_blocks:
   - conditional_run_trigger_fact_trip_data_to_env
   uuid: trigger_fact_trip_data_to_prod
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: teal
   configuration: {}
   downstream_blocks:
@@ -49,6 +49,7 @@ blocks:
   upstream_blocks:
   - create_stg_tables_if_not_exist
   - create_temp_staging_folders_if_not_exist
+  - create_prod_tables_if_not_exists
   uuid: conditional_run_trigger_fact_trip_data_to_env
 - all_upstream_blocks_executed: true
   color: null
@@ -88,11 +89,34 @@ blocks:
   language: python
   name: create_temp_staging_folders_if_not_exist
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: custom
   upstream_blocks: []
   uuid: create_temp_staging_folders_if_not_exist
+- all_upstream_blocks_executed: true
+  color: teal
+  configuration:
+    data_provider: postgres
+    data_provider_profile: production_db
+    dbt: {}
+    disable_query_preprocessing: true
+    export_write_policy: append
+    limit: 1000
+    use_raw_sql: true
+  downstream_blocks:
+  - conditional_run_trigger_fact_trip_data_to_env
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: sql
+  name: create_prod_tables_if_not_exists
+  retry_config: null
+  status: executed
+  timeout: null
+  type: custom
+  upstream_blocks: []
+  uuid: create_prod_tables_if_not_exists
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}

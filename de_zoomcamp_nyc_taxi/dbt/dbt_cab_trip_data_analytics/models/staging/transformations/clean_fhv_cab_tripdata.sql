@@ -26,5 +26,5 @@ converted AS (
     FROM filtered
 )
 
-SELECT *
+SELECT DISTINCT *
 FROM converted

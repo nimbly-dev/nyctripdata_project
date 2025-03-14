@@ -144,7 +144,7 @@ blocks:
       project_path: dbt/dbt_cab_trip_data_analytics
     limit: 1000
   downstream_blocks:
-  - dbt/dbt_cab_trip_data_analytics/models/staging/fact/fact_tripdata
+  - dbt/dbt_cab_trip_data_analytics/models/staging/fact/stg_fact_tripdata
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -163,9 +163,9 @@ blocks:
   color: null
   configuration:
     dbt_project_name: dbt/dbt_cab_trip_data_analytics
-    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/fact/fact_tripdata.sql
+    file_path: dbt/dbt_cab_trip_data_analytics/models/staging/fact/stg_fact_tripdata.sql
     file_source:
-      path: dbt/dbt_cab_trip_data_analytics/models/staging/fact/fact_tripdata.sql
+      path: dbt/dbt_cab_trip_data_analytics/models/staging/fact/stg_fact_tripdata.sql
       project_path: dbt/dbt_cab_trip_data_analytics
     limit: 1000
   downstream_blocks: []
@@ -173,14 +173,14 @@ blocks:
   executor_type: local_python
   has_callback: false
   language: sql
-  name: dbt/dbt_cab_trip_data_analytics/models/staging/fact/fact_tripdata
+  name: dbt/dbt_cab_trip_data_analytics/models/staging/fact/stg_fact_tripdata
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: dbt
   upstream_blocks:
   - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata
-  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/fact/fact_tripdata
+  uuid: dbt/dbt_cab_trip_data_analytics/models/staging/fact/stg_fact_tripdata
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config:
@@ -209,6 +209,6 @@ uuid: fact_trip_data_to_stage
 variables:
   environment: production
   get_data_from: '[''green'']'
-  year_month: '2021_12'
+  year_month: '2022_01'
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: stg_fact_tripdata
+  - name: fact_tripdata
     description: "Fact table storing trip data from multiple sources (Yellow, Green, FHV)."
     columns:
       - name: dwid
@@ -108,31 +108,31 @@ models:
         tests:
           - not_null:
               where: "cab_type = 'fhv' and DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
-    # constraints:
-    #   - type: primary_key
-    #     columns: [dwid, pickup_datetime, dropoff_datetime]
-    #   - type: foreign_key
-    #     columns: [ratecode_id]
-    #     reference:
-    #       table: dim_ratecode
-    #       column: ratecode_id
-    #   - type: foreign_key
-    #     columns: [vendor_id]
-    #     reference:
-    #       table: dim_vendor
-    #       column: vendor_id
-    #   - type: foreign_key
-    #     columns: [pu_location_id]
-    #     reference:
-    #       table: dim_location
-    #       column: location_id
-    #   - type: foreign_key
-    #     columns: [do_location_id]
-    #     reference:
-    #       table: dim_location
-    #       column: location_id
-    #   - type: foreign_key
-    #     columns: [payment_type]
-    #     reference:
-    #       table: dim_payment_type
-    #       column: payment_type_id
+    constraints:
+      - type: primary_key
+        columns: [dwid, pickup_datetime, dropoff_datetime]
+      - type: foreign_key
+        columns: [ratecode_id]
+        reference:
+          table: dim_ratecode
+          column: ratecode_id
+      - type: foreign_key
+        columns: [vendor_id]
+        reference:
+          table: dim_vendor
+          column: vendor_id
+      - type: foreign_key
+        columns: [pu_location_id]
+        reference:
+          table: dim_location
+          column: location_id
+      - type: foreign_key
+        columns: [do_location_id]
+        reference:
+          table: dim_location
+          column: location_id
+      - type: foreign_key
+        columns: [payment_type]
+        reference:
+          table: dim_payment_type
+          column: payment_type_id
