@@ -32,7 +32,7 @@ For more detailed information, refer to the [wiki](documentation/two-workflows.m
 
 
 ## 🗂️ Project Infrastructure
-![Environment Diagram](images/environment_diagram.png)
+![Environment Diagram](images/environment_diagram_2.png)
 
 The data processing in this project follows a **vertical pipeline** architecture with three stages:
 1. **Development**: 
