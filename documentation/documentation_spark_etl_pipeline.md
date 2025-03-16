@@ -8,17 +8,17 @@ To populate the databases with NYC trip data, you can use the **spark_populate_t
 1. **Navigate to the Pipelines**:  
    From the Mage Dashboard, click on **Pipelines** in the left-side panel. Then, select the **spark_populate_tripdata_local_infrastructure** pipeline to proceed.
 
-   ![NYC Tripdata Pipeline List](images/documentation/pipeline_list_spark_populate_tripdata_local_infastructure.JPG)
+   ![NYC Tripdata Pipeline List](../images/documentation/pipeline_list_spark_populate_tripdata_local_infastructure.JPG)
 
 2. **Trigger the Pipeline**:  
    On the pipeline page, navigate to **Trigger** in the left-side panel. Click on the **Run Pipeline orchestration via API** hyperlink to open the pipeline's trigger endpoint.
 
-   ![Pipeline Trigger](images/documentation/trigger_spark_populate_tripdata_local_infastructure.JPG)
+   ![Pipeline Trigger](../images/documentation/trigger_spark_populate_tripdata_local_infastructure.JPG)
 
 3. **Execute the Pipeline via API**:  
    Copy the API URL provided and use a tool like Postman to execute the pipeline.
 
-   ![Trigger Endpoint URL](images/documentation/endpoint_spark_populate_tripdata_local_infastructure.JPG)
+   ![Trigger Endpoint URL](../images/documentation/endpoint_spark_populate_tripdata_local_infastructure.JPG)
 
 
 
@@ -81,7 +81,7 @@ Once you send the request, the pipeline will begin processing the data as per th
  
 ### Structure of the Populate Tripdata Pipeline 
 
-![Trigger Endpoint URL](images/documentation/pipeline_diagram.png)
+![Trigger Endpoint URL](../images/documentation/pipeline_diagram.png)
 
 This diagram is the overview of the Pipeline Orchestration. This follows the Data Proccessing stages that we mentioned on the Project description.
 
@@ -101,7 +101,7 @@ The following is the Pipelines being run by this pipeline Orchestration
 
 #### Populate Infra Tripdata Pipelines
 
-![Populate Infra Tripdata Pipelines](images/documentation/spark_populate_tripdata_local_infastructure_pipeline_chart.JPG)
+![Populate Infra Tripdata Pipelines](../images/documentation/spark_populate_tripdata_local_infastructure_pipeline_chart.JPG)
 
 The `Populate Infra Tripdata Pipelines` workflow is a series of pipelines that automate the processing of NYC trip data from downloading to production. Each pipeline performs specific tasks to ensure data is correctly processed, cleaned, and loaded into PostgreSQL and the Lakehouse storage.
 
@@ -129,7 +129,7 @@ This pipeline loads the cleaned trip data into the **staging** PostgreSQL table 
   - If overwrite is disabled. It will create a temporary table first, and then the temporary table will be populated by parallel PSQL copy command. Finally, we will insert the data using Upsert strategy.
 
 Overwrite Workflow: 
-![Spark Load Workflow](images/documentation/psql_load_workflow.gif)
+![Spark Load Workflow](../images/documentation/psql_load_workflow.gif)
 
 
 ##### 3. **`spark_psql_stage_to_local_lakehouse_dir` Pipeline**
