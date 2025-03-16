@@ -47,7 +47,7 @@ The data processing in this project follows a **vertical pipeline** architecture
    - The final stage where data is fully prepared for **feature extraction**, **reporting**, and **analysis**.
    - The data at this point is ready for consumption in analytical and reporting workflows.
 
-The project leverages both **Data Lakehouse** and **Data Warehouse** concepts for effective data management:
+The project leverages both **Data Lake** and **Data Warehouse** concepts for effective data management:
 - **Data Lake**: This is where raw and intermediate data is stored. The local storage is organized under the `spark-lakehouse` directory, where temporary files, downloads, and processed trip data are housed.
 - **Data Warehouse**: The processed data moves through a series of PostgreSQL databases: **dev**, **stage**, and **production**, ensuring a smooth transition across the lifecycle and enhancing governance and data management.
 
