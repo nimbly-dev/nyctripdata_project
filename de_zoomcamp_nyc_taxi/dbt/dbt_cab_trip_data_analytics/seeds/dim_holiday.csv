@@ -1,0 +1,13 @@
+"holiday_id","holiday_name","month","day_or_rule","holiday_type","nyc_observance"
+1,"New Year's Day",1,"1","Federal",True
+2,"Lincoln's Birthday",2,"12","State (NYC)",True
+3,"Independence Day",7,"4","Federal",True
+4,"Veterans Day",11,"11","Federal",True
+5,"Christmas Day",12,"25","Federal",True
+6,"Martin Luther King Jr. Day",1,"third_monday","Federal",True
+7,"Presidents' Day",2,"third_monday","Federal",True
+8,"Memorial Day",5,"last_monday","Federal",True
+9,"Juneteenth National Independence Day",6,"19","Federal",True
+10,"Labor Day",9,"first_monday","Federal",True
+11,"Columbus Day",10,"second_monday","Federal",True
+12,"Thanksgiving Day",11,"fourth_thursday","Federal",True

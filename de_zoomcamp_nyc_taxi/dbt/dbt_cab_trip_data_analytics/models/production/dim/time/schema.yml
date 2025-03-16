@@ -1,0 +1,110 @@
+version: 2
+
+models:
+  - name: dim_cab_time_all_cabs
+    description: >
+      Aggregates trip counts by year, month, and cab type.
+      This model provides an overview of the total trips for all cab types.
+    columns:
+      - name: year
+        description: "Year extracted from the pickup_datetime."
+        tests:
+          - not_null
+      - name: month
+        description: "Month extracted from the pickup_datetime."
+        tests:
+          - not_null
+      - name: cab_type
+        description: "Cab type (e.g., 'yellow' or 'green')."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['yellow', 'green', 'fhv']
+      - name: total_trips
+        description: "Total number of trips aggregated for the given year, month, and cab type."
+        tests:
+          - not_null
+
+  - name: dim_cab_time_summary
+    description: >
+      Provides detailed time attributes from the fact table.
+      Extracts year, month, day, day-of-week, day name, quarter, and flags for weekend and holidays.
+    columns:
+      - name: pickup_datetime
+        description: "The original pickup datetime from the fact_tripdata table."
+        tests:
+          - not_null
+      - name: year
+        description: "Year extracted from the pickup_datetime."
+        tests:
+          - not_null
+      - name: month
+        description: "Month extracted from the pickup_datetime."
+        tests:
+          - not_null
+      - name: day
+        description: "Day extracted from the pickup_datetime."
+        tests:
+          - not_null
+      - name: day_of_week
+        description: "Numeric day of the week (e.g., 1=Monday, 7=Sunday)."
+        tests:
+          - not_null
+      - name: day_name
+        description: "Full weekday name (e.g., 'Monday')."
+        tests:
+          - not_null
+      - name: quarter
+        description: "Quarter extracted from the pickup_datetime."
+        tests:
+          - not_null
+      - name: is_weekend
+        description: "Boolean flag indicating if the day is a weekend."
+        tests:
+          - not_null
+      - name: holiday_flag
+        description: "Boolean flag indicating if the day is a holiday based on holiday tables and rules."
+        tests:
+          - not_null
+
+  - name: dim_time
+    description: >
+      Similar to dim_cab_time_summary, this model derives time attributes from pickup_datetime.
+      It may serve as a generic time dimension with similar logic to calculate holiday flags.
+    columns:
+      - name: pickup_datetime
+        description: "The original pickup datetime from the fact_tripdata table."
+        tests:
+          - not_null
+      - name: year
+        description: "Year extracted from the pickup_datetime."
+        tests:
+          - not_null
+      - name: month
+        description: "Month extracted from the pickup_datetime."
+        tests:
+          - not_null
+      - name: day
+        description: "Day extracted from the pickup_datetime."
+        tests:
+          - not_null
+      - name: day_of_week
+        description: "Numeric day of the week (e.g., 1=Monday, 7=Sunday)."
+        tests:
+          - not_null
+      - name: day_name
+        description: "Full weekday name (e.g., 'Monday')."
+        tests:
+          - not_null
+      - name: quarter
+        description: "Quarter extracted from the pickup_datetime."
+        tests:
+          - not_null
+      - name: is_weekend
+        description: "Boolean flag indicating if the day is a weekend."
+        tests:
+          - not_null
+      - name: holiday_flag
+        description: "Boolean flag indicating if the day is a holiday based on holiday tables and rules."
+        tests:
+          - not_null

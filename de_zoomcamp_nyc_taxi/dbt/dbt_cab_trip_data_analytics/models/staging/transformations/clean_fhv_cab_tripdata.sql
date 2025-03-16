@@ -20,7 +20,7 @@ converted AS (
         COALESCE(do_location_id, 0) AS do_location_id,
         pickup_datetime,
         dropoff_datetime,
-        COALESCE(payment_type, 0) AS payment_type,
+        COALESCE(NULLIF(payment_type, ''), 5) AS payment_type,
         COALESCE(dispatching_base_num, 'UNKNOWN') AS dispatching_base_num,
         COALESCE(affiliated_base_number, 'UNKNOWN') AS affiliated_base_number
     FROM filtered

@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: dim_payment_type_summary
+    description: "Summarizes trip metrics (counts, fare totals, distances) by payment type."
+    columns:
+      - name: payment_type_description
+        description: "Description of the payment method (e.g. 'Credit Card', 'Cash', 'No Charge')."
+        tests:
+          - not_null
+
+      - name: total_trips
+        description: "Total number of trips for this payment type."
+        tests:
+          - not_null
+
+      - name: total_fare
+        description: "Sum of all fare amounts for trips of this payment type."
+        tests:
+          - not_null
+
+      - name: avg_fare
+        description: "Average fare amount for this payment type."
+        tests:
+          - not_null
+
+      - name: avg_distance
+        description: "Average trip distance for trips of this payment type."
+        tests:
+          - not_null
+
+      - name: avg_total_amount
+        description: "Average total amount (including taxes, surcharges, tolls, etc.) for this payment type."
+        tests:
+          - not_null
+
+      - name: yellow_cab_trips
+        description: "Number of Yellow Cab trips for this payment type."
+        tests:
+          - not_null
+
+      - name: green_cab_trips
+        description: "Number of Green Cab trips for this payment type."
+        tests:
+          - not_null

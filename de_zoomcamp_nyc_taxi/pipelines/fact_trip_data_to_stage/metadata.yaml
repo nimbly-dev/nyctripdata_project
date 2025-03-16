@@ -16,7 +16,7 @@ blocks:
   language: sql
   name: dbt/dbt_cab_trip_data_analytics/models/staging/stg_yellow_cab_tripdata
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: dbt
   upstream_blocks: []
@@ -82,7 +82,7 @@ blocks:
   language: sql
   name: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_fhv_cab_tripdata
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: dbt
   upstream_blocks:
@@ -105,7 +105,7 @@ blocks:
   language: sql
   name: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_yellow_cab_tripdata
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: dbt
   upstream_blocks:
@@ -128,13 +128,13 @@ blocks:
   language: sql
   name: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_green_cab_tripdata
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: dbt
   upstream_blocks:
   - dbt/dbt_cab_trip_data_analytics/models/staging/stg_green_cab_tripdata
   uuid: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_green_cab_tripdata
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration:
     dbt_project_name: dbt/dbt_cab_trip_data_analytics
@@ -151,7 +151,7 @@ blocks:
   language: sql
   name: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: dbt
   upstream_blocks:
@@ -159,7 +159,7 @@ blocks:
   - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_yellow_cab_tripdata
   - dbt/dbt_cab_trip_data_analytics/models/staging/transformations/clean_green_cab_tripdata
   uuid: dbt/dbt_cab_trip_data_analytics/models/staging/transformations/combine_clean_cab_tripdata
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration:
     dbt_project_name: dbt/dbt_cab_trip_data_analytics
@@ -209,6 +209,6 @@ uuid: fact_trip_data_to_stage
 variables:
   environment: production
   get_data_from: '[''green'']'
-  year_month: '2022_01'
+  year_month: '2021_12'
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

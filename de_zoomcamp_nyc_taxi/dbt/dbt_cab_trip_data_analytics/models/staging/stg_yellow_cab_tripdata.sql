@@ -22,7 +22,6 @@
     config(
         materialized='incremental',
         unique_key='dwid',
-        on_schema_change='sync_all_columns',
         pre_hook=[
             delete_existing,
             create_partition('staging', 'stg_yellow_cab_tripdata', year_month),

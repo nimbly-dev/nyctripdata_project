@@ -31,8 +31,6 @@
     )
 }}
 
-
-
 WITH yellow AS (
     SELECT 
         dwid,
@@ -40,13 +38,13 @@ WITH yellow AS (
         fare_amount::REAL,
         total_amount::REAL,
         trip_distance::REAL,
-        COALESCE(vendor_id, 0) AS vendor_id,
-        COALESCE(ratecode_id, 0) AS ratecode_id,
+        vendor_id,          -- Already cleaned in ephemeral 'yellow'
+        ratecode_id,        -- Already cleaned
         COALESCE(pu_location_id, 0) AS pu_location_id,
         COALESCE(do_location_id, 0) AS do_location_id,
         pickup_datetime,
         dropoff_datetime,
-        COALESCE(payment_type, 0) AS payment_type,
+        COALESCE(payment_type, 5) AS payment_type,
         dispatching_base_num,
         affiliated_base_number
     FROM {{ ref('stg_yellow_cab_tripdata') }}
@@ -60,13 +58,13 @@ green AS (
         fare_amount::REAL,
         total_amount::REAL,
         trip_distance::REAL,
-        COALESCE(vendor_id, 0) AS vendor_id,
-        COALESCE(ratecode_id, 0) AS ratecode_id,
+        vendor_id,          -- Already cleaned in ephemeral 'green'
+        ratecode_id,
         COALESCE(pu_location_id, 0) AS pu_location_id,
         COALESCE(do_location_id, 0) AS do_location_id,
         pickup_datetime,
         dropoff_datetime,
-        COALESCE(payment_type, 0) AS payment_type,
+        COALESCE(payment_type, 5) AS payment_type,
         dispatching_base_num,
         affiliated_base_number
     FROM {{ ref('stg_green_cab_tripdata') }}
@@ -86,7 +84,10 @@ fhv AS (
         COALESCE(do_location_id, 0) AS do_location_id,
         pickup_datetime,
         dropoff_datetime,
-        COALESCE(payment_type, 0) AS payment_type,
+        CASE 
+          WHEN payment_type IS NULL OR TRIM(CAST(payment_type AS TEXT)) = '' THEN 5 
+          ELSE payment_type::int 
+        END AS payment_type,
         COALESCE(dispatching_base_num, 'UNKNOWN') AS dispatching_base_num,
         COALESCE(affiliated_base_number, 'UNKNOWN') AS affiliated_base_number
     FROM {{ ref('stg_fhv_cab_tripdata') }}

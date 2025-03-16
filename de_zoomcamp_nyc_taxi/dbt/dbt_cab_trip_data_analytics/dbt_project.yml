@@ -19,10 +19,49 @@ vars:
 dispatch:
   - macro_namespace: dbt
     search_order: ['dbt_cab_trip_data_analytics', 'dbt']
+    
+seeds:
+  dbt_cab_trip_data_analytics:
+    +schema: production_dim
+    dim_zone_mapping:
+      +enabled: true
 
-# models:
-#   dbt_cab_trip_data_analytics:
-#     staging:
-#       +schema: "{{ target.schema }}"
-#     fact:
-#       +schema: "{{ target.schema }}_fact"
+models:
+  dbt_cab_trip_data_analytics:
+    production:
+      dim:
+        +schema: production_dim
+        +materialized: incremental
+        zone:
+          dim_cab_dropoff_location_summary:
+            +enabled: true
+          dim_cab_pickup_location_summary:
+            +enabled: true
+          dim_pickup_dropoff_heatmap:
+            +enabled: true
+          dim_zone_mapping:
+            +enabled: true
+        rate_code:
+          dim_rate_code:
+            +enabled: true
+          dim_rate_code_summary:
+            +enabled: true
+        vendor:
+          dim_vendor:
+            +enabled: true
+          dim_vendor_type_summary:
+            +enabled: true
+        payment_type:
+          dim_payment_type:
+            +enabled: true
+          dim_cab_payment_type_summary:
+            +enabled: true
+        time:
+          dim_holiday:
+            +enabled: true
+          dim_cab_time:
+            +enabled: true
+          dim_cab_time_summary:
+            +enabled: true
+          dim_cab_time_all_cabs:
+            +enabled: true
