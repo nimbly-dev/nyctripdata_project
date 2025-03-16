@@ -41,12 +41,12 @@ You can monitor the progress of your pipeline directly in the Mage app. Navigate
 
 If the pipeline fails, you can investigate the issue by selecting the pipeline detail and reviewing the logs. You can also re-run the pipeline if necessary.
 
-![Pipeline Run List](images/documentation/pipeline_run_list.JPG)
+![Pipeline Run List](../images/documentation/pipeline_run_list.JPG)
 
 Clicking on a specific pipeline will display the individual code blocks that are executed as part of the pipeline:
 
-![Pipeline Run Detail](images/documentation/pipeline_run_detail.JPG)
+![Pipeline Run Detail](../images/documentation/pipeline_run_detail.JPG)
 
 To view real-time logs or troubleshoot errors, click the logs icon, which provides a live tail of the pipeline’s execution:
 
-![Pipeline Run Log Tail](images/documentation/pipeline_log_tail.JPG)
+![Pipeline Run Log Tail](../images/documentation/pipeline_log_tail.JPG)
