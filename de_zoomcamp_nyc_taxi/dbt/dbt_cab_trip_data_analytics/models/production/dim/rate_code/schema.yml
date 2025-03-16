@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: dim_rate_code_summary
+    description: "Aggregated rate code dimension summarizing trip counts, average fares, and distances for each rate type."
+    columns:
+      - name: rate_code_description
+        description: "Description of the rate code category (e.g., 'Standard Rate', 'JFK', 'Negotiated Fare')."
+        tests:
+          - not_null
+
+      - name: total_trips
+        description: "Total number of trips associated with this rate code."
+        tests:
+          - not_null
+
+      - name: avg_fare
+        description: "Average fare amount for this rate code category."
+        tests:
+          - not_null
+
+      - name: avg_distance
+        description: "Average trip distance for trips in this rate category."
+        tests:
+          - not_null
+
+      - name: avg_total_amount
+        description: "Average total amount (including extra fees, taxes) for this rate category."
+        tests:
+          - not_null
+
+      - name: yellow_cab_trips
+        description: "Total number of trips under this rate code for Yellow Cabs."
+        tests:
+          - not_null
+
+      - name: green_cab_trips
+        description: "Total number of trips under this rate code for Green Cabs."
+        tests:
+          - not_null

@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: dim_cab_dropoff_location_summary
+    description: >
+      Summarizes drop-off location details from fact data by joining with the zone mapping.
+      Provides details on borough, zone, latitude, longitude, and geolocation along with trip metrics.
+    columns:
+      - name: do_location_id
+        description: "Drop-off location identifier from the fact_tripdata table."
+        tests:
+          - not_null
+          - unique
+      - name: borough_dropoff
+        description: "Borough name for drop-off as derived from the zone mapping."
+        tests:
+          - not_null
+      - name: zone_dropoff
+        description: "Zone name for drop-off."
+        tests:
+          - not_null
+      - name: latitude_dropoff
+        description: "Latitude coordinate for the drop-off location."
+      - name: longitude_dropoff
+        description: "Longitude coordinate for the drop-off location."
+      - name: geolocation_dropoff
+        description: "Combined geolocation information for the drop-off location."
+      - name: total_trips
+        description: "Total number of trips with this drop-off location."
+        tests:
+          - not_null
+      - name: avg_fare
+        description: "Average fare amount for trips ending at this drop-off location."
+        tests:
+          - not_null
+      - name: avg_distance
+        description: "Average trip distance for trips ending at this drop-off location."
+        tests:
+          - not_null
+
+  - name: dim_cab_pickup_location_summary
+    description: >
+      Summarizes pickup location details from fact data by joining with the zone mapping.
+      Provides details on borough, zone, latitude, longitude, and geolocation along with trip metrics.
+    columns:
+      - name: pu_location_id
+        description: "Pickup location identifier from the fact_tripdata table."
+        tests:
+          - not_null
+          - unique
+      - name: borough_pickup
+        description: "Borough name for pickup as derived from the zone mapping."
+        tests:
+          - not_null
+      - name: zone_pickup
+        description: "Zone name for pickup."
+        tests:
+          - not_null
+      - name: latitude_pickup
+        description: "Latitude coordinate for the pickup location."
+      - name: longitude_pickup
+        description: "Longitude coordinate for the pickup location."
+      - name: geolocation_pickup
+        description: "Combined geolocation information for the pickup location."
+      - name: total_trips
+        description: "Total number of trips with this pickup location."
+        tests:
+          - not_null
+      - name: avg_fare
+        description: "Average fare amount for trips starting at this pickup location."
+        tests:
+          - not_null
+      - name: avg_distance
+        description: "Average trip distance for trips starting at this pickup location."
+        tests:
+          - not_null
+
+  - name: dim_pickup_dropoff_heatmap
+    description: >
+      Provides a heatmap summary of trips aggregated by the borough of pickup and dropoff.
+      Useful for visualizing traffic flows between different boroughs.
+    columns:
+      - name: borough_pickup
+        description: "Borough for pickup location as derived from the zone mapping."
+        tests:
+          - not_null
+      - name: borough_dropoff
+        description: "Borough for dropoff location as derived from the zone mapping."
+        tests:
+          - not_null
+      - name: total_trips
+        description: "Total number of trips aggregated by pickup and dropoff borough."
+        tests:
+          - not_null

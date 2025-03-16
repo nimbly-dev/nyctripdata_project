@@ -11,7 +11,7 @@ blocks:
   language: python
   name: trigger_dim_pipelines
   retry_config: null
-  status: not_executed
+  status: executed
   timeout: null
   type: data_exporter
   upstream_blocks: []
@@ -49,5 +49,6 @@ variables:
   - vendor_type
   - zone
   - unknown
+  is_refresh_only: false
 variables_dir: /home/src/mage_data/de_zoomcamp_nyc_taxi
 widgets: []

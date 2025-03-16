@@ -28,6 +28,22 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EO
 EOSQL
 echo "'$FACT_SCHEMA' schema created successfully in $POSTGRES_DB."
 
+# Determine the schema for fact tables based on environment
+if [ "$ENVIRONMENT" = "stage" ]; then
+    DIM_SCHEMA="staging_dim"
+elif [ "$ENVIRONMENT" = "production" ]; then
+    DIM_SCHEMA="production_dim"
+else
+    echo "Error: Unknown ENVIRONMENT value. Must be 'stage' or 'production'."
+    exit 1
+fi
+
+echo "Creating '$DIM_SCHEMA' schema in $POSTGRES_DB..."
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname="$POSTGRES_DB" <<EOSQL
+    CREATE SCHEMA IF NOT EXISTS $DIM_SCHEMA;
+EOSQL
+echo "'$DIM_SCHEMA' schema created successfully in $POSTGRES_DB."
+
 
 # Create 'utility' schema for all environments
 echo "Creating 'utility' schema in $POSTGRES_DB..."

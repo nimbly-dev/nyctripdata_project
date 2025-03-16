@@ -183,8 +183,6 @@ magic-zoomcamp
 
 # Resources
 de_zoomcamp_nyc_taxi/resources/csv
-dim_*.csv
 .recovery_code
 .profiles_interpolated_temp
-*.csv
 temp_copy

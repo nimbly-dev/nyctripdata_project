@@ -25,7 +25,7 @@ def truncate_staging_tables(year_month):
             'truncate_partition',  # or 'drop_old_partition' if you prefer dropping
             '--args', f'{{ "schema_name": "staging", "base_table_name": "{table}", "year_month": "{year_month}" }}'
         ]
-        print(f'🧹 Cleaning table partition: {table} for {year_month} ...')
+        print(f'Cleaning table partition: {table} for {year_month} ...')
         subprocess.run(cmd, check=True)
 
 
@@ -62,12 +62,12 @@ def trigger(*args, **kwargs):
                     verbose=True,
                 )
             except Exception as e:
-                print(f"⚠️ Failed for {year_month}: {str(e)}")
+                print(f" Failed for {year_month}: {str(e)}")
 
             # 1) Clean the monthly partitions (truncate or drop)
             try:
                 truncate_staging_tables(year_month)
             except Exception as e:
-                print(f"⚠️ Failed to cleanup data for {year_month}: {str(e)}")
+                print(f" Failed to cleanup data for {year_month}: {str(e)}")
                 # Optionally continue or break here
 

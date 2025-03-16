@@ -22,7 +22,7 @@
 {% set csv_path = "/tmp/temp_copy/combined/" ~ year_month ~ "/combined_" ~ year_month ~ ".csv" %}
 {% set copy_command = "COPY " ~ target_schema ~ '.' ~ table_name ~ " FROM '" ~ csv_path ~ "' WITH CSV HEADER;" %}
 
-{# Reference the combined_clean_cab_tripdata table from staging #}
+{# Reference the combine_clean_cab_tripdata table from staging #}
 {% set combined_relation = target.schema ~ '."combine_clean_cab_tripdata"' %}
 
 {% if is_incremental() %}
@@ -72,7 +72,6 @@ payment_type INT, dispatching_base_num VARCHAR, affiliated_base_number VARCHAR
             "data_type": "date",
             "granularity": "month"
         },
-        on_schema_change="sync_all_columns",
         pre_hook=[
             create_partition(target_schema, table_name, year_month),
             truncate_partition(target_schema, table_name, year_month),

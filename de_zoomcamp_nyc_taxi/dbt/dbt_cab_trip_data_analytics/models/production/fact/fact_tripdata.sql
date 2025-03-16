@@ -14,7 +14,6 @@
             "data_type": "timestamp",   
             "granularity": "month"
         },
-        on_schema_change='sync_all_columns',
         pre_hook=[
             create_partition(target_schema, table_name, year_month),
             truncate_partition(target_schema, table_name, year_month)

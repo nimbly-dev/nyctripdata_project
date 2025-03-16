@@ -1,0 +1,52 @@
+version: 2
+
+models:
+  - name: dim_vendor_type
+    description: "Aggregated vendor dimension summarizing trip counts, fare amounts, and distance metrics by cab type."
+    columns:
+      - name: vendor_name
+        description: "The name of the vendor (e.g., 'Creative Mobile Technologies', 'VeriFone')."
+        tests:
+          - not_null
+
+      - name: cab_type
+        description: "Type of cab (e.g., 'yellow', 'green')."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['yellow', 'green']
+
+      - name: total_trips
+        description: "Total number of trips for this vendor and cab type."
+        tests:
+          - not_null
+
+      - name: total_fare
+        description: "Sum of the fare amounts for all trips in this vendor/cab combination."
+        tests:
+          - not_null
+
+      - name: avg_fare
+        description: "Average fare amount for trips in this vendor/cab combination."
+        tests:
+          - not_null
+
+      - name: avg_distance
+        description: "Average trip distance (in miles) for trips in this vendor/cab combination."
+        tests:
+          - not_null
+
+      - name: avg_total_amount
+        description: "Average total amount (including fare, tolls, tips, taxes, etc.) for this vendor/cab combination."
+        tests:
+          - not_null
+
+      - name: yellow_cab_trips
+        description: "Number of yellow cab trips for this vendor."
+        tests:
+          - not_null
+
+      - name: green_cab_trips
+        description: "Number of green cab trips for this vendor."
+        tests:
+          - not_null

@@ -2,69 +2,47 @@ blocks:
 - all_upstream_blocks_executed: true
   color: null
   configuration:
-    data_provider: postgres
-    data_provider_profile: production_db
     dbt: {}
+    dbt_profile_target: production
+    dbt_project_name: dbt/dbt_cab_trip_data_analytics
     disable_query_preprocessing: false
     export_write_policy: append
+    file_path: dbt/dbt_cab_trip_data_analytics/models/production/dim/rate_code/dim_rate_code_summary.sql
+    file_source:
+      path: dbt/dbt_cab_trip_data_analytics/models/production/dim/rate_code/dim_rate_code_summary.sql
+      project_path: dbt/dbt_cab_trip_data_analytics
     limit: 1000
-    use_raw_sql: true
+    use_raw_sql: false
   downstream_blocks:
-  - create_or_refresh_dim_rate_code_summary_mv
+  - export_dim_rate_code_summary
   executor_config: null
   executor_type: local_python
   has_callback: false
   language: sql
-  name: create_dim_rate_code_table_if_not_exists
+  name: dbt/dbt_cab_trip_data_analytics/models/production/dim/rate_code/dim_rate_code_summary
   retry_config: null
   status: executed
   timeout: null
-  type: data_loader
+  type: dbt
   upstream_blocks: []
-  uuid: create_dim_rate_code_table_if_not_exists
-- all_upstream_blocks_executed: true
-  color: null
+  uuid: dbt/dbt_cab_trip_data_analytics/models/production/dim/rate_code/dim_rate_code_summary
+- all_upstream_blocks_executed: false
+  color: yellow
   configuration:
-    data_provider: postgres
-    data_provider_profile: production_db
-    dbt: {}
-    disable_query_preprocessing: true
-    export_write_policy: append
-    limit: 1000
-    use_raw_sql: true
-  downstream_blocks:
-  - export_dim_cab_rate_code_summary_to_csv_file
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: sql
-  name: create_or_refresh_dim_rate_code_summary_mv
-  retry_config: null
-  status: executed
-  timeout: null
-  type: transformer
-  upstream_blocks:
-  - create_dim_rate_code_table_if_not_exists
-  uuid: create_or_refresh_dim_rate_code_summary_mv
-- all_upstream_blocks_executed: true
-  color: null
-  configuration:
-    data_provider: postgres
-    data_provider_profile: production_db
     export_write_policy: append
   downstream_blocks: []
   executor_config: null
   executor_type: local_python
   has_callback: false
   language: python
-  name: export_dim_cab_rate_code_summary_to_csv_file
+  name: export_dim_rate_code_summary
   retry_config: null
   status: executed
   timeout: null
-  type: data_exporter
+  type: custom
   upstream_blocks:
-  - create_or_refresh_dim_rate_code_summary_mv
-  uuid: export_dim_cab_rate_code_summary_to_csv_file
+  - dbt/dbt_cab_trip_data_analytics/models/production/dim/rate_code/dim_rate_code_summary
+  uuid: export_dim_rate_code_summary
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}

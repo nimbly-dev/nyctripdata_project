@@ -1,0 +1,24 @@
+dbt_cab_trip_data_analytics:
+  outputs:
+    production:
+      dbname: nyc_taxi_production_postgres
+      host: postgres-production
+      keepalives_idle: 0
+      password: postgres
+      port: 5434
+      schema: production
+      threads: 8
+      type: postgres
+      user: postgres
+    stage:
+      dataset: staging
+      dbname: nyc_taxi_staging_postgres
+      host: postgres-staging
+      keepalives_idle: 0
+      password: postgres
+      port: 5433
+      schema: staging
+      threads: 4
+      type: postgres
+      user: postgres
+  target: stage

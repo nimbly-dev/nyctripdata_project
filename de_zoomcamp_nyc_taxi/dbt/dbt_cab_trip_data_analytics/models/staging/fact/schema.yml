@@ -10,129 +10,95 @@ models:
         tests:
           - unique
           - not_null
+
       - name: cab_type
         description: "Cab type: Yellow, Green, or FHV."
         data_type: text
         tests:
           - not_null:
               where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
       - name: fare_amount
         description: "Total fare amount of the trip. Expected for yellow/green."
         data_type: real
         tests:
           - not_null:
-              where: "cab_type in ('yellow', 'green') and DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+              where: "cab_type in ('yellow', 'green') AND DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
       - name: total_amount
         description: "Total amount charged including fees and surcharges. Expected for yellow/green."
         data_type: real
         tests:
           - not_null:
-              where: "cab_type in ('yellow', 'green') and DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+              where: "cab_type in ('yellow', 'green') AND DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
       - name: trip_distance
         description: "Distance traveled during the trip in miles. Expected for yellow/green."
         data_type: real
         tests:
           - not_null:
-              where: "cab_type in ('yellow', 'green') and DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+              where: "cab_type in ('yellow', 'green') AND DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
       - name: pickup_datetime
         description: "Timestamp when the trip started."
         data_type: timestamp
         tests:
           - not_null:
               where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
       - name: dropoff_datetime
         description: "Timestamp when the trip ended."
         data_type: timestamp
         tests:
           - not_null:
               where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
       - name: ratecode_id
         description: "Rate code indicating the type of fare. Expected for yellow/green."
         data_type: int
         tests:
           - not_null:
-              where: "cab_type in ('yellow', 'green') and DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
-          - relationships:
-              to: ref('dim_ratecode')
-              field: ratecode_id
-              where: "cab_type in ('yellow', 'green') and DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+              where: "cab_type in ('yellow', 'green') AND DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+              
       - name: vendor_id
         description: "Vendor ID for the trip. Expected for yellow/green."
         data_type: int
         tests:
           - not_null:
-              where: "cab_type in ('yellow', 'green') and DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
-          - relationships:
-              to: ref('dim_vendor')
-              field: vendor_id
-              where: "cab_type in ('yellow', 'green') and DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+              where: "cab_type in ('yellow', 'green') AND DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
       - name: pu_location_id
         description: "Pickup location ID."
         data_type: int
         tests:
           - not_null:
               where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
-          - relationships:
-              to: ref('dim_location')
-              field: location_id
-              where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
       - name: do_location_id
         description: "Dropoff location ID."
         data_type: int
         tests:
           - not_null:
               where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
-          - relationships:
-              to: ref('dim_location')
-              field: location_id
-              where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
       - name: payment_type
         description: "Payment method used for the trip."
         data_type: int
         tests:
           - not_null:
               where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
-          - relationships:
-              to: ref('dim_payment_type')
-              field: payment_type_id
-              where: "DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
+              
       - name: dispatching_base_num
         description: "Base number for FHV dispatch. Expected for FHV only."
         data_type: text
         tests:
           - not_null:
-              where: "cab_type = 'fhv' and DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+              where: "cab_type = 'fhv' AND DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
+
       - name: affiliated_base_number
         description: "Affiliated base number for FHV dispatch. Expected for FHV only."
         data_type: text
         tests:
           - not_null:
-              where: "cab_type = 'fhv' and DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"
-    # constraints:
-    #   - type: primary_key
-    #     columns: [dwid, pickup_datetime, dropoff_datetime]
-    #   - type: foreign_key
-    #     columns: [ratecode_id]
-    #     reference:
-    #       table: dim_ratecode
-    #       column: ratecode_id
-    #   - type: foreign_key
-    #     columns: [vendor_id]
-    #     reference:
-    #       table: dim_vendor
-    #       column: vendor_id
-    #   - type: foreign_key
-    #     columns: [pu_location_id]
-    #     reference:
-    #       table: dim_location
-    #       column: location_id
-    #   - type: foreign_key
-    #     columns: [do_location_id]
-    #     reference:
-    #       table: dim_location
-    #       column: location_id
-    #   - type: foreign_key
-    #     columns: [payment_type]
-    #     reference:
-    #       table: dim_payment_type
-    #       column: payment_type_id
+              where: "cab_type = 'fhv' AND DATE_TRUNC('month', pickup_datetime) = TO_DATE('{{ var('year_month', '2021_12') }}-01', 'YYYY-MM-DD')"

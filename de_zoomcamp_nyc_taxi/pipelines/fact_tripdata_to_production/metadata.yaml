@@ -42,7 +42,7 @@ blocks:
   language: sql
   name: dbt/dbt_cab_trip_data_analytics/models/production/fact/fact_tripdata
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: dbt
   upstream_blocks:
