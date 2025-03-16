@@ -68,6 +68,8 @@ To learn more about the usage of the **ETL Spark pipeline**, check out the [Spar
 
 For an overview of the **General Tripdata** and its tables, refer to the [Tripdata Tables documentation](documentation/documentation_tripdata_tables.md).
 
+For an overview of the **Fact/Dimenstion** tables, refer to the [Dbt Fact and Tripdata documentation](documentation/documentation_dbt_fact_dim.md).
+
 ## ❓ FAQ
 
 ### 1. What is the purpose/goal of this project?
