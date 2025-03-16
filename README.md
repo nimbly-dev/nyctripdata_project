@@ -91,15 +91,3 @@ This dataset was introduced to me through the [DataTalksClub Data Engineering Zo
 The dataset is large, with the `yellow_tripdata` as one year having 32 million records, making it ideal for leveraging Spark to distribute workloads effectively. This presented a valuable challenge, as an inefficient ETL process could easily overwhelm the system, requiring careful optimization.
 
 While the dataset focuses on NYC taxi trips—less relevant outside the transportation industry—it offers meaningful insights for anyone researching or analyzing taxi patterns in New York City.
-
-### 3. I have this 'X' issue?
-
-Known issues are documented in the Issues tab, and some include workarounds that can be used until they are resolved. After STABLE_RELEASE_1, I may not actively track or maintain issues unless they are critical.
-
-Moving forward, my focus will shift to the next phase of the project, which is a potential cloud migration.
-
-### 4. Can you migrate this to the cloud? 
-
-I plan to start with a Proof of Concept (PoC) that outlines the necessary services for migration, replacements (e.g., Self-Hosted Apache Spark with AWS EMR), and the overall architecture.
-
-The PoC will utilize Free Tier AWS Services wherever possible and will be documented in this repository, likely as a README.md file with an accompanying architecture diagram. The actual cloud migration project will be hosted in a separate repository and will primarily include Terraform code, detailed steps, and supporting documentation.
