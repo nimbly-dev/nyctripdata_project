@@ -5,6 +5,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10.14-blue)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-blue)
 ![Docker](https://img.shields.io/badge/Docker-Available-blue)
+![dbt](https://img.shields.io/badge/Dbt-orange)
 ![Mage](https://img.shields.io/badge/Mage-Orchestration-orange)
 ![GitHub Workflow CI](https://img.shields.io/badge/GitHub%20Workflow-CI-blue)
 [![Sample Dashboard](https://img.shields.io/badge/Sample-Dashboard-vlue)](https://lookerstudio.google.com/u/0/reporting/2b0189c7-098b-4a3d-b463-daa1abcf5b40/page/CWDFE)
@@ -19,9 +20,16 @@
 
 ## 🚀 About
 
-The NYC Tripdata Project automates the process of gathering data from the NYC TLC API. The collected data is cleaned, transformed, and prepared through pipelines, producing datasets that are ready for analytics and reporting. 
+The **NYC Tripdata Project** automates the process of collecting data from the NYC TLC API. The collected data is then cleaned, transformed, and prepared through pipelines, resulting in datasets that are ready for analysis and reporting.
 
-Additionally, the project includes on-demand CI workflows to test and verify pipeline stability whenever there are code changes, ensuring reliable and efficient data processing.
+This project is divided into two main workflows:
+
+1. **ETL Pipeline**: This workflow is responsible for extracting raw data, transforming it, and preparing it for the analytical workflow. It leverages **Apache Spark** to efficiently process and transform millions of lines of data.
+
+2. **Analytical Workflow**: Using the data prepared by the Spark workflow, this workflow utilizes **dbt-core** to create fact and dimension tables for reporting and analytics.
+
+For more detailed information, refer to the [wiki](documentation/two-workflows.md).
+
 
 ## 🗂️ Project Infrastructure
 ![Environment Diagram](images/environment_diagram.png)
@@ -40,7 +48,7 @@ The data processing in this project follows a **vertical pipeline** architecture
    - The data at this point is ready for consumption in analytical and reporting workflows.
 
 The project leverages both **Data Lakehouse** and **Data Warehouse** concepts for effective data management:
-- **Data Lakehouse**: This is where raw and intermediate data is stored. The local storage is organized under the `spark-lakehouse` directory, where temporary files, downloads, and processed trip data are housed.
+- **Data Lake**: This is where raw and intermediate data is stored. The local storage is organized under the `spark-lakehouse` directory, where temporary files, downloads, and processed trip data are housed.
 - **Data Warehouse**: The processed data moves through a series of PostgreSQL databases: **dev**, **stage**, and **production**, ensuring a smooth transition across the lifecycle and enhancing governance and data management.
 
 ## 📊 Dataset
